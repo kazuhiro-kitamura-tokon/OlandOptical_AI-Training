@@ -534,7 +534,7 @@
 const ACCOUNTS = {
   misawa:   { hash: null, name: '三澤', role: 'member', initial: '三' },
   kuboki:   { hash: null, name: '久保木', role: 'member', initial: '久' },
-  kojima:   { hash: null, name: '小島', role: 'member', initial: '小' },
+  ojima:   { hash: null, name: '小島', role: 'member', initial: '小' },
   osada:    { hash: null, name: '長田', role: 'member', initial: '長' },
   owner:    { hash: null, name: 'オーナー', role: 'owner', initial: 'O' },
 };
@@ -548,7 +548,7 @@ const ACCOUNTS = {
 const TEMP_PASSWORDS = {
   misawa:  'misawa2026',
   kuboki:  'kuboki2026',
-  kojima:  'kojima2026',
+  ojima:  'ojima2026',
   osada:   'osada2026',
   owner:   'oland-owner2026',
 };
@@ -578,10 +578,10 @@ const SESSIONS = {
     { day: 2, label: 'DAY 2', title: 'AIの力を引き出す実践テクニック', desc: 'プロンプトエンジニアリング深掘り・業務タスク棚卸し', file: 'sessions/session02-kuboki.html', accent: 'day2' },
     { day: 3, label: 'DAY 3', title: 'AIで「自分の武器」をつくる', desc: 'Claude Code デモ・Canvas バイブコーディング', file: 'sessions/session03-kuboki.html', accent: 'day3' },
   ],
-  kojima: [
+  ojima: [
     { day: 1, label: 'DAY 1', title: 'AIを実務で使うための土台づくり', desc: 'AI概論・プロンプト設計の基礎・ツール比較', file: 'sessions/session01.html', accent: 'day1' },
-    { day: 2, label: 'DAY 2', title: 'AIの力を引き出す実践テクニック', desc: 'プロンプトエンジニアリング深掘り・業務タスク棚卸し', file: 'sessions/session02-kojima.html', accent: 'day2' },
-    { day: 3, label: 'DAY 3', title: 'AIで「自分の武器」をつくる', desc: 'Claude Code デモ・Canvas バイブコーディング', file: 'sessions/session03-kojima.html', accent: 'day3' },
+    { day: 2, label: 'DAY 2', title: 'AIの力を引き出す実践テクニック', desc: 'プロンプトエンジニアリング深掘り・業務タスク棚卸し', file: 'sessions/session02-ojima.html', accent: 'day2' },
+    { day: 3, label: 'DAY 3', title: 'AIで「自分の武器」をつくる', desc: 'Claude Code デモ・Canvas バイブコーディング', file: 'sessions/session03-ojima.html', accent: 'day3' },
   ],
   osada: [
     { day: 1, label: 'DAY 1', title: 'AIを実務で使うための土台づくり', desc: 'AI概論・プロンプト設計の基礎・ツール比較', file: 'sessions/session01.html', accent: 'day1' },
@@ -659,8 +659,8 @@ function showDashboard() {
 }
 
 function renderOwnerTabs() {
-  const members = ['misawa', 'kuboki', 'kojima', 'osada'];
-  const names   = { misawa: '三澤', kuboki: '久保木', kojima: '小島', osada: '長田' };
+  const members = ['misawa', 'kuboki', 'ojima', 'osada'];
+  const names   = { misawa: '三澤', kuboki: '久保木', ojima: '小島', osada: '長田' };
 
   let tabHtml = '<div class="tab-nav">';
   members.forEach((m, i) => {
