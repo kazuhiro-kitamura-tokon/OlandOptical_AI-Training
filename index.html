@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI研修テキスト｜オーランドオプティカル</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-50: #e8f0fe;
+    --blue-100: #d2e3fc;
+    --blue-200: #aecbfa;
+    --blue-500: #4285f4;
+    --blue-600: #1a73e8;
+    --blue-700: #1967d2;
+    --teal-50: #e6f7f5;
+    --teal-500: #26a69a;
+    --teal-600: #00897b;
+    --green-50: #e6f4ea;
+    --green-600: #1e8e3e;
+    --purple-50: #f3e8fd;
+    --purple-500: #7c3aed;
+    --purple-600: #9334e6;
+    --orange-50: #fff3e0;
+    --orange-600: #fb8c00;
+    --gray-50: #f8f9fa;
+    --gray-100: #f1f3f4;
+    --gray-200: #e8eaed;
+    --gray-300: #dadce0;
+    --gray-400: #bdc1c6;
+    --gray-500: #9aa0a6;
+    --gray-600: #80868b;
+    --gray-700: #5f6368;
+    --gray-800: #3c4043;
+    --gray-900: #202124;
+    --shadow-sm: 0 1px 2px rgba(60,64,67,0.1), 0 1px 3px rgba(60,64,67,0.08);
+    --shadow-md: 0 1px 3px rgba(60,64,67,0.12), 0 4px 8px rgba(60,64,67,0.08);
+    --shadow-lg: 0 2px 6px rgba(60,64,67,0.12), 0 8px 24px rgba(60,64,67,0.08);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+
+  body {
+    font-family: 'Noto Sans JP', 'IBM Plex Sans', sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    line-height: 1.8;
+    font-size: 16px;
+    min-height: 100vh;
+  }
+
+  /* ═══════ Login Screen ═══════ */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a73e8 0%, #4f46e5 40%, #7c3aed 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #login-screen::before {
+    content: '';
+    position: absolute;
+    top: -30%; right: -15%;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  #login-screen::after {
+    content: '';
+    position: absolute;
+    bottom: -40%; left: -10%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .login-card {
+    background: white;
+    border-radius: 20px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+    position: relative;
+    z-index: 1;
+    animation: fadeUp 0.6s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .login-logo {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .login-logo .icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--blue-600), var(--purple-500));
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .login-logo .icon svg {
+    width: 28px; height: 28px;
+    fill: white;
+  }
+
+  .login-logo h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gray-900);
+    letter-spacing: -0.02em;
+  }
+
+  .login-logo p {
+    font-size: 13px;
+    color: var(--gray-500);
+    margin-top: 4px;
+  }
+
+  .login-form {
+    margin-top: 32px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 6px;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--gray-900);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+
+  .form-group input:focus {
+    border-color: var(--blue-600);
+    box-shadow: 0 0 0 3px rgba(26,115,232,0.12);
+  }
+
+  .login-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--blue-600), var(--purple-500));
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin-top: 8px;
+  }
+
+  .login-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(26,115,232,0.3);
+  }
+
+  .login-btn:active {
+    transform: translateY(0);
+  }
+
+  .login-error {
+    background: #fce8e6;
+    color: #d93025;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-top: 16px;
+    display: none;
+    text-align: center;
+  }
+
+  /* ═══════ Dashboard ═══════ */
+  #dashboard {
+    display: none;
+    min-height: 100vh;
+  }
+
+  .dash-header {
+    background: white;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .dash-header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .dash-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .dash-header-left .mini-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--blue-600), var(--purple-500));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dash-header-left .mini-icon svg {
+    width: 18px; height: 18px;
+    fill: white;
+  }
+
+  .dash-header-left span {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-800);
+  }
+
+  .dash-header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .user-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: var(--gray-100);
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--gray-700);
+    font-weight: 500;
+  }
+
+  .user-badge .avatar {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--blue-600);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .logout-btn {
+    padding: 6px 14px;
+    background: none;
+    border: 1.5px solid var(--gray-300);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .logout-btn:hover {
+    border-color: var(--gray-400);
+    color: var(--gray-800);
+    background: var(--gray-100);
+  }
+
+  .dash-main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  .dash-welcome {
+    margin-bottom: 40px;
+  }
+
+  .dash-welcome h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--gray-900);
+    letter-spacing: -0.02em;
+  }
+
+  .dash-welcome p {
+    font-size: 15px;
+    color: var(--gray-600);
+    margin-top: 4px;
+  }
+
+  /* ─── Tab nav for owner ─── */
+  .tab-nav {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 32px;
+    background: var(--gray-100);
+    border-radius: 12px;
+    padding: 4px;
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab-btn:hover {
+    color: var(--gray-800);
+    background: rgba(255,255,255,0.5);
+  }
+
+  .tab-btn.active {
+    background: white;
+    color: var(--gray-900);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ─── Session cards ─── */
+  .session-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  .session-card {
+    background: white;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .session-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .card-accent {
+    height: 6px;
+  }
+
+  .card-accent.day1 { background: linear-gradient(90deg, var(--blue-600), var(--purple-500)); }
+  .card-accent.day2 { background: linear-gradient(90deg, var(--teal-600), var(--green-600)); }
+  .card-accent.day3 { background: linear-gradient(90deg, var(--orange-600), #e65100); }
+
+  .card-body {
+    padding: 24px;
+  }
+
+  .card-day {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .card-day.day1 { background: var(--blue-50); color: var(--blue-700); }
+  .card-day.day2 { background: var(--teal-50); color: var(--teal-600); }
+  .card-day.day3 { background: var(--orange-50); color: var(--orange-600); }
+
+  .card-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--gray-900);
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--gray-500);
+    line-height: 1.7;
+  }
+
+  .card-footer {
+    padding: 14px 24px;
+    border-top: 1px solid var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-footer .open-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--blue-600);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .card-footer .open-label svg {
+    width: 16px; height: 16px;
+    fill: var(--blue-600);
+  }
+
+  .card-footer .person-tag {
+    font-size: 12px;
+    color: var(--gray-400);
+    font-weight: 500;
+  }
+
+  /* ─── Footer ─── */
+  .dash-footer {
+    text-align: center;
+    padding: 32px 24px;
+    font-size: 12px;
+    color: var(--gray-400);
+  }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 600px) {
+    .login-card { padding: 36px 24px; margin: 16px; }
+    .session-grid { grid-template-columns: 1fr; }
+    .dash-welcome h2 { font-size: 22px; }
+    .tab-nav { gap: 2px; }
+    .tab-btn { padding: 8px 14px; font-size: 13px; }
+    .dash-header-left span { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════ LOGIN ═══════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="icon">
+        <svg viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+      </div>
+      <h1>AI研修テキスト</h1>
+      <p>オーランドオプティカル</p>
+    </div>
+
+    <div class="login-form">
+      <div class="form-group">
+        <label for="uid">ユーザーID</label>
+        <input type="text" id="uid" placeholder="IDを入力" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label for="pw">パスワード</label>
+        <input type="password" id="pw" placeholder="パスワードを入力">
+      </div>
+      <button class="login-btn" onclick="doLogin()">ログイン</button>
+      <div class="login-error" id="login-error">ユーザーIDまたはパスワードが正しくありません</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ DASHBOARD ═══════ -->
+<div id="dashboard">
+  <header class="dash-header">
+    <div class="dash-header-inner">
+      <div class="dash-header-left">
+        <div class="mini-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+        </div>
+        <span>AI研修テキスト</span>
+      </div>
+      <div class="dash-header-right">
+        <div class="user-badge" id="user-badge"></div>
+        <button class="logout-btn" onclick="doLogout()">ログアウト</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dash-main">
+    <div class="dash-welcome" id="dash-welcome"></div>
+    <div id="tab-nav-area"></div>
+    <div class="session-grid" id="session-grid"></div>
+  </main>
+
+  <footer class="dash-footer">
+    © 2026 Oland Optical ×  Elios AI研修
+  </footer>
+</div>
+
+<script>
+// ─── Account & Content Data ───
+// パスワードはSHA-256ハッシュで保存（カジュアル認証だがソースに平文を置かない）
+// ※ GitHub Pagesなのでソースは見えるが、ハッシュ化で一段階の防御
+
+const ACCOUNTS = {
+  misawa:   { hash: null, name: '三澤', role: 'member', initial: '三' },
+  kuboki:   { hash: null, name: '久保木', role: 'member', initial: '久' },
+  kojima:   { hash: null, name: '小島', role: 'member', initial: '小' },
+  osada:    { hash: null, name: '長田', role: 'member', initial: '長' },
+  owner:    { hash: null, name: 'オーナー', role: 'owner', initial: 'O' },
+};
+
+// ───────────────────────────────
+// ★ 初回セットアップ: 以下のパスワードを変更してから使う
+//   変更後に generateHashes() をブラウザコンソールで実行し、
+//   出力されたハッシュ値を ACCOUNTS の hash に貼り付ける。
+//   その後この TEMP_PASSWORDS ブロックを削除する。
+// ───────────────────────────────
+const TEMP_PASSWORDS = {
+  misawa:  'misawa2026',
+  kuboki:  'kuboki2026',
+  kojima:  'kojima2026',
+  osada:   'osada2026',
+  owner:   'oland-owner2026',
+};
+
+async function generateHashes() {
+  for (const [id, pw] of Object.entries(TEMP_PASSWORDS)) {
+    const h = await sha256(pw);
+    console.log(`${id}: '${h}'`);
+  }
+  console.log('↑ これらを ACCOUNTS[id].hash に貼り付けてください');
+}
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// セッション定義
+const SESSIONS = {
+  misawa: [
+    { day: 1, label: 'DAY 1', title: 'AIを実務で使うための土台づくり', desc: 'AI概論・プロンプト設計の基礎・ツール比較', file: 'sessions/session01.html', accent: 'day1' },
+    { day: 2, label: 'DAY 2', title: 'AIの力を引き出す実践テクニック', desc: 'プロンプトエンジニアリング深掘り・Gemini Gems', file: 'sessions/session02-misawa.html', accent: 'day2' },
+    { day: 3, label: 'DAY 3', title: 'AIで「自分の武器」をつくる', desc: 'Claude Code デモ・Canvas バイブコーディング', file: 'sessions/session03-misawa.html', accent: 'day3' },
+  ],
+  kuboki: [
+    { day: 1, label: 'DAY 1', title: 'AIを実務で使うための土台づくり', desc: 'AI概論・プロンプト設計の基礎・ツール比較', file: 'sessions/session01.html', accent: 'day1' },
+    { day: 2, label: 'DAY 2', title: 'AIの力を引き出す実践テクニック', desc: 'プロンプトエンジニアリング深掘り・業務タスク棚卸し', file: 'sessions/session02-kuboki.html', accent: 'day2' },
+    { day: 3, label: 'DAY 3', title: 'AIで「自分の武器」をつくる', desc: 'Claude Code デモ・Canvas バイブコーディング', file: 'sessions/session03-kuboki.html', accent: 'day3' },
+  ],
+  kojima: [
+    { day: 1, label: 'DAY 1', title: 'AIを実務で使うための土台づくり', desc: 'AI概論・プロンプト設計の基礎・ツール比較', file: 'sessions/session01.html', accent: 'day1' },
+    { day: 2, label: 'DAY 2', title: 'AIの力を引き出す実践テクニック', desc: 'プロンプトエンジニアリング深掘り・業務タスク棚卸し', file: 'sessions/session02-kojima.html', accent: 'day2' },
+    { day: 3, label: 'DAY 3', title: 'AIで「自分の武器」をつくる', desc: 'Claude Code デモ・Canvas バイブコーディング', file: 'sessions/session03-kojima.html', accent: 'day3' },
+  ],
+  osada: [
+    { day: 1, label: 'DAY 1', title: 'AIを実務で使うための土台づくり', desc: 'AI概論・プロンプト設計の基礎・ツール比較', file: 'sessions/session01.html', accent: 'day1' },
+    { day: 2, label: 'DAY 2', title: 'AIの力を引き出す実践テクニック', desc: 'プロンプトエンジニアリング深掘り・業務タスク棚卸し', file: 'sessions/session02-osada.html', accent: 'day2' },
+    { day: 3, label: 'DAY 3', title: 'AIで「自分の武器」をつくる', desc: 'Claude Code デモ・Canvas バイブコーディング', file: 'sessions/session03-osada.html', accent: 'day3' },
+  ],
+};
+
+// ─── Login Logic ───
+let currentUser = null;
+
+async function doLogin() {
+  const uid = document.getElementById('uid').value.trim().toLowerCase();
+  const pw  = document.getElementById('pw').value;
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+
+  const account = ACCOUNTS[uid];
+  if (!account) { errEl.style.display = 'block'; return; }
+
+  // ハッシュがまだ設定されてない場合は平文比較（初期セットアップ用）
+  if (account.hash) {
+    const inputHash = await sha256(pw);
+    if (inputHash !== account.hash) { errEl.style.display = 'block'; return; }
+  } else if (TEMP_PASSWORDS[uid]) {
+    if (pw !== TEMP_PASSWORDS[uid]) { errEl.style.display = 'block'; return; }
+  } else {
+    errEl.style.display = 'block'; return;
+  }
+
+  currentUser = { id: uid, ...account };
+  showDashboard();
+}
+
+// Enterキーでログイン
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none') {
+    doLogin();
+  }
+});
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('uid').value = '';
+  document.getElementById('pw').value = '';
+}
+
+// ─── Dashboard Rendering ───
+function showDashboard() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+
+  // User badge
+  const badge = document.getElementById('user-badge');
+  badge.innerHTML = `<div class="avatar">${currentUser.initial}</div>${currentUser.name}`;
+
+  // Welcome
+  const welcome = document.getElementById('dash-welcome');
+  if (currentUser.role === 'owner') {
+    welcome.innerHTML = `
+      <h2>受講者テキスト一覧</h2>
+      <p>各受講者のセッションテキストを確認できます</p>
+    `;
+    renderOwnerTabs();
+  } else {
+    welcome.innerHTML = `
+      <h2>${currentUser.name}さんの研修テキスト</h2>
+      <p>各セッションのテキストにアクセスできます</p>
+    `;
+    document.getElementById('tab-nav-area').innerHTML = '';
+    renderSessions(currentUser.id);
+  }
+}
+
+function renderOwnerTabs() {
+  const members = ['misawa', 'kuboki', 'kojima', 'osada'];
+  const names   = { misawa: '三澤', kuboki: '久保木', kojima: '小島', osada: '長田' };
+
+  let tabHtml = '<div class="tab-nav">';
+  members.forEach((m, i) => {
+    tabHtml += `<button class="tab-btn ${i === 0 ? 'active' : ''}" onclick="switchTab('${m}', this)">${names[m]}</button>`;
+  });
+  tabHtml += '</div>';
+  document.getElementById('tab-nav-area').innerHTML = tabHtml;
+
+  renderSessions(members[0]);
+}
+
+function switchTab(memberId, btnEl) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btnEl.classList.add('active');
+  renderSessions(memberId);
+}
+
+function renderSessions(memberId) {
+  const sessions = SESSIONS[memberId];
+  const grid = document.getElementById('session-grid');
+  const memberName = ACCOUNTS[memberId].name;
+
+  grid.innerHTML = sessions.map(s => `
+    <a class="session-card" href="${s.file}" target="_blank" rel="noopener">
+      <div class="card-accent ${s.accent}"></div>
+      <div class="card-body">
+        <span class="card-day ${s.accent}">${s.label}</span>
+        <div class="card-title">${s.title}</div>
+        <div class="card-desc">${s.desc}</div>
+      </div>
+      <div class="card-footer">
+        <span class="open-label">
+          テキストを開く
+          <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </span>
+        ${currentUser.role === 'owner' ? `<span class="person-tag">${memberName}</span>` : ''}
+      </div>
+    </a>
+  `).join('');
+}
+</script>
+
+</body>
+</html>
