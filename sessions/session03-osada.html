@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Lesson Session 03 — AIを「自分専用」にする</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal-50: #e6f7f5; --teal-100: #b3ece6; --teal-200: #80e0d6;
+    --teal-500: #26a69a; --teal-600: #00897b; --teal-700: #00796b;
+    --orange-50: #fff3e0; --orange-100: #ffe0b2; --orange-600: #fb8c00;
+    --blue-50: #e8f0fe; --blue-100: #d2e3fc; --blue-200: #aecbfa;
+    --blue-600: #1a73e8; --blue-700: #1967d2;
+    --green-50: #e6f4ea; --green-100: #ceead6; --green-600: #1e8e3e; --green-700: #188038;
+    --yellow-50: #fef7e0; --yellow-100: #feefc3; --yellow-600: #f9ab00;
+    --red-50: #fce8e6; --red-100: #fad2cf; --red-600: #d93025;
+    --purple-50: #f3e8fd; --purple-100: #e8d0fb; --purple-600: #9334e6;
+    --gray-50: #f8f9fa; --gray-100: #f1f3f4; --gray-200: #e8eaed;
+    --gray-300: #dadce0; --gray-400: #bdc1c6; --gray-500: #9aa0a6;
+    --gray-600: #80868b; --gray-700: #5f6368; --gray-800: #3c4043; --gray-900: #202124;
+    --shadow-sm: 0 1px 2px rgba(60,64,67,0.1), 0 1px 3px rgba(60,64,67,0.08);
+    --shadow-md: 0 1px 3px rgba(60,64,67,0.12), 0 4px 8px rgba(60,64,67,0.08);
+    --radius: 12px; --radius-sm: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { font-family: 'Noto Sans JP', 'IBM Plex Sans', sans-serif; background: var(--gray-50); color: var(--gray-900); line-height: 1.9; font-size: 16px; min-height: 100vh; display: flex; flex-direction: column; }
+  .hero { background: linear-gradient(135deg, var(--teal-600) 0%, var(--teal-700) 40%, #004d40 100%); color: white; padding: 68px 24px 48px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -40%; right: -15%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%); border-radius: 50%; }
+  .hero-inner { max-width: 760px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-label { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; margin-bottom: 12px; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero h1 { font-size: 28px; font-weight: 700; line-height: 1.45; margin-bottom: 16px; }
+  .hero p { font-size: 15px; line-height: 1.8; opacity: 0.9; max-width: 600px; }
+  .hero-meta { margin-top: 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+  .hero-meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; opacity: 0.85; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero-meta-item svg { width: 18px; height: 18px; }
+  .tab-nav { position: sticky; top: 0; z-index: 100; background: white; border-bottom: 1px solid var(--gray-200); padding: 0 24px; box-shadow: var(--shadow-sm); }
+  .tab-nav-inner { max-width: 760px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
+  .tab-nav-inner::-webkit-scrollbar { display: none; }
+  .tab-btn { flex-shrink: 0; padding: 14px 16px; font-size: 13px; font-weight: 500; color: var(--gray-600); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: 'Noto Sans JP', sans-serif; }
+  .tab-btn:hover { color: var(--teal-600); background: var(--teal-50); }
+  .tab-btn.active { color: var(--teal-600); border-bottom-color: var(--teal-600); }
+  .page-container { flex: 1; }
+  .page { display: none; max-width: 760px; width: 100%; margin: 0 auto; padding: 48px 24px 80px; animation: pageIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes pageIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--gray-200); }
+  .page-nav-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--gray-300); background: white; color: var(--gray-700); transition: all 0.2s; font-family: 'Noto Sans JP', sans-serif; }
+  .page-nav-btn:hover { border-color: var(--teal-600); color: var(--teal-600); background: var(--teal-50); }
+  .page-nav-btn.primary { background: var(--teal-600); color: white; border-color: var(--teal-600); }
+  .page-nav-btn.primary:hover { background: var(--teal-700); }
+  .page-nav-btn.hidden { visibility: hidden; }
+  .page-counter { font-size: 13px; color: var(--gray-500); font-family: 'IBM Plex Sans', sans-serif; }
+  .section-header { margin-bottom: 32px; }
+  .section-number { font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--teal-600); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+  .section-title { font-size: 24px; font-weight: 700; line-height: 1.4; }
+  .prose { font-size: 16px; line-height: 2; color: var(--gray-800); }
+  .prose p { margin-bottom: 20px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { font-weight: 600; color: var(--gray-900); }
+  .card { background: white; border-radius: var(--radius); padding: 28px 32px; margin: 28px 0; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); }
+  .card-teal { background: var(--teal-50); border-color: var(--teal-200); }
+  .card-blue { background: var(--blue-50); border-color: var(--blue-200); }
+  .card-green { background: var(--green-50); border-color: var(--green-100); }
+  .card-orange { background: var(--orange-50); border-color: var(--orange-100); }
+  .card-purple { background: var(--purple-50); border-color: var(--purple-100); }
+  .card-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+  .cl-teal { color: var(--teal-600); } .cl-blue { color: var(--blue-600); } .cl-green { color: var(--green-700); }
+  .cl-orange { color: var(--orange-600); } .cl-purple { color: var(--purple-600); }
+  .steps { margin: 24px 0; }
+  .step { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
+  .step:last-child { margin-bottom: 0; }
+  .step-marker { flex-shrink: 0; width: 32px; height: 32px; background: var(--teal-600); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; font-weight: 600; margin-top: 2px; }
+  .step-content { flex: 1; }
+  .step-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .step-desc { font-size: 15px; color: var(--gray-700); line-height: 1.7; }
+  .prompt-box { background: var(--gray-900); color: #e8eaed; border-radius: var(--radius); padding: 24px 28px; margin: 24px 0; font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; line-height: 1.8; position: relative; }
+  .prompt-box::before { content: 'PROMPT'; position: absolute; top: 10px; right: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: var(--gray-500); }
+  .divider { height: 1px; background: var(--gray-200); margin: 40px 0; }
+  .note { background: var(--gray-100); border-radius: var(--radius-sm); padding: 20px 24px; margin: 24px 0; font-size: 14px; line-height: 1.8; color: var(--gray-700); }
+  .note-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-500); margin-bottom: 6px; }
+  .callout { background: linear-gradient(135deg, var(--teal-50) 0%, var(--blue-50) 100%); border: 1px solid var(--teal-200); border-radius: var(--radius); padding: 28px 32px; margin: 32px 0; text-align: center; }
+  .callout-icon { font-size: 28px; margin-bottom: 12px; }
+  .callout-text { font-size: 17px; font-weight: 600; line-height: 1.7; }
+  .callout-sub { font-size: 14px; color: var(--gray-600); margin-top: 10px; line-height: 1.7; }
+  .checklist { margin: 24px 0; }
+  .checklist-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--gray-100); }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-box { flex-shrink: 0; width: 22px; height: 22px; border: 2px solid var(--gray-300); border-radius: 4px; margin-top: 2px; }
+  .checklist-text { font-size: 15px; color: var(--gray-800); line-height: 1.6; }
+  .ojt-option { background: white; border-radius: var(--radius); padding: 24px 28px; margin-bottom: 16px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); transition: border-color 0.2s, box-shadow 0.2s; }
+  .ojt-option:hover { border-color: var(--teal-500); box-shadow: var(--shadow-md); }
+  .ojt-option-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal-600); margin-bottom: 8px; }
+  .ojt-option h4 { font-weight: 700; font-size: 17px; margin-bottom: 8px; }
+  .ojt-option p { font-size: 14px; color: var(--gray-600); line-height: 1.8; }
+  .gem-flow { display: flex; flex-direction: column; gap: 0; margin: 24px 0; }
+  .gem-step { display: flex; gap: 16px; align-items: flex-start; }
+  .gem-step-line { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+  .gem-step-dot { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .gem-step-connector { width: 2px; height: 20px; background: var(--gray-200); }
+  .gem-step-body { flex: 1; padding-bottom: 16px; }
+  .gem-step-body h4 { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .gem-step-body p { font-size: 14px; color: var(--gray-600); line-height: 1.7; }
+  @media (max-width: 640px) {
+    .hero { padding: 48px 20px 36px; } .hero h1 { font-size: 23px; }
+    .page { padding: 36px 20px 64px; }
+    .card { padding: 22px 20px; }
+    .tab-btn { padding: 12px 12px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">AI Lesson — Session 03</div>
+    <h1>AIを「自分専用」にする</h1>
+    <p>Gemsで店舗専用AIを作り、<br>業務AI化の第一歩を踏み出します。</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        60分 ／ 座学20分＋実践40分
+      </div>
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        1 on 1 レクチャー
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <button class="tab-btn active" data-page="0">ふりかえり</button>
+    <button class="tab-btn" data-page="1">Gemsとは</button>
+    <button class="tab-btn" data-page="2">Gemsの作り方</button>
+    <button class="tab-btn" data-page="3">アプリを育てる</button>
+    <button class="tab-btn" data-page="4">完成ロードマップ</button>
+    <button class="tab-btn" data-page="5">一緒に作ろう</button>
+  </div>
+</nav>
+
+<div class="page-container">
+
+<!-- ━━━ Page 0: ふりかえり ━━━ -->
+<div class="page active" data-page="0">
+  <div class="section-header">
+    <div class="section-number">Review</div>
+    <h2 class="section-title">前回のふりかえり</h2>
+  </div>
+  <div class="prose"><p>Session 2では、データ分析の4ステップ、バイブコーディングの3方式、引き継ぎ書の作り方を学びました。</p></div>
+  <div class="card card-teal">
+    <div class="card-label cl-teal">Session 2 で身につけたこと</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">CSVで渡す → 4ステップで分析</div>
+          <div class="step-desc">ExcelではなくCSV形式で渡し、確認→クリーニング→整理→分析の順で進める。一度にやらせない。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">引き継ぎ書でセッションを引っ越す</div>
+          <div class="step-desc">会話が長くなったら引き継ぎ書を書いてもらい、新しいチャットに移動する。失敗の記憶に引っ張られない。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">HTMLで保存、メモ帳に「v1」「v2」</div>
+          <div class="step-desc">動いたバージョンのコードをこまめにコピーして保存する。Geminiは保存が弱いので自分で管理する。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="prose">
+    <p>前回、営業報告メールの半自動化を<strong>自発的に</strong>試していたのが素晴らしかったです。プロモードの回数制限で数値がズレた問題は、プランアップで解決します。</p>
+    <p>今日はSession 1-2で学んだ基礎をベースに、<strong>「教わる」から「一緒に作る」に本格的にシフト</strong>します。</p>
+  </div>
+
+  <div class="note">
+    <div class="note-label">宿題の確認</div>
+    <p>ゴールデンウィークを挟みましたが、いかがでしたか？</p>
+    <div class="checklist">
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>AI化できそうな業務を3つ選定した？</strong> — 会議資料、評価シート、シフト管理……どれを優先にしますか？</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>GW中にAIと格闘した？</strong> — 遊び半分でOK。何か試してみた？うまくいったこと、いかなかったこと</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>パーソナライズ設定、自分のアカウントでやった？</strong> — 前回まだ未設定でした。入れてみた？</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>チャットに名前をつけるようにした？</strong> — 「ダッシュボード分析」のように後から探せる名前</div></div>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn hidden">← 前へ</button>
+    <span class="page-counter">0 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(1)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 1: Gemsとは ━━━ -->
+<div class="page" data-page="1">
+  <div class="section-header">
+    <div class="section-number">Section 01</div>
+    <h2 class="section-title">Gems — 「自分専用AI」を作る機能</h2>
+  </div>
+  <div class="prose">
+    <p>Session 2の最後に予告した<strong>Gems（ジェムズ）</strong>を、今日いよいよ触ります。</p>
+    <p>普通のチャットでは、毎回「私はメガネ屋の店長で…」と説明しなきゃいけません。パーソナライズ設定である程度は解決しますが、<strong>業務ごとに違う文脈</strong>（会議資料の作り方、評価の基準、店舗ルール）は毎回渡す必要がありました。</p>
+    <p>Gemsは、<strong>その文脈をあらかじめ組み込んだ「専用AI」</strong>を作れる機能です。</p>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">普通のチャット vs Gems</div>
+    <div class="prose">
+      <p><strong>普通のチャット</strong> = 毎回初対面の人に説明して依頼する<br>
+      <strong>Gems</strong> = すでに事情を全部知っているベテラン社員に頼む</p>
+      <p>Gemsに店舗のルール、過去のデータ、マニュアルを読み込ませておけば、話しかけるだけで<strong>相馬店の事情を踏まえた回答</strong>をしてくれます。しかも、メンバー全員で共有できます。</p>
+    </div>
+  </div>
+
+  <div class="card card-green">
+    <div class="card-label cl-green">長田さんに向いている Gems の例</div>
+    <div class="prose">
+      <p><strong>📊 会議資料AI</strong> — 営業管理データのCSVを渡すだけで、いつもの形式で会議資料を作ってくれるGem。グラフの出し方、比較の観点をあらかじめ指示しておく。</p>
+      <p><strong>📋 評価サポートAI</strong> — 評価基準やフィードバックのテンプレートを読み込ませたGem。スタッフの行動データを渡すと、評価案とフィードバック文を提案してくれる。</p>
+      <p><strong>📖 店舗ルールAI</strong> — マニュアルやルールブックを読み込ませたGem。「度付きレンズの返品ルールは？」と聞けばすぐ答えてくれる。休日の電話対応を減らせる。</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">💎</div>
+    <div class="callout-text">Gemsは「自分の武器を増やす」仕組み</div>
+    <div class="callout-sub">
+      前回、分析結果をアプリ化したのと考え方は同じです。<br>
+      繰り返す作業は仕組みにする。Gemsはその最も手軽な形。
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(0)">← 前へ</button>
+    <span class="page-counter">1 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(2)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 2: Gemsの作り方 ━━━ -->
+<div class="page" data-page="2">
+  <div class="section-header">
+    <div class="section-number">Section 02</div>
+    <h2 class="section-title">Gemsの作り方 — 5ステップ</h2>
+  </div>
+  <div class="prose">
+    <p>実際にGemsを作る手順を見ていきましょう。<br>GeminiのサイドバーにあるGems（💎マーク）から作成できます。</p>
+  </div>
+
+  <div class="gem-flow">
+    <div class="gem-step">
+      <div class="gem-step-line">
+        <div class="gem-step-dot" style="background: var(--teal-50); color: var(--teal-600);">1</div>
+        <div class="gem-step-connector"></div>
+      </div>
+      <div class="gem-step-body">
+        <h4>名前をつける</h4>
+        <p>「相馬店 会議資料AI」のように、何のGemかわかる名前に。後で探しやすくなります。</p>
+      </div>
+    </div>
+    <div class="gem-step">
+      <div class="gem-step-line">
+        <div class="gem-step-dot" style="background: var(--blue-50); color: var(--blue-600);">2</div>
+        <div class="gem-step-connector"></div>
+      </div>
+      <div class="gem-step-body">
+        <h4>指示文（システムプロンプト）を書く</h4>
+        <p>このGemが何者で、何をする専門家かを書きます。ここが一番大事。後で例を見ましょう。</p>
+      </div>
+    </div>
+    <div class="gem-step">
+      <div class="gem-step-line">
+        <div class="gem-step-dot" style="background: var(--green-50); color: var(--green-600);">3</div>
+        <div class="gem-step-connector"></div>
+      </div>
+      <div class="gem-step-body">
+        <h4>ファイルを読み込ませる</h4>
+        <p>店舗マニュアル、過去の会議資料、評価基準書など。PDFでもテキストでもOK。このファイルがGemの「知識」になります。</p>
+      </div>
+    </div>
+    <div class="gem-step">
+      <div class="gem-step-line">
+        <div class="gem-step-dot" style="background: var(--orange-50); color: var(--orange-600);">4</div>
+        <div class="gem-step-connector"></div>
+      </div>
+      <div class="gem-step-body">
+        <h4>テストする</h4>
+        <p>実際に話しかけてみて、期待通りの回答が返ってくるか確認。おかしければ指示文を修正する。</p>
+      </div>
+    </div>
+    <div class="gem-step">
+      <div class="gem-step-line">
+        <div class="gem-step-dot" style="background: var(--purple-50); color: var(--purple-600);">5</div>
+        <div class="gem-step-connector"></div>
+      </div>
+      <div class="gem-step-body">
+        <h4>共有する（任意）</h4>
+        <p>リンクを共有すれば、店舗メンバー全員が同じGemを使えます。「みんなで使える店舗AI」の完成です。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="prose"><p><strong>指示文の書き方</strong>が一番のポイントです。以下はサンプルです。</p></div>
+
+  <div class="card">
+    <div class="card-label cl-blue">会議資料AI の指示文サンプル</div>
+    <div class="prompt-box">あなたは「相馬店 会議資料アシスタント」です。<br><br>## 役割<br>相馬店の営業管理データを分析し、店長会議で使える資料を作成する専門家です。<br><br>## 知識<br>添付されたファイルに、相馬店の過去の営業管理データと会議資料のサンプルが含まれています。<br>これらを参考に、フォーマットや観点を揃えてください。<br><br>## やり方<br>1. CSVファイルが渡されたら、まず中身を確認して報告する<br>2. 不要データがあればクリーニングを提案する<br>3. 整理後、前月比・前年同月比・注目すべき変化を分析する<br>4. 分析結果を5枚のスライド構成で出力する<br><br>## ルール<br>・数値計算は必ずコードで実行すること<br>・グラフは見やすいシンプルなデザインにすること<br>・分析結果に対する改善アクション案を必ず含めること<br>・わからないことは推測せず確認すること</div>
+  </div>
+
+  <div class="note">
+    <div class="note-label">指示文を書くのが難しい？</div>
+    <p>大丈夫。<strong>メタプロンプトで作れます</strong>。「こういうGemを作りたいんだけど、指示文を一緒に考えて」とGeminiに相談すれば、良い指示文を提案してくれます。Session 1で学んだメタプロンプトが、ここで活きてきます。</p>
+  </div>
+
+  <div class="card card-orange">
+    <div class="card-label cl-orange">Tips：大量の資料はNotebookLMと使い分ける</div>
+    <div class="prose">
+      <p>Geminiのコンテキストは非常に大きいので、Gemsにそこそこのファイルを入れても問題なく動きます。ただし、<strong>マニュアル10冊分のような膨大な資料</strong>を読み込ませたい場合は、Gemsよりも<strong>NotebookLM</strong>の方が向いています。</p>
+      <p>NotebookLMはGoogleが提供する無料ツールで、大量のドキュメントをまとめて読み込ませて「この資料群に基づいて答えて」と質問できる仕組みです。<strong>Gemsは「繰り返す作業の自動化」、NotebookLMは「大量資料の検索・質問」</strong>と使い分けると最強です。</p>
+      <p>今日はまずGemsから。NotebookLMは次回以降、必要になったら一緒に触りましょう。</p>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(1)">← 前へ</button>
+    <span class="page-counter">2 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(3)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 3: アプリを育てる技術 ━━━ -->
+<div class="page" data-page="3">
+  <div class="section-header">
+    <div class="section-number">Section 03</div>
+    <h2 class="section-title">アプリを「育てる」技術</h2>
+  </div>
+  <div class="prose">
+    <p>Session 2でアプリ化と引き継ぎ書の概念を学びました。<br>今日は、それを<strong>実際の運用で回すための実践テクニック</strong>を追加します。</p>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">検証のサイクル</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">作る — Gemやキャンバスでアプリを生成</div>
+          <div class="step-desc">前回学んだ方法で、CSVを読み込んで分析するアプリやダッシュボードを作る。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">テストする — 既知のデータで検証</div>
+          <div class="step-desc">答えがわかっているデータを渡して、正しい結果が出るか確認する。<strong>「このCSVとこのアプリを渡すから、アプリが正しく動いてるか検証して」</strong>と新しいセッションで依頼する。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">直す — エラーやズレを修正</div>
+          <div class="step-desc">エラーメッセージはそのまま貼る。見た目の問題はスクショ＋赤丸。前回学んだTipsをそのまま使う。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">4</div>
+        <div class="step-content">
+          <div class="step-title">保存する — 動いたバージョンをキープ</div>
+          <div class="step-desc">修正がうまくいったら、コードをメモ帳にコピーして「v2」「v3」と保存。引き継ぎ書も更新する。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-orange">
+    <div class="card-label cl-orange">前回のセッションで起きた「PDFの読み取り問題」の復習</div>
+    <div class="prose">
+      <p>規則性がわかりにくいPDFはAIが読み間違えやすい。対処法は3つ：</p>
+      <p><strong>① 規則性をテキストで伝える</strong> —「列ごとに項目が何個あって、左が順位、右が実績」のように明示する</p>
+      <p><strong>② プロモードで一度表にさせる</strong> —「このPDFを表形式に変換して」と依頼し、変換結果を確認してから分析に使う</p>
+      <p><strong>③ 複数タブは個別CSVに分解</strong> — Excelの各タブを個別にCSVエクスポートして1つずつ渡す</p>
+    </div>
+  </div>
+
+  <div class="card card-blue">
+    <div class="card-label cl-blue">計算を正確にやらせるコツ（復習）</div>
+    <div class="prose">
+      <p>AIは検索ベースで答えるため、単純な足し算でも間違えることがある。<strong>「コードで計算して」</strong>の一言を添えるだけで、プログラムとして実行してくれるので正確になる。</p>
+      <p>特にセルの合計値や平均値など、数値が多い計算は必ずこの方法で。カラーコードの変換も同様に、コードベースでやらせると精度が上がります。</p>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(2)">← 前へ</button>
+    <span class="page-counter">3 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(4)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 4: 完成ロードマップ ━━━ -->
+<div class="page" data-page="4">
+  <div class="section-header">
+    <div class="section-number">Section 04</div>
+    <h2 class="section-title">完成ロードマップ — 3つの業務AI化</h2>
+  </div>
+  <div class="prose">
+    <p>AI化できそうな業務を3つ選定する宿題を出していました。<br>ここでは、それぞれ<strong>「本当に完成させるとしたら何が必要か」</strong>を具体的に見ていきます。全体像が見えると「あ、これならできそう」となるはずです。</p>
+  </div>
+
+  <!-- ===== 会議資料 ===== -->
+  <div class="card" style="border-left: 4px solid var(--green-600);">
+    <div class="card-label cl-green">🥇 会議資料の自動作成 — 最もすぐ完成に近い</div>
+    <div class="prose" style="margin-bottom: 16px;">
+      <p><strong>ゴール：</strong>営業管理CSVを渡すだけで、店長会議用のスライド5枚が出てくるGem</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker" style="background: var(--green-600);">1</div>
+        <div class="step-content">
+          <div class="step-title">素材を揃える（10分）</div>
+          <div class="step-desc">
+            <strong>必要なもの：</strong>過去2〜3ヶ月分の営業管理Excel → CSV化したもの。過去の会議資料があれば1部（フォーマット参考用）。<br>
+            <strong>決めること：</strong>スライドに必ず含めたい観点（前月比？前年同月比？カテゴリ別？）
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--green-600);">2</div>
+        <div class="step-content">
+          <div class="step-title">Gemの指示文を作る（15分）</div>
+          <div class="step-desc">
+            <strong>使うツール：</strong>Gemini（メタプロンプトで指示文を一緒に作成）<br>
+            <strong>やること：</strong>「会議資料AIを作りたい」とGeminiに相談し、指示文の骨格を提案してもらう。Page 2のサンプルをベースにカスタマイズ
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--green-600);">3</div>
+        <div class="step-content">
+          <div class="step-title">Gemを作成してテスト（15分）</div>
+          <div class="step-desc">
+            <strong>やること：</strong>指示文を入力、CSVを読み込ませてGemを作成。実際にCSVを渡して「スライド作って」と依頼し、出てきた結果を確認・修正<br>
+            <strong>判定基準：</strong>数字が合ってる？ グラフはわかりやすい？ 会議で見せられるレベル？
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="margin: 20px 0 0; padding: 16px 20px; text-align: left;">
+      <div class="prose" style="font-size: 14px; color: var(--gray-700);">
+        <p><strong>合計：約40分。今日の研修中に完成可能。</strong><br>次の店長会議で実際に使ってみて、改善点を見つけるところまでがゴール。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 営業報告メール ===== -->
+  <div class="card" style="border-left: 4px solid var(--blue-600);">
+    <div class="card-label cl-blue">🥈 営業報告メールの半自動化</div>
+    <div class="prose" style="margin-bottom: 16px;">
+      <p><strong>ゴール：</strong>日々の営業データを渡すと、報告メールの下書きが出てくるGem</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker" style="background: var(--blue-600);">1</div>
+        <div class="step-content">
+          <div class="step-title">素材を揃える</div>
+          <div class="step-desc">
+            <strong>必要なもの：</strong>過去の営業報告メール5〜10通（「こういうトーンで書いてほしい」の参考例）。当日の売上データの入力元（Excel or 手書き）<br>
+            <strong>決めること：</strong>メールのフォーマット（宛先・件名・本文の構成）。毎日の変動で特に報告したい項目
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--blue-600);">2</div>
+        <div class="step-content">
+          <div class="step-title">Gemの指示文を作る</div>
+          <div class="step-desc">
+            <strong>使うツール：</strong>Gemini＋過去メールのサンプル<br>
+            <strong>やること：</strong>過去メールのトーンや構成をGemに学ばせる。「この形式で」「この観点を必ず含めて」をルール化
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--blue-600);">3</div>
+        <div class="step-content">
+          <div class="step-title">テストして磨く</div>
+          <div class="step-desc">
+            <strong>やること：</strong>昨日のデータで試しに作らせて、実際のメールと比較。「もう少しカジュアルに」「数字の並び順を変えて」のように修正を重ねる
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="margin: 20px 0 0; padding: 16px 20px; text-align: left;">
+      <div class="prose" style="font-size: 14px; color: var(--gray-700);">
+        <p><strong>合計：3ステップ × 各15分程度。</strong>前回すでに半分やっているので、Gem化してトーンを固めれば完成。次回のテーマ候補。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 評価シート ===== -->
+  <div class="card" style="border-left: 4px solid var(--purple-600);">
+    <div class="card-label cl-purple">🥉 評価シート・シフト管理のAI化</div>
+    <div class="prose" style="margin-bottom: 16px;">
+      <p><strong>ゴール：</strong>スタッフの行動データを渡すと、評価案＋フィードバック文を提案してくれるGem</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker" style="background: var(--purple-600);">1</div>
+        <div class="step-content">
+          <div class="step-title">素材を揃える</div>
+          <div class="step-desc">
+            <strong>必要なもの：</strong>評価基準書（項目と配点のルール）。過去の評価シート1〜2人分（どういう書き方をしているかの参考）。スタッフの行動データや日報<br>
+            <strong>決めること：</strong>評価の観点（何を重視するか）。AIに任せる範囲と自分で判断する範囲の線引き
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--purple-600);">2</div>
+        <div class="step-content">
+          <div class="step-title">Gemの指示文を設計する</div>
+          <div class="step-desc">
+            <strong>使うツール：</strong>Gemini（メタプロンプトで壁打ち）<br>
+            <strong>やること：</strong>評価基準をルールとして読み込ませる。「最終判断は必ず人間に確認を求めること」をルールに含める。出力フォーマットを指定
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--purple-600);">3</div>
+        <div class="step-content">
+          <div class="step-title">テスト → 修正 → 本番で試す</div>
+          <div class="step-desc">
+            <strong>やること：</strong>過去の評価データで試しに出力させて、自分の評価と比較する。ズレがあれば指示文を調整。2〜3回の修正で実用レベルに到達<br>
+            <strong>注意：</strong>評価は機密性が高い情報。個人名を伏せてテストするなど配慮が必要
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="margin: 20px 0 0; padding: 16px 20px; text-align: left;">
+      <div class="prose" style="font-size: 14px; color: var(--gray-700);">
+        <p><strong>合計：3ステップですが、素材の準備に少し時間がかかる。</strong>評価基準の言語化が一番のハードル。ただ、それ自体がAIとの壁打ちで整理できるので、2回のセッションで完成を目指せます。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🎯</div>
+    <div class="callout-text">まず1つ「完全に使える状態」にする</div>
+    <div class="callout-sub">
+      3つ同時に中途半端に作るより、<br>
+      会議資料AIを1つ完成させて「これ便利だな」を実感する方が<br>
+      次の2つ目・3つ目の速度が圧倒的に上がります。
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(3)">← 前へ</button>
+    <span class="page-counter">4 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(5)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 5: 一緒に作ろう ━━━ -->
+<div class="page" data-page="5">
+  <div class="section-header">
+    <div class="section-number">Hands-on</div>
+    <h2 class="section-title">一緒に作ろう</h2>
+  </div>
+  <div class="prose">
+    <p>今日のメインイベントです。<br>残り時間を全部使って、<strong>実際にGemを作るか、業務AI化の第一歩を踏み出します</strong>。</p>
+    <p>以下から今日取り組むものを選んでください。</p>
+  </div>
+
+  <div class="ojt-option">
+    <div class="ojt-option-label">Option A — おすすめ</div>
+    <h4>💎 会議資料AIのGemを作る</h4>
+    <p>Gemsの指示文をメタプロンプトで一緒に作成し、過去の営業管理データを読み込ませて「会議資料AI」を完成させます。次の店長会議で実際に使えるものを目指しましょう。データがあれば今日中にGemが完成します。</p>
+  </div>
+
+  <div class="ojt-option">
+    <div class="ojt-option-label">Option B</div>
+    <h4>📊 前回のダッシュボードアプリを改善する</h4>
+    <p>Session 2で作ったCSV分析ダッシュボードの精度を上げます。新しいCSVで検証し、数値のズレがあれば修正。プロモードで本格運用できる状態に仕上げます。</p>
+  </div>
+
+  <div class="ojt-option">
+    <div class="ojt-option-label">Option C</div>
+    <h4>📋 評価シートAIの設計を始める</h4>
+    <p>評価基準やフィードバックのテンプレートを整理し、Gemの指示文の骨格を作ります。今日中に完成は難しいかもしれませんが、設計のたたき台ができれば次回一気に進められます。</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card card-purple">
+    <div class="card-label cl-purple">次回に向けて</div>
+    <div class="prose"><p>Session 3以降は、毎回「何か1つ形にする」をゴールにしていきます。</p></div>
+    <div class="checklist">
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>今日作ったGemを実際の業務で使ってみる</strong> — 次の会議で試して、改善点を見つける</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>うまくいかなかった点をスクショで残す</strong> — 次回の改善材料に</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>2つ目のAI化候補を具体的に整理する</strong> — 評価シートorシフト管理、どちらを先にやるか考える</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>パーソナライズ設定がまだなら必ず入力する</strong> — Gemとの相乗効果で回答品質が変わります</div></div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🚀</div>
+    <div class="callout-text">長田さんは4名の中でいちばん自走に近い</div>
+    <div class="callout-sub">
+      プランアップが通れば、ここから一気に加速できます。<br>
+      店舗全体のAI活用を引っ張る「キーパーソン」として、<br>
+      一緒に形にしていきましょう。
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(4)">← 前へ</button>
+    <span class="page-counter">5 / 5</span>
+    <button class="page-nav-btn hidden">次へ →</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const pages = document.querySelectorAll('.page');
+  function goPage(idx) {
+    tabBtns.forEach(b => b.classList.remove('active'));
+    tabBtns[idx].classList.add('active');
+    pages.forEach(p => p.classList.remove('active'));
+    pages[idx].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => goPage(parseInt(btn.dataset.page)));
+  });
+</script>
+</body>
+</html>

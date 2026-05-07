@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Lesson Session 03 — 業務をAIに任せてみる</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal-50: #e6f7f5; --teal-100: #b3ece6; --teal-200: #80e0d6;
+    --teal-500: #26a69a; --teal-600: #00897b; --teal-700: #00796b;
+    --orange-50: #fff3e0; --orange-100: #ffe0b2; --orange-600: #fb8c00;
+    --blue-50: #e8f0fe; --blue-100: #d2e3fc; --blue-200: #aecbfa;
+    --blue-600: #1a73e8; --blue-700: #1967d2;
+    --green-50: #e6f4ea; --green-100: #ceead6; --green-600: #1e8e3e; --green-700: #188038;
+    --yellow-50: #fef7e0; --yellow-100: #feefc3; --yellow-600: #f9ab00;
+    --red-50: #fce8e6; --red-100: #fad2cf; --red-600: #d93025;
+    --purple-50: #f3e8fd; --purple-100: #e8d0fb; --purple-600: #9334e6;
+    --gray-50: #f8f9fa; --gray-100: #f1f3f4; --gray-200: #e8eaed;
+    --gray-300: #dadce0; --gray-400: #bdc1c6; --gray-500: #9aa0a6;
+    --gray-600: #80868b; --gray-700: #5f6368; --gray-800: #3c4043; --gray-900: #202124;
+    --shadow-sm: 0 1px 2px rgba(60,64,67,0.1), 0 1px 3px rgba(60,64,67,0.08);
+    --shadow-md: 0 1px 3px rgba(60,64,67,0.12), 0 4px 8px rgba(60,64,67,0.08);
+    --radius: 12px; --radius-sm: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body {
+    font-family: 'Noto Sans JP', 'IBM Plex Sans', sans-serif;
+    background: var(--gray-50); color: var(--gray-900);
+    line-height: 1.9; font-size: 16px; min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  .hero {
+    background: linear-gradient(135deg, var(--teal-600) 0%, var(--teal-700) 40%, #004d40 100%);
+    color: white; padding: 68px 24px 48px; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -40%; right: -15%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-inner { max-width: 760px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-label { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; margin-bottom: 12px; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero h1 { font-size: 28px; font-weight: 700; line-height: 1.45; margin-bottom: 16px; }
+  .hero p { font-size: 15px; line-height: 1.8; opacity: 0.9; max-width: 600px; }
+  .hero-meta { margin-top: 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+  .hero-meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; opacity: 0.85; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero-meta-item svg { width: 18px; height: 18px; }
+
+  .tab-nav { position: sticky; top: 0; z-index: 100; background: white; border-bottom: 1px solid var(--gray-200); padding: 0 24px; box-shadow: var(--shadow-sm); }
+  .tab-nav-inner { max-width: 760px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
+  .tab-nav-inner::-webkit-scrollbar { display: none; }
+  .tab-btn { flex-shrink: 0; padding: 14px 16px; font-size: 13px; font-weight: 500; color: var(--gray-600); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: 'Noto Sans JP', sans-serif; }
+  .tab-btn:hover { color: var(--teal-600); background: var(--teal-50); }
+  .tab-btn.active { color: var(--teal-600); border-bottom-color: var(--teal-600); }
+  .tab-btn.appendix { color: var(--gray-500); font-style: italic; }
+  .tab-btn.appendix.active { color: var(--gray-700); border-bottom-color: var(--gray-400); }
+
+  .page-container { flex: 1; }
+  .page { display: none; max-width: 760px; width: 100%; margin: 0 auto; padding: 48px 24px 80px; animation: pageIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes pageIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--gray-200); }
+  .page-nav-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--gray-300); background: white; color: var(--gray-700); transition: all 0.2s; font-family: 'Noto Sans JP', sans-serif; }
+  .page-nav-btn:hover { border-color: var(--teal-600); color: var(--teal-600); background: var(--teal-50); }
+  .page-nav-btn.primary { background: var(--teal-600); color: white; border-color: var(--teal-600); }
+  .page-nav-btn.primary:hover { background: var(--teal-700); }
+  .page-nav-btn.hidden { visibility: hidden; }
+  .page-counter { font-size: 13px; color: var(--gray-500); font-family: 'IBM Plex Sans', sans-serif; }
+
+  .section-header { margin-bottom: 32px; }
+  .section-number { font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--teal-600); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+  .section-title { font-size: 24px; font-weight: 700; line-height: 1.4; }
+  .prose { font-size: 16px; line-height: 2; color: var(--gray-800); }
+  .prose p { margin-bottom: 20px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { font-weight: 600; color: var(--gray-900); }
+
+  .card { background: white; border-radius: var(--radius); padding: 28px 32px; margin: 28px 0; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); }
+  .card-teal { background: var(--teal-50); border-color: var(--teal-200); }
+  .card-blue { background: var(--blue-50); border-color: var(--blue-200); }
+  .card-green { background: var(--green-50); border-color: var(--green-100); }
+  .card-orange { background: var(--orange-50); border-color: var(--orange-100); }
+  .card-yellow { background: var(--yellow-50); border-color: var(--yellow-100); }
+  .card-red { background: var(--red-50); border-color: var(--red-100); }
+  .card-purple { background: var(--purple-50); border-color: var(--purple-100); }
+  .card-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+  .cl-teal { color: var(--teal-600); } .cl-blue { color: var(--blue-600); } .cl-green { color: var(--green-700); }
+  .cl-orange { color: var(--orange-600); } .cl-yellow { color: var(--yellow-600); } .cl-red { color: var(--red-600); } .cl-purple { color: var(--purple-600); }
+
+  .steps { margin: 24px 0; }
+  .step { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
+  .step:last-child { margin-bottom: 0; }
+  .step-marker { flex-shrink: 0; width: 32px; height: 32px; background: var(--teal-600); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; font-weight: 600; margin-top: 2px; }
+  .step-content { flex: 1; }
+  .step-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .step-desc { font-size: 15px; color: var(--gray-700); line-height: 1.7; }
+
+  .prompt-box { background: var(--gray-900); color: #e8eaed; border-radius: var(--radius); padding: 24px 28px; margin: 24px 0; font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; line-height: 1.8; position: relative; }
+  .prompt-box::before { content: 'PROMPT'; position: absolute; top: 10px; right: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: var(--gray-500); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+  .judge-card { background: white; border-radius: var(--radius-sm); padding: 20px 22px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); }
+  .judge-card-icon { font-size: 22px; margin-bottom: 8px; }
+  .judge-card-title { font-weight: 700; font-size: 14px; margin-bottom: 8px; }
+  .judge-card-body { font-size: 13px; color: var(--gray-700); line-height: 1.7; }
+
+  .shortcut-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+  .shortcut-item { background: white; border-radius: var(--radius-sm); padding: 16px 20px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 14px; }
+  .shortcut-key { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; background: var(--gray-100); border: 1px solid var(--gray-300); border-radius: 6px; padding: 4px 10px; white-space: nowrap; color: var(--gray-800); flex-shrink: 0; }
+  .shortcut-desc { font-size: 14px; color: var(--gray-700); line-height: 1.5; }
+
+  .divider { height: 1px; background: var(--gray-200); margin: 40px 0; }
+  .note { background: var(--gray-100); border-radius: var(--radius-sm); padding: 20px 24px; margin: 24px 0; font-size: 14px; line-height: 1.8; color: var(--gray-700); }
+  .note-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-500); margin-bottom: 6px; }
+  .callout { background: linear-gradient(135deg, var(--teal-50) 0%, var(--blue-50) 100%); border: 1px solid var(--teal-200); border-radius: var(--radius); padding: 28px 32px; margin: 32px 0; text-align: center; }
+  .callout-icon { font-size: 28px; margin-bottom: 12px; }
+  .callout-text { font-size: 17px; font-weight: 600; line-height: 1.7; }
+  .callout-sub { font-size: 14px; color: var(--gray-600); margin-top: 10px; line-height: 1.7; }
+
+  .checklist { margin: 24px 0; }
+  .checklist-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--gray-100); }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-box { flex-shrink: 0; width: 22px; height: 22px; border: 2px solid var(--gray-300); border-radius: 4px; margin-top: 2px; }
+  .checklist-text { font-size: 15px; color: var(--gray-800); line-height: 1.6; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; font-family: 'IBM Plex Sans', sans-serif; letter-spacing: 0.04em; }
+  .badge-green { background: var(--green-50); color: var(--green-700); border: 1px solid var(--green-100); }
+  .badge-yellow { background: var(--yellow-50); color: var(--yellow-600); border: 1px solid var(--yellow-100); }
+  .badge-red { background: var(--red-50); color: var(--red-600); border: 1px solid var(--red-100); }
+
+  .task-list { margin: 20px 0; }
+  .task-item { display: flex; gap: 16px; align-items: flex-start; padding: 16px 0; border-bottom: 1px solid var(--gray-100); }
+  .task-item:last-child { border-bottom: none; }
+  .task-num { flex-shrink: 0; width: 28px; height: 28px; background: var(--gray-100); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 700; color: var(--gray-600); margin-top: 2px; }
+  .task-content { flex: 1; }
+  .task-name { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .task-detail { font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+
+  /* 付録専用スタイル */
+  .appendix-hero { background: var(--gray-100); border-bottom: 1px solid var(--gray-200); padding: 28px 24px; text-align: center; }
+  .appendix-hero-label { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-500); font-family: 'IBM Plex Sans', sans-serif; margin-bottom: 8px; }
+  .appendix-hero-title { font-size: 20px; font-weight: 700; color: var(--gray-800); }
+  .appendix-hero-sub { font-size: 14px; color: var(--gray-600); margin-top: 8px; }
+
+  @media (max-width: 640px) {
+    .hero { padding: 48px 20px 36px; } .hero h1 { font-size: 23px; }
+    .page { padding: 36px 20px 64px; }
+    .two-col, .shortcut-grid { grid-template-columns: 1fr; }
+    .card { padding: 22px 20px; }
+    .tab-btn { padding: 12px 12px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">AI Lesson — Session 03</div>
+    <h1>業務をAIに任せてみる</h1>
+    <p>座学はここまで。今日からは<strong>自分の仕事をAIで実際に動かす</strong>フェーズです。<br>持ち寄った業務リストをもとに、今日の1時間で1つ、形にしましょう。</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        60分 ／ 確認15分＋実践45分
+      </div>
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        1 on 1 レクチャー
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <button class="tab-btn active" data-page="0">ふりかえり</button>
+    <button class="tab-btn" data-page="1">業務の仕分け</button>
+    <button class="tab-btn" data-page="2">一緒にやってみよう</button>
+    <button class="tab-btn" data-page="3">経理コーチを育てる</button>
+    <button class="tab-btn" data-page="4">次のステップ</button>
+    <button class="tab-btn appendix" data-page="5">付録：PC操作ガイド</button>
+  </div>
+</nav>
+
+<div class="page-container">
+
+<!-- ━━━ Page 0: ふりかえり ━━━ -->
+<div class="page active" data-page="0">
+  <div class="section-header">
+    <div class="section-number">Review</div>
+    <h2 class="section-title">前回のふりかえり＋宿題発表</h2>
+  </div>
+  <div class="prose">
+    <p>前回は3つのことをやりました。</p>
+  </div>
+  <div class="card card-teal">
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">モードの使い分け</div>
+          <div class="step-desc">高速・思考・プロの3モード。プロモードは「精読モード」。PDFや重たい作業はプロモードが基本。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">紙のデータをAIに読ませる</div>
+          <div class="step-desc">手書きの経費帳をスキャンしてGeminiに渡す→表として書き起こす→CSV出力→会計ソフトへ。手入力ゼロが実現できる。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">自分専用「経理コーチ」Gemを作った</div>
+          <div class="step-desc">ディープリサーチで経理の教科書を作成→Gemに仕込む→「メガネさん」完成。365日いつでも相談できる先生が手元にある。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="note">
+    <div class="note-label">宿題の確認</div>
+    <p>前回お願いしていた宿題です。できているものがあれば教えてください。</p>
+    <div class="checklist">
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text">「メガネさん」（経理コーチGem）を使って経理の勉強を始めてみた</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text">簿記の練習問題や参考資料をGemに追加した</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text">毎日AIに何か話しかけた</div></div>
+    </div>
+  </div>
+
+  <div class="card card-blue" style="margin-top: 32px;">
+    <div class="card-label cl-blue">🎯 今日のメインイベント — 業務リスト発表</div>
+    <div class="prose">
+      <p>「AI化できそうな業務・時間がかかっているルーチンワーク」を<strong>5つピックアップ</strong>してきてもらいました。</p>
+      <p>まずはそのリストを聞かせてください。今日はその中から<strong>1〜2つを実際に動かす</strong>のがゴールです。</p>
+    </div>
+    <div class="task-list">
+      <div class="task-item">
+        <div class="task-num">1</div>
+        <div class="task-content">
+          <div class="task-name" style="color: var(--gray-400);">（発表をここで聞く）</div>
+          <div class="task-detail"></div>
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-num">2</div>
+        <div class="task-content"><div class="task-name" style="color: var(--gray-400);">（発表をここで聞く）</div></div>
+      </div>
+      <div class="task-item">
+        <div class="task-num">3</div>
+        <div class="task-content"><div class="task-name" style="color: var(--gray-400);">（発表をここで聞く）</div></div>
+      </div>
+      <div class="task-item">
+        <div class="task-num">4</div>
+        <div class="task-content"><div class="task-name" style="color: var(--gray-400);">（発表をここで聞く）</div></div>
+      </div>
+      <div class="task-item">
+        <div class="task-num">5</div>
+        <div class="task-content"><div class="task-name" style="color: var(--gray-400);">（発表をここで聞く）</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn hidden">← 前へ</button>
+    <span class="page-counter">0 / 4</span>
+    <button class="page-nav-btn primary" onclick="goPage(1)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 1: 業務の仕分け ━━━ -->
+<div class="page" data-page="1">
+  <div class="section-header">
+    <div class="section-number">Section 01</div>
+    <h2 class="section-title">業務を「仕分け」する</h2>
+  </div>
+  <div class="prose">
+    <p>出してもらった業務リスト、全部AIでできるわけではありません。<br>まず<strong>「今すぐできる／条件付きでできる／まだ難しい」の3つに仕分け</strong>するところから始めましょう。</p>
+    <p>仕分けの基準を知っておくと、今後も自分でジャッジできるようになります。</p>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">3つの仕分けカテゴリ</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker" style="background: var(--green-600);">✓</div>
+        <div class="step-content">
+          <div class="step-title">今すぐできる <span class="badge badge-green">即実践</span></div>
+          <div class="step-desc">文章作成・メール文案・データの読み取り・要約・表への変換・翻訳など。<br>今日この1時間でそのまま動かせるもの。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--yellow-600);">△</div>
+        <div class="step-content">
+          <div class="step-title">条件付きでできる <span class="badge badge-yellow">準備次第</span></div>
+          <div class="step-desc">社内のデータやフォーマットをAIに渡す準備が必要なもの。プロモードへのプランアップが必要なケースも。<br>今日は設計だけして、次回以降に実践する。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--red-600);">✕</div>
+        <div class="step-content">
+          <div class="step-title">まだ難しい <span class="badge badge-red">将来対応</span></div>
+          <div class="step-desc">他のシステムと連携が必要なもの、機密性が高くAIに渡せないもの、リアルタイム性が必要なもの。<br>「できない」ではなく「今はまだ」。技術は進んでいる。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="prose"><p><strong>仕分けに使える判断チャート</strong>です。迷ったらこれで確認してください。</p></div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">AIに頼めるかの判断ポイント</div>
+    <div class="two-col">
+      <div class="judge-card" style="border-left: 3px solid var(--green-600);">
+        <div class="judge-card-icon">📝</div>
+        <div class="judge-card-title">「言葉」を扱う作業</div>
+        <div class="judge-card-body">文章を書く・直す・まとめる・翻訳する——これはほぼ全部AIの得意領域。すぐ頼んでOK。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--green-600);">
+        <div class="judge-card-icon">📊</div>
+        <div class="judge-card-title">「整理・変換」する作業</div>
+        <div class="judge-card-body">バラバラなデータを表にする、PDFを読み取る、CSVに変換する——フォーマットを変える作業は得意。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--yellow-600);">
+        <div class="judge-card-icon">🔗</div>
+        <div class="judge-card-title">「他のシステムと繋がる」作業</div>
+        <div class="judge-card-body">会計ソフトへの自動入力、メールの自動送信など。連携の設定が必要。できるが準備がいる。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--red-600);">
+        <div class="judge-card-icon">🔒</div>
+        <div class="judge-card-title">「機密・個人情報」を含む作業</div>
+        <div class="judge-card-body">顧客の個人情報、社外秘の財務データなど。会社のルール確認が先。無断でAIに渡さない。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <div class="note-label">今日の進め方</div>
+    <p>持ってきた5つの業務を一緒に仕分けします。<strong>「今すぐできる」に入ったものの中から1〜2つ選んで、次のページで実際に動かします。</strong><br>「条件付き」のものは設計だけ今日やって、準備ができたら次回以降に実践します。</p>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(0)">← 前へ</button>
+    <span class="page-counter">1 / 4</span>
+    <button class="page-nav-btn primary" onclick="goPage(2)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 2: 一緒にやってみよう ━━━ -->
+<div class="page" data-page="2">
+  <div class="section-header">
+    <div class="section-number">Hands-on</div>
+    <h2 class="section-title">一緒にやってみよう</h2>
+  </div>
+  <div class="prose">
+    <p>仕分けで「今すぐできる」になった業務を、実際にGeminiで動かします。<br><strong>今日の1時間で、業務が1つ楽になった状態を作る</strong>のがゴールです。</p>
+    <p>完成度は100%じゃなくて大丈夫。「動いた」「使えそう」という感触を掴むことが大事です。</p>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">OJTの進め方</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">お題を1つ決める</div>
+          <div class="step-desc">「今すぐできる」に仕分けた業務の中から、<strong>今日やってみたいものを1つ選びます。</strong><br>「これが一番時間かかってる」「これが一番やってみたい」どちらでもOKです。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">メタプロンプトで依頼を整える</div>
+          <div class="step-desc">まず「目的・相手・成果物・制約」の4つを整理してから依頼します。<br>迷ったらAIに「この依頼をもっと良くするにはどう書けばいいか」と相談してもOK。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">動かして、確認して、直す</div>
+          <div class="step-desc">一発で完璧にはならなくて当然です。<br>出てきたものを見て「ここをこうして」と追加依頼しながら仕上げていきます。<br><strong>このやりとりの繰り返しが「AIを使いこなす」ということです。</strong></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">4</div>
+        <div class="step-content">
+          <div class="step-title">プロンプトを保存しておく</div>
+          <div class="step-desc">うまくいった依頼文は、メモ帳やGoogleドキュメントにコピーして保存してください。<br>次回また同じ業務が来たとき、<strong>そのまま貼り付けるだけで使い回せます。</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="prose"><p>業務の種類によって、使いやすいプロンプトの型が違います。参考にしてください。</p></div>
+
+  <div class="card">
+    <div class="card-label cl-blue">型 A — 書類・メール文を作る</div>
+    <div class="prompt-box">以下の目的でメール文を作成してください。<br><br>【目的】〇〇を△△さんに伝えるため<br>【相手】社内の□□さん（〇〇部門）<br>【成果物】メール本文（件名も）<br>【制約】丁寧だが硬すぎないトーン。300文字以内。<br><br>伝えたい内容：[ここに書く]</div>
+    <div class="note" style="margin-top: 12px;"><p>💡 社内メールは相手の部署や立場を書くと、トーンが自動で調整されます。</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-blue">型 B — データや書類を読み取って整理する</div>
+    <div class="prompt-box">このファイルを添付しました。まだ分析しないでください。<br><br>まず、何が含まれているか教えてください。<br>・列名（項目名）<br>・データの件数<br>・読み取れなかった部分があれば「？」と教えてください</div>
+    <div class="note" style="margin-top: 12px;"><p>💡 「まだ分析しないで」を入れるのがポイント。確認してから次のステップに進みます。</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-blue">型 C — 調べる・考える・相談する</div>
+    <div class="prompt-box">以下の状況について相談したいです。<br><br>【状況】[今困っていることや、やろうとしていることを書く]<br>【知りたいこと】[何を教えてほしいか]<br><br>知らないことや不確かなことは「わからない」と言ってください。<br>具体的な例を使って説明してください。</div>
+    <div class="note" style="margin-top: 12px;"><p>💡 「わからないと言っていい」を入れるとハルシネーション（もっともらしい嘘）を防げます。</p></div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🎯</div>
+    <div class="callout-text">「今日、1つの業務が楽になった」が今日のゴール。</div>
+    <div class="callout-sub">
+      完成じゃなくていい。「使えそう」という感触があればOK。<br>
+      うまくいったプロンプトは必ず保存して、次回に持ち越しましょう。
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(1)">← 前へ</button>
+    <span class="page-counter">2 / 4</span>
+    <button class="page-nav-btn primary" onclick="goPage(3)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 3: 経理コーチを育てる ━━━ -->
+<div class="page" data-page="3">
+  <div class="section-header">
+    <div class="section-number">Section 03</div>
+    <h2 class="section-title">経理コーチ「メガネさん」を育てる</h2>
+  </div>
+  <div class="prose">
+    <p>前回作った経理コーチGem「メガネさん」、使い始めていますか？</p>
+    <p>Gemは<strong>使えば使うほど、追加するほど賢くなります。</strong><br>今日は「育て方」を覚えて、もっと頼れる先生にしていきましょう。</p>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">メガネさんを育てる3つの方法</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">簿記の問題集をアップロードする</div>
+          <div class="step-desc">簿記3級・2級の問題集PDFや、ネットで拾ったテキストをGemの「知識」に追加します。<br>追加すると、<strong>「この問題の解き方を教えて」「仕訳の練習問題を出して」</strong>と頼めるようになります。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">会社のルールを覚えさせる</div>
+          <div class="step-desc">「うちの会社の経費精算ルール」「よく使う勘定科目の一覧」などをテキストで追加すると、<br><strong>「うちの会社ではどう処理する？」という会社固有の質問に答えられるようになります。</strong><br>※機密情報は会社のルールを確認してから追加してください。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">クイズ形式で自分をテストする</div>
+          <div class="step-desc">「簿記3級レベルの仕訳問題を5問出して」と頼むと、問題と答えを出してくれます。<br>通勤中や空き時間に使えば、<strong>独学よりはるかに効率よく知識が定着します。</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="prose"><p>知識を追加する手順と、日々の使い方プロンプト集です。</p></div>
+
+  <div class="card">
+    <div class="card-label cl-green">知識を追加する手順</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker" style="background: var(--green-600); font-size: 12px;">①</div>
+        <div class="step-content">
+          <div class="step-title">Geminiの左サイドバーから「メガネさん」を開く</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--green-600); font-size: 12px;">②</div>
+        <div class="step-content">
+          <div class="step-title">右上の「編集」（鉛筆マーク）をクリック</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--green-600); font-size: 12px;">③</div>
+        <div class="step-content">
+          <div class="step-title">「知識」セクションの「＋ファイルを追加」でPDFやテキストをアップロード</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--green-600); font-size: 12px;">④</div>
+        <div class="step-content">
+          <div class="step-title">「保存」して完了。次回から追加した知識を使って答えてくれます</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-blue">日々の使い方 — プロンプト例</div>
+    <div class="prompt-box" style="margin-bottom: 16px;">簿記3級レベルの仕訳問題を3問出してください。<br>答えはすぐ見せず、私が回答してから正誤を教えてください。</div>
+    <div class="prompt-box" style="margin-bottom: 16px;">今日、備品として文房具を3,200円分購入しました（現金払い）。<br>仕訳の書き方を教えてください。理由も一緒に説明してください。</div>
+    <div class="prompt-box">「減価償却」という言葉が出てきたのですが、意味がよくわかりません。<br>小学生でもわかるように説明して、具体的な例も見せてください。</div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">📚</div>
+    <div class="callout-text">毎日5分、メガネさんに話しかける。</div>
+    <div class="callout-sub">
+      難しい問題じゃなくていい。「今日これが出てきてよくわからなかった」でOK。<br>
+      続けることで、<strong>気づいたら経理の知識が体に入っている状態</strong>になります。
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(2)">← 前へ</button>
+    <span class="page-counter">3 / 4</span>
+    <button class="page-nav-btn primary" onclick="goPage(4)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 4: 次のステップ ━━━ -->
+<div class="page" data-page="4">
+  <div class="section-header">
+    <div class="section-number">Next Step</div>
+    <h2 class="section-title">次のステップ</h2>
+  </div>
+  <div class="prose">
+    <p>Session 03まで来ました。ここまでで、AIを使う基本的な力はしっかり身についています。<br>あとは<strong>「使い続けること」だけが鍵</strong>です。</p>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">次回までにやってみてほしいこと</div>
+    <div class="checklist">
+      <div class="checklist-item">
+        <div class="checklist-box"></div>
+        <div class="checklist-text"><strong>今日動かした業務を、一人でもう一回やってみる</strong><br><span style="font-size:13px; color: var(--gray-600);">「先生と一緒」ではなく「一人で再現できるか」が本当の定着のバロメーターです。</span></div>
+      </div>
+      <div class="checklist-item">
+        <div class="checklist-box"></div>
+        <div class="checklist-text"><strong>うまくいったプロンプトを保存・使い回す</strong><br><span style="font-size:13px; color: var(--gray-600);">Googleドキュメントに「プロンプト集」を作って、業務ごとに貯めていくと資産になります。</span></div>
+      </div>
+      <div class="checklist-item">
+        <div class="checklist-box"></div>
+        <div class="checklist-text"><strong>メガネさんに毎日5分話しかける</strong><br><span style="font-size:13px; color: var(--gray-600);">業務中に「あれってどうだっけ？」と思ったら、まずメガネさんに聞く習慣を。</span></div>
+      </div>
+      <div class="checklist-item">
+        <div class="checklist-box"></div>
+        <div class="checklist-text"><strong>「条件付き」業務の準備を進める</strong><br><span style="font-size:13px; color: var(--gray-600);">今日「条件付き」に仕分けた業務の準備（データ整理・フォーマット確認など）を少しずつ進めておく。</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-purple" style="margin-top: 28px;">
+    <div class="card-label cl-purple">これからの研修について</div>
+    <div class="prose">
+      <p>Session 04以降は<strong>2つの柱</strong>で進めていきます。</p>
+      <p>「あの業務もできるかな？」「これうまくいかなかった」——なんでも持ち込んでください。一緒に解決していきましょう。</p>
+    </div>
+    <div class="steps" style="margin-top: 20px;">
+      <div class="step">
+        <div class="step-marker" style="background: var(--purple-600);">①</div>
+        <div class="step-content">
+          <div class="step-title">業務伴走 — 持ち込んだ業務を一緒に動かし続ける</div>
+          <div class="step-desc">今日仕分けした「条件付き」の業務も、準備ができたら順番に実践していきます。<br>「うまくいかない」が出てきたときも一緒にデバッグしていきましょう。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--purple-600);">②</div>
+        <div class="step-content">
+          <div class="step-title">オフィスツール習得 — スプレッドシートとスライドの中にいるGemini</div>
+          <div class="step-desc">実は、<strong>GoogleスプレッドシートとGoogleスライドの中に直接Geminiが入っています。</strong><br>別タブでGeminiを開かなくても、作業している画面の中でAIに話しかけられます。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-blue" style="margin-top: 0;">
+    <div class="card-label cl-blue">🔜 次回予告 — 作業しながらAIに頼む</div>
+    <div class="prose">
+      <p>たとえばスプレッドシートで、こんなことができるようになります。</p>
+    </div>
+    <div class="steps" style="margin-top: 16px;">
+      <div class="step">
+        <div class="step-marker" style="background: var(--blue-600); font-size: 12px;">例1</div>
+        <div class="step-content">
+          <div class="step-title">関数を日本語で頼む</div>
+          <div class="step-desc">「B列の合計をC1に出したい」と話しかけるだけで、正しい関数を入力してくれる。<br>関数の書き方を覚えなくていい。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--blue-600); font-size: 12px;">例2</div>
+        <div class="step-content">
+          <div class="step-title">表からグラフを一発で作る</div>
+          <div class="step-desc">「この表を棒グラフにして、月別に並べて」と頼むだけ。<br>グラフの種類や並べ方の設定も全部AIがやってくれる。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--blue-600); font-size: 12px;">例3</div>
+        <div class="step-content">
+          <div class="step-title">スライドの叩き台を自動生成</div>
+          <div class="step-desc">「この数字をもとに、月次報告のスライドを作って」と頼むと、<br>スライドの構成・タイトル・内容の下書きを一気に出してくれる。</div>
+        </div>
+      </div>
+    </div>
+    <div class="note" style="margin-top: 16px;">
+      <p>💡 これはGoogleのWorkspaceプランに含まれている機能なので、<strong>今の契約のまま追加費用なしで使えます。</strong>次回、実際に一緒に触ってみましょう。</p>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(3)">← 前へ</button>
+    <span class="page-counter">4 / 4</span>
+    <button class="page-nav-btn hidden">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 5: 付録 PC操作ガイド ━━━ -->
+<div class="page" data-page="5">
+  <div class="appendix-hero">
+    <div class="appendix-hero-label">Appendix</div>
+    <div class="appendix-hero-title">PC操作のミニガイド</div>
+    <div class="appendix-hero-sub">AIを使う時に「あれ、どうやるんだっけ？」と詰まりやすい操作をまとめました。<br>いつでも見返してください。</div>
+  </div>
+
+  <div class="card" style="margin-top: 32px;">
+    <div class="card-label cl-teal">📸 スクリーンショット（画面を写真に撮る）</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker" style="background: var(--blue-600); font-size: 11px; width: 40px; border-radius: 8px;">Win</div>
+        <div class="step-content">
+          <div class="step-title">Windowsの場合</div>
+          <div class="step-desc">
+            <strong>① 画面全体：</strong>キーボードの「PrintScreen」キーを押す → クリップボードにコピーされる<br>
+            <strong>② 一部だけ切り取る（おすすめ）：</strong>「Windowsキー＋Shift＋S」を同時押し → 画面が暗くなる → 撮りたい範囲をドラッグ → 自動で保存される<br>
+            <strong>③ 保存場所：</strong>「ピクチャ」フォルダ内の「スクリーンショット」フォルダ
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--gray-700); font-size: 11px; width: 40px; border-radius: 8px;">Mac</div>
+        <div class="step-content">
+          <div class="step-title">Macの場合</div>
+          <div class="step-desc">
+            <strong>① 画面全体：</strong>「Command＋Shift＋3」→ デスクトップに保存される<br>
+            <strong>② 一部だけ切り取る（おすすめ）：</strong>「Command＋Shift＋4」→ 十字カーソルが出る → 撮りたい範囲をドラッグ<br>
+            <strong>③ 保存場所：</strong>デスクトップ
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note" style="margin-top: 16px;">
+      <p>💡 AIにレイアウトの問題を伝えるときは、スクショを撮って「ここがおかしい」と赤丸を描き込んで渡すと一発で伝わります。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">📎 GeminiにファイルをアップロードするSteps</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">Geminiの入力欄を開く</div>
+          <div class="step-desc">画面下の「メッセージを入力...」欄をクリック。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">「＋」ボタンをクリック</div>
+          <div class="step-desc">入力欄の左端にある「＋」マークをクリックすると、ファイルの種類を選べるメニューが出ます。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">ファイルを選んでアップロード</div>
+          <div class="step-desc">「ファイルをアップロード」→ パソコンの中からファイルを選ぶ。<br>PDF・画像（JPG/PNG）・Excelファイルなどが使えます。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">4</div>
+        <div class="step-content">
+          <div class="step-title">プロンプトを入力して送信</div>
+          <div class="step-desc">ファイルがアップロードされたら、「このファイルを読んで〇〇してください」と入力して送信。<br><strong>PDFや画像を読み取らせるときは、必ずプロモードにしてから送信してください。</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">⌨️ 覚えておくと便利なショートカットキー</div>
+    <div class="shortcut-grid">
+      <div class="shortcut-item">
+        <div class="shortcut-key">Ctrl + C</div>
+        <div class="shortcut-desc"><strong>コピー</strong><br>選択した文字や画像をコピーする</div>
+      </div>
+      <div class="shortcut-item">
+        <div class="shortcut-key">Ctrl + V</div>
+        <div class="shortcut-desc"><strong>貼り付け</strong><br>コピーした内容を貼り付ける</div>
+      </div>
+      <div class="shortcut-item">
+        <div class="shortcut-key">Ctrl + Z</div>
+        <div class="shortcut-desc"><strong>元に戻す</strong><br>直前の操作を取り消す。ミスしたらまずこれ</div>
+      </div>
+      <div class="shortcut-item">
+        <div class="shortcut-key">Ctrl + A</div>
+        <div class="shortcut-desc"><strong>全選択</strong><br>ページ内の文字をすべて選択する</div>
+      </div>
+      <div class="shortcut-item">
+        <div class="shortcut-key">Ctrl + S</div>
+        <div class="shortcut-desc"><strong>保存</strong><br>編集中のファイルを上書き保存する</div>
+      </div>
+      <div class="shortcut-item">
+        <div class="shortcut-key">Ctrl + F</div>
+        <div class="shortcut-desc"><strong>検索</strong><br>ページ内の文字を検索する</div>
+      </div>
+      <div class="shortcut-item">
+        <div class="shortcut-key">Alt + Tab</div>
+        <div class="shortcut-desc"><strong>ウィンドウ切り替え</strong><br>開いているアプリをすばやく切り替える</div>
+      </div>
+      <div class="shortcut-item">
+        <div class="shortcut-key">Win + D</div>
+        <div class="shortcut-desc"><strong>デスクトップ表示</strong><br>開いているウィンドウを全部一時的に隠す</div>
+      </div>
+    </div>
+    <div class="note" style="margin-top: 16px;">
+      <p>💡 MacはCtrlの代わりに「Command（⌘）」キーを使います。例：Command + C でコピー。</p>
+    </div>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">🆘 困ったときはまずAIに聞く</div>
+    <div class="prose">
+      <p>操作でわからないことがあったとき、検索する前に<strong>まずGeminiに聞いてみてください。</strong></p>
+    </div>
+    <div class="prompt-box" style="margin-top: 16px;">Windowsで、デスクトップにあるファイルを別のフォルダに移動する方法を教えてください。<br>パソコンに慣れていないので、ステップごとに丁寧に説明してください。</div>
+    <div class="prose" style="margin-top: 16px; font-size: 14px; color: var(--gray-700);">
+      <p>「パソコンに慣れていないので」と一言添えるだけで、AIは難しい言葉を使わずに、ステップごとに丁寧に教えてくれます。<br>検索より早くて、わからない部分を追加で聞けるのがAIの強みです。</p>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(4)">← 本編に戻る</button>
+    <span class="page-counter" style="color: var(--gray-400);">付録</span>
+    <button class="page-nav-btn hidden">次へ →</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const pages = document.querySelectorAll('.page');
+  function goPage(idx) {
+    tabBtns.forEach(b => b.classList.remove('active'));
+    tabBtns[idx].classList.add('active');
+    pages.forEach(p => p.classList.remove('active'));
+    pages[idx].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => goPage(parseInt(btn.dataset.page)));
+  });
+</script>
+</body>
+</html>

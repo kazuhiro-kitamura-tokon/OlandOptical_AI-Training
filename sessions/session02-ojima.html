@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Lesson Session 02 — AIの力を引き出す実践テクニック</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal-50: #e6f7f5; --teal-100: #b3ece6; --teal-200: #80e0d6;
+    --teal-500: #26a69a; --teal-600: #00897b; --teal-700: #00796b;
+    --orange-50: #fff3e0; --orange-100: #ffe0b2; --orange-600: #fb8c00;
+    --blue-50: #e8f0fe; --blue-100: #d2e3fc; --blue-200: #aecbfa;
+    --blue-600: #1a73e8; --blue-700: #1967d2;
+    --green-50: #e6f4ea; --green-100: #ceead6; --green-600: #1e8e3e; --green-700: #188038;
+    --yellow-50: #fef7e0; --yellow-100: #feefc3; --yellow-600: #f9ab00;
+    --red-50: #fce8e6; --red-100: #fad2cf; --red-600: #d93025;
+    --purple-50: #f3e8fd; --purple-100: #e8d0fb; --purple-600: #9334e6;
+    --gray-50: #f8f9fa; --gray-100: #f1f3f4; --gray-200: #e8eaed;
+    --gray-300: #dadce0; --gray-400: #bdc1c6; --gray-500: #9aa0a6;
+    --gray-600: #80868b; --gray-700: #5f6368; --gray-800: #3c4043; --gray-900: #202124;
+    --shadow-sm: 0 1px 2px rgba(60,64,67,0.1), 0 1px 3px rgba(60,64,67,0.08);
+    --shadow-md: 0 1px 3px rgba(60,64,67,0.12), 0 4px 8px rgba(60,64,67,0.08);
+    --radius: 12px; --radius-sm: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body {
+    font-family: 'Noto Sans JP', 'IBM Plex Sans', sans-serif;
+    background: var(--gray-50); color: var(--gray-900);
+    line-height: 1.9; font-size: 16px; min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  .hero {
+    background: linear-gradient(135deg, var(--teal-600) 0%, var(--teal-700) 40%, #004d40 100%);
+    color: white; padding: 68px 24px 48px; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -40%; right: -15%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-inner { max-width: 760px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-label { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; margin-bottom: 12px; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero h1 { font-size: 28px; font-weight: 700; line-height: 1.45; margin-bottom: 16px; }
+  .hero p { font-size: 15px; line-height: 1.8; opacity: 0.9; max-width: 600px; }
+  .hero-meta { margin-top: 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+  .hero-meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; opacity: 0.85; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero-meta-item svg { width: 18px; height: 18px; }
+
+  .tab-nav { position: sticky; top: 0; z-index: 100; background: white; border-bottom: 1px solid var(--gray-200); padding: 0 24px; box-shadow: var(--shadow-sm); }
+  .tab-nav-inner { max-width: 760px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
+  .tab-nav-inner::-webkit-scrollbar { display: none; }
+  .tab-btn { flex-shrink: 0; padding: 14px 16px; font-size: 13px; font-weight: 500; color: var(--gray-600); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: 'Noto Sans JP', sans-serif; }
+  .tab-btn:hover { color: var(--teal-600); background: var(--teal-50); }
+  .tab-btn.active { color: var(--teal-600); border-bottom-color: var(--teal-600); }
+
+  .page-container { flex: 1; }
+  .page { display: none; max-width: 760px; width: 100%; margin: 0 auto; padding: 48px 24px 80px; animation: pageIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes pageIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--gray-200); }
+  .page-nav-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--gray-300); background: white; color: var(--gray-700); transition: all 0.2s; font-family: 'Noto Sans JP', sans-serif; }
+  .page-nav-btn:hover { border-color: var(--teal-600); color: var(--teal-600); background: var(--teal-50); }
+  .page-nav-btn.primary { background: var(--teal-600); color: white; border-color: var(--teal-600); }
+  .page-nav-btn.primary:hover { background: var(--teal-700); }
+  .page-nav-btn.hidden { visibility: hidden; }
+  .page-counter { font-size: 13px; color: var(--gray-500); font-family: 'IBM Plex Sans', sans-serif; }
+
+  .section-header { margin-bottom: 32px; }
+  .section-number { font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--teal-600); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+  .section-title { font-size: 24px; font-weight: 700; line-height: 1.4; }
+  .prose { font-size: 16px; line-height: 2; color: var(--gray-800); }
+  .prose p { margin-bottom: 20px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { font-weight: 600; color: var(--gray-900); }
+
+  .card { background: white; border-radius: var(--radius); padding: 28px 32px; margin: 28px 0; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); }
+  .card-teal { background: var(--teal-50); border-color: var(--teal-200); }
+  .card-blue { background: var(--blue-50); border-color: var(--blue-200); }
+  .card-green { background: var(--green-50); border-color: var(--green-100); }
+  .card-orange { background: var(--orange-50); border-color: var(--orange-100); }
+  .card-yellow { background: var(--yellow-50); border-color: var(--yellow-100); }
+  .card-red { background: var(--red-50); border-color: var(--red-100); }
+  .card-purple { background: var(--purple-50); border-color: var(--purple-100); }
+  .card-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+  .cl-teal { color: var(--teal-600); } .cl-blue { color: var(--blue-600); } .cl-green { color: var(--green-700); }
+  .cl-orange { color: var(--orange-600); } .cl-yellow { color: var(--yellow-600); } .cl-red { color: var(--red-600); } .cl-purple { color: var(--purple-600); }
+
+  .steps { margin: 24px 0; }
+  .step { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
+  .step:last-child { margin-bottom: 0; }
+  .step-marker { flex-shrink: 0; width: 32px; height: 32px; background: var(--teal-600); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; font-weight: 600; margin-top: 2px; }
+  .step-content { flex: 1; }
+  .step-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .step-desc { font-size: 15px; color: var(--gray-700); line-height: 1.7; }
+
+  .prompt-box { background: var(--gray-900); color: #e8eaed; border-radius: var(--radius); padding: 24px 28px; margin: 24px 0; font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; line-height: 1.8; position: relative; }
+  .prompt-box::before { content: 'PROMPT'; position: absolute; top: 10px; right: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: var(--gray-500); }
+
+  .mode-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+  .mode-card { background: white; border-radius: var(--radius-sm); padding: 20px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); text-align: center; }
+  .mode-icon { font-size: 28px; margin-bottom: 10px; }
+  .mode-name { font-weight: 700; font-size: 16px; margin-bottom: 6px; }
+  .mode-detail { font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+  .mode-tag { display: inline-block; margin-top: 10px; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; font-family: 'IBM Plex Sans', sans-serif; }
+
+  .strength-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+  .strength-item { background: white; border-radius: var(--radius-sm); padding: 20px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); }
+  .strength-icon { font-size: 22px; margin-bottom: 8px; }
+  .strength-title { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+  .strength-desc { font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+
+  .divider { height: 1px; background: var(--gray-200); margin: 40px 0; }
+  .note { background: var(--gray-100); border-radius: var(--radius-sm); padding: 20px 24px; margin: 24px 0; font-size: 14px; line-height: 1.8; color: var(--gray-700); }
+  .note-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-500); margin-bottom: 6px; }
+  .practice { background: white; border: 2px dashed var(--teal-200); border-radius: var(--radius); padding: 28px 32px; margin: 32px 0; }
+  .practice-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal-600); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .callout { background: linear-gradient(135deg, var(--teal-50) 0%, var(--blue-50) 100%); border: 1px solid var(--teal-200); border-radius: var(--radius); padding: 28px 32px; margin: 32px 0; text-align: center; }
+  .callout-icon { font-size: 28px; margin-bottom: 12px; }
+  .callout-text { font-size: 17px; font-weight: 600; line-height: 1.7; }
+  .callout-sub { font-size: 14px; color: var(--gray-600); margin-top: 10px; line-height: 1.7; }
+
+  .checklist { margin: 24px 0; }
+  .checklist-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--gray-100); }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-box { flex-shrink: 0; width: 22px; height: 22px; border: 2px solid var(--gray-300); border-radius: 4px; margin-top: 2px; }
+  .checklist-text { font-size: 15px; color: var(--gray-800); line-height: 1.6; }
+
+  .flow-row { display: flex; align-items: center; gap: 12px; margin: 16px 0; flex-wrap: wrap; }
+  .flow-item { background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 10px 18px; font-size: 14px; font-weight: 500; box-shadow: var(--shadow-sm); }
+  .flow-arrow { color: var(--teal-600); font-size: 18px; font-weight: 700; }
+
+  .teacher-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+  .teacher-card { background: white; border-radius: var(--radius); padding: 22px 24px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); }
+  .teacher-card-icon { font-size: 24px; margin-bottom: 10px; }
+  .teacher-card-title { font-weight: 700; font-size: 15px; margin-bottom: 8px; }
+  .teacher-card-body { font-size: 13px; color: var(--gray-700); line-height: 1.7; }
+
+  @media (max-width: 640px) {
+    .hero { padding: 48px 20px 36px; } .hero h1 { font-size: 23px; }
+    .page { padding: 36px 20px 64px; }
+    .mode-grid, .strength-grid, .teacher-grid { grid-template-columns: 1fr; }
+    .card, .practice { padding: 22px 20px; }
+    .tab-btn { padding: 12px 12px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">AI Lesson — Session 02</div>
+    <h1>AIの力を引き出す実践テクニック</h1>
+    <p>前回学んだ「仕事の分解」を土台に、<br>紙のデータをAIに読ませる方法と、AIを「先生」として使う方法を身につけます。</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        60分 ／ 座学30分＋実践30分
+      </div>
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        1 on 1 レクチャー
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <button class="tab-btn active" data-page="0">ふりかえり</button>
+    <button class="tab-btn" data-page="1">モードの使い分け</button>
+    <button class="tab-btn" data-page="2">紙→データの電子化</button>
+    <button class="tab-btn" data-page="3">自分専用AI先生を作る</button>
+    <button class="tab-btn" data-page="4">得意と不得意</button>
+    <button class="tab-btn" data-page="5">一緒にやってみよう</button>
+  </div>
+</nav>
+
+<div class="page-container">
+
+<!-- ━━━ Page 0: ふりかえり ━━━ -->
+<div class="page active" data-page="0">
+  <div class="section-header">
+    <div class="section-number">Review</div>
+    <h2 class="section-title">前回のふりかえり</h2>
+  </div>
+  <div class="prose"><p>前回、3つのことを学びました。</p></div>
+  <div class="card card-teal">
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">AIは、雑な依頼だとぶれやすい</div>
+          <div class="step-desc">前提が足りないと、AIは「当てずっぽう」に近い状態で答えを出してしまう。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">良い依頼は、仕事の分解からできる</div>
+          <div class="step-desc">目的・相手・成果物・制約の4つを整理すると、AIの出力精度が大きく変わる。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">その分解すら、AIに手伝わせられる</div>
+          <div class="step-desc">メタプロンプトで「相談→質問→整理→完成」のステップを踏むと、実務レベルの依頼文が仕上がる。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="prose">
+    <p>今日はこの土台をベースに、<strong>AIを実業務で使いこなすための具体的な方法</strong>を学びます。</p>
+    <p>「なんとなく使える」から<strong>「自分の仕事に組み込んで使える」</strong>へ——そのための2つのスキルを今日は身につけていきましょう。</p>
+  </div>
+  <div class="note">
+    <div class="note-label">宿題の確認</div>
+    <p>前回お願いしていた宿題です。できているものがあれば教えてください。</p>
+    <div class="checklist">
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text">AIとたくさん話してみた（仕事じゃなくてもOK）</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text">メタプロンプトを1回試してみた</div></div>
+    </div>
+  </div>
+  <div class="page-nav">
+    <button class="page-nav-btn hidden">← 前へ</button>
+    <span class="page-counter">0 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(1)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 1: モードの使い分け ━━━ -->
+<div class="page" data-page="1">
+  <div class="section-header">
+    <div class="section-number">Section 01</div>
+    <h2 class="section-title">AIのモードを使い分ける</h2>
+  </div>
+  <div class="prose">
+    <p>前回、忘年会の案内メールを作ってもらったとき、Geminiの右側に「高速モード」「思考モード」「プロモード」があったのを覚えていますか？</p>
+    <p>これはただの「速さの違い」ではなく、<strong>AIが一度に読める情報量（コンテキストウィンドウ）</strong>が違うんです。これを理解すると、「なんかうまくいかない」の原因がすぐわかるようになります。</p>
+  </div>
+  <div class="mode-grid">
+    <div class="mode-card">
+      <div class="mode-icon">⚡</div>
+      <div class="mode-name">高速モード</div>
+      <div class="mode-detail">処理速度が速い。<br>短い会話や<br>アイデア出しに最適。</div>
+      <div class="mode-tag" style="background: var(--green-50); color: var(--green-700);">日常会話向き</div>
+    </div>
+    <div class="mode-card">
+      <div class="mode-icon">🧠</div>
+      <div class="mode-name">思考モード</div>
+      <div class="mode-detail">考える時間をかける。<br>複雑な分析や<br>論理的な作業に。</div>
+      <div class="mode-tag" style="background: var(--blue-50); color: var(--blue-600);">分析・考察向き</div>
+    </div>
+    <div class="mode-card">
+      <div class="mode-icon">💎</div>
+      <div class="mode-name">プロモード</div>
+      <div class="mode-detail">最大の処理能力。<br>大量データや<br>長文書類の読み込みに。</div>
+      <div class="mode-tag" style="background: var(--purple-50); color: var(--purple-600);">高精度作業向き</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label cl-teal">なぜモードで差が出るのか</div>
+    <div class="prose">
+      <p>高速モードは、いわば<strong>「斜め読みモード」</strong>です。<br>情報量が多いと、AIは自動的に要約してから処理します。「見ました」と言っていても、実は全部は読めていません。</p>
+      <p>プロモードは、<strong>「精読モード」</strong>です。<br>コンテキストウィンドウ（一度に抱えられる情報量）が大きいので、書類の隅々まで目を通した上で回答してくれます。<br>PDFや画像を読ませるときは<strong>必ずプロモード</strong>にする、と覚えておきましょう。</p>
+    </div>
+  </div>
+  <div class="card card-teal">
+    <div class="card-label cl-teal">使い分けの判断基準</div>
+    <div class="prose">
+      <p><strong>高速モード →</strong> メタプロンプトでの壁打ち、メールの文案作成、ちょっとした質問や相談。会話のやりとりが多い作業。</p>
+      <p><strong>思考モード →</strong> 複雑な状況の分析、原因の考察、長めの文章の構成検討。「じっくり考えてほしい」作業。</p>
+      <p><strong>プロモード →</strong> PDFやスキャン画像の読み込み、大量データの分析、Excelやスプレッドシートの処理。「正確さが命」の作業。</p>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="callout-icon">💡</div>
+    <div class="callout-text">会話はたくさん、仕上げは1発。</div>
+    <div class="callout-sub">
+      メタプロンプトでの壁打ちや依頼の整理は高速モードで何往復でも。<br>
+      最終的な成果物を出すときだけプロモードに切り替える。<br>
+      これが、回数制限を気にしながらも精度を保つ<strong>いちばん賢い使い方</strong>です。
+    </div>
+  </div>
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(0)">← 前へ</button>
+    <span class="page-counter">1 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(2)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 2: 紙→データの電子化 ━━━ -->
+<div class="page" data-page="2">
+  <div class="section-header">
+    <div class="section-number">Section 02</div>
+    <h2 class="section-title">紙のデータをAIに読ませる</h2>
+  </div>
+  <div class="prose">
+    <p>総務の仕事には、紙の書類や手書きの記録が多くありますよね。<br>「これ、ExcelやGoogleスプレッドシートに入力するの大変だな」と感じたことはありませんか？</p>
+    <p>実は、<strong>AIはスキャンした画像やPDFを見て、表にまとめてくれる</strong>ことができます。<br>難しそうに見えるかもしれませんが、やってみるとびっくりするほど簡単です。</p>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">📄</div>
+    <div class="callout-text">紙 → スキャン → AIに渡す → テキスト化 → Excel</div>
+    <div class="callout-sub">この流れを一度覚えると、手入力の時間が大きく減ります。</div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">基本の流れ（4ステップ）</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">スキャンまたは写真を撮る</div>
+          <div class="step-desc">紙の書類をスキャナーでPDFにするか、スマホで写真を撮ります。<br>コツは、<strong>なるべく真上から、影が入らないように撮る</strong>こと。斜めになっていても意外と読めますが、鮮明な方が精度が上がります。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">GeminiにPDF/画像を添付する</div>
+          <div class="step-desc">Geminiの入力欄の左に「＋」ボタンがあります。そこからファイルをアップロード。<br><strong>このときは必ずプロモードに切り替えてください。</strong>画像やPDFの読み取りはプロモードが断然精度が高いです。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">「表にして」と頼む</div>
+          <div class="step-desc">ただ渡すだけでなく、<strong>欲しい形を指定するのがポイント</strong>です。<br>「この書類の内容を表にしてください」だけでも動きますが、列名を指定するともっと正確になります。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">4</div>
+        <div class="step-content">
+          <div class="step-title">内容を確認してコピーする</div>
+          <div class="step-desc">AIが表を作ったら、<strong>必ず元の紙と見比べて確認</strong>してください。<br>読み取りミスは必ず起きます。確認してから「コピー」してExcelやスプレッドシートに貼り付けます。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="prose"><p><strong>実際にどう指示するか</strong>、場面別のプロンプト例を見てみましょう。</p></div>
+
+  <div class="card">
+    <div class="card-label cl-blue">パターン 1 — 表形式の書類（請求書・納品書など）</div>
+    <div class="prompt-box">このPDFを添付しました。<br><br>書類の内容を読み取って、以下の列で表にしてください。<br>・日付 ・品名 ・数量 ・単価 ・金額<br><br>読み取れない部分は「？」と入力してください。</div>
+    <div class="note" style="margin-top: 16px;">
+      <p>💡 <strong>「読み取れない部分は？にして」</strong>を入れておくと、AIが勝手に補完するのを防げます。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-blue">パターン 2 — 手書きのメモ・記録</div>
+    <div class="prompt-box">この写真は手書きのメモです。<br><br>読み取れる内容をすべてテキストに起こしてください。<br>読み取れなかった文字は「■」で埋めてください。<br>文章の構造（見出し・箇条書きなど）はそのまま再現してください。</div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-blue">パターン 3 — 会計関連の書類をExcel向けに整理</div>
+    <div class="prompt-box">このスキャンデータを読み取って、Excelに貼り付けられる形で表にしてください。<br><br>列構成：<br>・勘定科目 ・摘要 ・金額（円）・日付<br><br>日付はYYYY/MM/DD形式で統一してください。<br>金額は数字のみ（カンマなし）で出力してください。</div>
+    <div class="note" style="margin-top: 16px;">
+      <p>💡 <strong>「日付の書式」や「金額のカンマなし」</strong>を指定しておくと、ExcelやCSVへの貼り付けがスムーズです。</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card card-orange">
+    <div class="card-label cl-orange">CSV形式で出力してもらうと、さらに便利</div>
+    <div class="prose">
+      <p>表を作ってもらったあと、こう頼むと<strong>Excelや会計ソフトに直接インポートできる</strong>形式で出力してもらえます。</p>
+    </div>
+    <div class="prompt-box">この表をCSV形式で出力してください。<br>1行目はヘッダー行にしてください。</div>
+    <div class="prose" style="font-size: 14px; color: var(--gray-700); margin-top: 16px;">
+      <p>CSVとは「カンマで区切ったテキストデータ」のことです。表計算ソフトや多くの会計ソフトが対応しているので、コピーしてファイルとして保存すれば、直接インポートできます。<br><strong>手入力がゼロになる</strong>のがいちばんの強みです。</p>
+    </div>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">まとめ：電子化フローの全体像</div>
+    <div class="flow-row">
+      <div class="flow-item">📄 紙の書類</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item">📷 スキャン/写真</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item">🤖 AIに渡す（プロモード）</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item">✅ 内容確認</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item">📊 Excel/会計ソフトへ</div>
+    </div>
+    <div class="prose" style="margin-top: 16px; font-size: 14px; color: var(--gray-700);">
+      <p>一度慣れてしまえば、<strong>紙1枚の入力が5分→1分以内</strong>になります。最初の数回は確認の手間がかかりますが、確認しながら慣れることで精度も上がっていきます。</p>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(1)">← 前へ</button>
+    <span class="page-counter">2 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(3)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 3: 自分専用AI先生を作る ━━━ -->
+<div class="page" data-page="3">
+  <div class="section-header">
+    <div class="section-number">Section 03</div>
+    <h2 class="section-title">自分専用「経理AI先生」を作る</h2>
+  </div>
+  <div class="prose">
+    <p>ここからが今日のハイライトです。</p>
+    <p>「AIに経理を教えてもらう」だけでも便利ですが、もう一歩進んで<strong>「自分のことを知った上で教えてくれる、専用のAI先生」を作る</strong>ことができます。</p>
+    <p>難しそうに聞こえますが、手順は3ステップ。今日はその全体像を理解して、実際に動かしてみましょう。</p>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">全体の流れ</div>
+    <div class="flow-row" style="justify-content: center; gap: 8px;">
+      <div class="flow-item" style="text-align:center;">🔍<br><span style="font-size:12px;">Step 1<br>ディープリサーチ</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item" style="text-align:center;">🤖<br><span style="font-size:12px;">Step 2<br>Gemsに仕込む</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item" style="text-align:center;">🎓<br><span style="font-size:12px;">Step 3<br>先生と対話する</span></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Step 1 -->
+  <div class="card" style="border-left: 4px solid var(--blue-600);">
+    <div class="card-label cl-blue">Step 1 — ディープリサーチで「教科書」を作る</div>
+    <div class="prose">
+      <p>Geminiには<strong>「ディープリサーチ」</strong>という機能があります。<br>通常の検索と違い、AIが自律的にウェブを何十か所も調べ回って、<strong>数十ページ分のレポートを自動で作ってくれる</strong>機能です。</p>
+      <p>これを使って、まず「経理の基礎知識まとめ」を作ります。<br>自分で勉強するのではなく、<strong>AIに自分のための教科書を作らせる</strong>イメージです。</p>
+    </div>
+    <div class="prompt-box">以下のテーマで、私が独学で経理を学ぶための教科書をまとめてください。<br><br>【対象】経理の実務担当者。独学で学んできたため基礎に不安がある。<br>【内容に含めてほしいこと】<br>・借方・貸方の基本（仕訳の考え方）<br>・よく使う勘定科目一覧と使い方<br>・月次の経理業務の流れ（売上・仕入・経費・給与）<br>・領収書・請求書の管理と記帳の手順<br>・決算に向けた準備の基本<br><br>【出力形式】見出しと箇条書きで整理。専門用語には必ず注釈を入れること。</div>
+    <div class="note" style="margin-top: 16px;">
+      <p>💡 ディープリサーチはGeminiの画面上部「ディープリサーチ」タブから使えます。通常より時間がかかりますが（5〜10分）、出てくるレポートの質が全然違います。</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Step 2 -->
+  <div class="card" style="border-left: 4px solid var(--green-600);">
+    <div class="card-label cl-green">Step 2 — Gemsに仕込んで「専用AI先生」を作る</div>
+    <div class="prose">
+      <p><strong>Gems</strong>とは、Geminiをカスタマイズして「専門知識を持った自分専用AI」を作る機能です。<br>Step 1で作ったレポートをGemsに読み込ませると、<strong>「経理の基礎を熟知した上で、小島さんに合わせて教えてくれるAI」</strong>が完成します。</p>
+    </div>
+
+    <div class="steps" style="margin-top: 20px;">
+      <div class="step">
+        <div class="step-marker" style="background: var(--green-600);">1</div>
+        <div class="step-content">
+          <div class="step-title">Gemsを開く</div>
+          <div class="step-desc">Geminiの左サイドバーから「Gems」→「新しいGemを作成」をクリック。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--green-600);">2</div>
+        <div class="step-content">
+          <div class="step-title">名前とアイコンをつける</div>
+          <div class="step-desc">「経理の先生」など、わかりやすい名前をつける。前回学んだ「名前をつけることの意味」、ここでも使えます。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--green-600);">3</div>
+        <div class="step-content">
+          <div class="step-title">「指示」にプロンプトを貼る</div>
+          <div class="step-desc">下のプロンプトをそのまま貼り付け、Step 1で作ったレポートの内容も一緒に追加します。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--green-600);">4</div>
+        <div class="step-content">
+          <div class="step-title">保存して完成</div>
+          <div class="step-desc">「保存」を押すと、左サイドバーに専用AIが追加されます。以後はここから呼び出すだけ。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="prompt-box" style="margin-top: 20px;">あなたは「経理の家庭教師」です。<br><br>【あなたの役割】<br>私（小島）は総務担当として経理業務を独学でこなしてきました。<br>専門的な教育を受けていないため、基礎が不安定な部分があります。<br>あなたは私の専任の経理教師として、以下のルールで教えてください。<br><br>【教え方のルール】<br>・専門用語が出たら必ず平易な言葉で補足する<br>・「うちの会社で言うと〜」という具体例を必ず入れる<br>・一度に大量の情報を出さず、理解を確認しながら進む<br>・間違った理解をしていたら、責めずに優しく訂正する<br>・「なぜそうなるのか」の理由も必ず説明する<br><br>【持っている知識】<br>（ここにStep 1のレポート内容を貼り付ける）</div>
+  </div>
+
+  <!-- Gemsが使えない場合 -->
+  <div class="card card-yellow" style="margin-top: 24px;">
+    <div class="card-label cl-yellow">⚠️ Gemsが使えない場合（Gemini Advanced未契約）</div>
+    <div class="prose">
+      <p>GemsはGemini Advancedプラン（有料）が必要な機能です。<br>現在の契約で使えない場合は、<strong>「簡易版」で同じことができます。</strong></p>
+      <p>毎回チャットを始めるとき、上のプロンプト（教え方のルール部分）をコピーして最初に貼り付けるだけ。<br>少し手間ですが、効果はほぼ同じです。</p>
+    </div>
+    <div class="note" style="margin-top: 12px; background: var(--yellow-50); border-radius: var(--radius-sm);">
+      <p>💡 <strong>「Gemsを使いたいからAdvancedに上げてほしい」</strong>という交渉材料にもなります。実際にやりたいことがあって、それに必要な機能がある——これが稟議を通す最短ルートです。</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Step 3 -->
+  <div class="card" style="border-left: 4px solid var(--purple-600);">
+    <div class="card-label cl-purple">Step 3 — 専用AI先生と対話する</div>
+    <div class="prose">
+      <p>Gemができたら、あとは普通に話しかけるだけです。<br>一般のGeminiと違うのは、<strong>「経理の知識を持ち、小島さん向けの教え方を知っている」状態で答えてくれる</strong>点です。</p>
+    </div>
+    <div class="teacher-grid" style="margin-top: 16px;">
+      <div class="teacher-card">
+        <div class="teacher-card-icon">🤔</div>
+        <div class="teacher-card-title">疑問があるとき</div>
+        <div class="teacher-card-body">「借方と貸方、また混乱してきた。もう一回教えて」<br>→ 何回聞いても嫌がらず、毎回丁寧に教えてくれる</div>
+      </div>
+      <div class="teacher-card">
+        <div class="teacher-card-icon">📋</div>
+        <div class="teacher-card-title">業務処理の相談</div>
+        <div class="teacher-card-body">「今月、備品を15,000円で購入した。どう仕訳する？」<br>→ 勘定科目・仕訳の書き方をその場で教えてくれる</div>
+      </div>
+      <div class="teacher-card">
+        <div class="teacher-card-icon">✅</div>
+        <div class="teacher-card-title">自分の作業の確認</div>
+        <div class="teacher-card-body">「この仕訳、合ってるか確認して」と作業内容を見せる<br>→ 間違いがあれば理由つきで指摘してくれる</div>
+      </div>
+      <div class="teacher-card">
+        <div class="teacher-card-icon">📚</div>
+        <div class="teacher-card-title">体系的に学ぶ</div>
+        <div class="teacher-card-body">「月次業務の流れを最初から教えて。1項目ずつ確認しながら進めたい」<br>→ ペースに合わせてカリキュラムを組んでくれる</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🎓</div>
+    <div class="callout-text">自分専用のAI先生は、使えば使うほど賢くなる。</div>
+    <div class="callout-sub">
+      質問を重ねるほど、あなたの理解レベルや疑問のパターンが蓄積されていきます。<br>「いつでも聞ける先生」が手元にいる状態——<br>これが、<strong>独学での経理学習をまったく別次元に変えてくれます。</strong>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(2)">← 前へ</button>
+    <span class="page-counter">3 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(4)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 4: 得意と不得意 ━━━ -->
+<div class="page" data-page="4">
+  <div class="section-header">
+    <div class="section-number">Section 04</div>
+    <h2 class="section-title">AIの得意なこと・苦手なこと</h2>
+  </div>
+  <div class="prose">
+    <p>AIはすごく便利ですが、何でもできるわけではありません。<br>得意なことと苦手なことを知っておくと、<strong>「AIに任せる場面」と「自分で確認する場面」</strong>がはっきりして、失敗が減ります。</p>
+  </div>
+
+  <div class="prose"><p><strong>🟢 AIが得意なこと</strong></p></div>
+  <div class="strength-grid">
+    <div class="strength-item" style="border-left: 4px solid var(--green-600);">
+      <div class="strength-icon">📝</div>
+      <div class="strength-title">文章の生成・リライト</div>
+      <div class="strength-desc">メール、報告書、案内文。ゼロから書くのも、既存文のトーン変更や要約も得意。</div>
+    </div>
+    <div class="strength-item" style="border-left: 4px solid var(--green-600);">
+      <div class="strength-icon">🔍</div>
+      <div class="strength-title">情報の要約・整理</div>
+      <div class="strength-desc">長い文書の要点抽出、議事録のまとめ、情報の構造化。「この資料を3行でまとめて」が一瞬。</div>
+    </div>
+    <div class="strength-item" style="border-left: 4px solid var(--green-600);">
+      <div class="strength-icon">📷</div>
+      <div class="strength-title">画像・PDF の読み取り</div>
+      <div class="strength-desc">スキャンデータや写真を見て、テキストや表として出力。手入力の代わりに使える。</div>
+    </div>
+    <div class="strength-item" style="border-left: 4px solid var(--green-600);">
+      <div class="strength-icon">💡</div>
+      <div class="strength-title">アイデア出し・壁打ち</div>
+      <div class="strength-desc">施策案、文章の構成案、対応方針のアイデア。大量の候補を短時間で出してくれる。</div>
+    </div>
+    <div class="strength-item" style="border-left: 4px solid var(--green-600);">
+      <div class="strength-icon">🎓</div>
+      <div class="strength-title">教える・解説する</div>
+      <div class="strength-desc">経理・法律・税務など、専門知識をわかりやすく解説してもらえる。質問に応じてレベルも調整できる。</div>
+    </div>
+    <div class="strength-item" style="border-left: 4px solid var(--green-600);">
+      <div class="strength-icon">🔄</div>
+      <div class="strength-title">フォーマット変換</div>
+      <div class="strength-desc">「この表をメール文にして」「議事録を箇条書きにして」——形式の変換が非常に速い。</div>
+    </div>
+    <div class="strength-item" style="border-left: 4px solid var(--green-600);">
+      <div class="strength-icon">📊</div>
+      <div class="strength-title">データの整理・分析</div>
+      <div class="strength-desc">スプレッドシートやCSVから傾向を見つける、表を整理する。CSVで渡すと特に正確。</div>
+    </div>
+    <div class="strength-item" style="border-left: 4px solid var(--green-600);">
+      <div class="strength-icon">🌐</div>
+      <div class="strength-title">翻訳・多言語対応</div>
+      <div class="strength-desc">英語メール、外国語の資料理解。ニュアンスを含めた自然な翻訳が可能。</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="prose"><p><strong>🔴 AIが苦手なこと・注意が必要なこと</strong></p></div>
+  <div class="strength-grid">
+    <div class="strength-item" style="border-left: 4px solid var(--red-600);">
+      <div class="strength-icon">👻</div>
+      <div class="strength-title">知らないことでも自信満々に答える</div>
+      <div class="strength-desc">これが実務でいちばん危険。AIは「わかりません」と言わず、それらしい嘘を作ることがある（ハルシネーション）。<strong>事実確認は必ず自分で。</strong></div>
+    </div>
+    <div class="strength-item" style="border-left: 4px solid var(--red-600);">
+      <div class="strength-icon">🔢</div>
+      <div class="strength-title">数値計算は「条件付き」</div>
+      <div class="strength-desc">AI単体で暗算させると間違えることがある。金額の計算などは、AIに表を作らせた後、自分でも確認する習慣をつけること。</div>
+    </div>
+    <div class="strength-item" style="border-left: 4px solid var(--red-600);">
+      <div class="strength-icon">🏢</div>
+      <div class="strength-title">自社固有の情報は知らない</div>
+      <div class="strength-desc">社内規定、取引先の特性、自社のルール——これらはAIの学習データにない。使うなら必ずコンテキストとして渡す。</div>
+    </div>
+    <div class="strength-item" style="border-left: 4px solid var(--red-600);">
+      <div class="strength-icon">📅</div>
+      <div class="strength-title">最新情報は「検索」が必要</div>
+      <div class="strength-desc">AIの知識には期限がある。ただし、Geminiの検索機能を使えば最新情報にアクセスできる。税制改正など最新情報が必要なときは「検索して調べて」と一言加える。</div>
+    </div>
+    <div class="strength-item" style="border-left: 4px solid var(--red-600);">
+      <div class="strength-icon">📏</div>
+      <div class="strength-title">手書き文字の読み取りミス</div>
+      <div class="strength-desc">印字された文字は高精度で読めるが、手書き（特に崩し字）は読み取りミスが起きやすい。読み取り後は必ず確認すること。</div>
+    </div>
+    <div class="strength-item" style="border-left: 4px solid var(--red-600);">
+      <div class="strength-icon">🔒</div>
+      <div class="strength-title">機密情報の扱いに注意</div>
+      <div class="strength-desc">AIに入力したデータがどう扱われるかはサービスによって異なる。顧客の個人情報や機密データを入力する場合は、会社のルールを確認すること。</div>
+    </div>
+  </div>
+
+  <div class="card card-orange" style="margin-top: 32px;">
+    <div class="card-label cl-orange">実務での心構え</div>
+    <div class="prose">
+      <p><strong>AIの出力は「優秀なアシスタントの第一稿」と思う。</strong></p>
+      <p>得意なこと → 積極的に任せて、自分の時間を確保する。<br>苦手なこと → AIの出力を叩き台にしつつ、最終確認は自分で行う。</p>
+      <p>特に<strong>ハルシネーション（もっともらしい嘘）</strong>への意識が大事です。<br>「AIが言ってるから正しい」ではなく、「AIが出してくれたから、ここだけ自分で確認しよう」——この姿勢が、AIと長く付き合うための基本になります。</p>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(3)">← 前へ</button>
+    <span class="page-counter">4 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(5)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 5: 一緒にやってみよう ━━━ -->
+<div class="page" data-page="5">
+  <div class="section-header">
+    <div class="section-number">Hands-on</div>
+    <h2 class="section-title">一緒にやってみよう</h2>
+  </div>
+  <div class="prose">
+    <p>ここからはOJTパートです。<br>今日学んだことを使って、<strong>実際の業務課題に一緒に取り組みます</strong>。</p>
+    <p>難しく考えなくて大丈夫です。「やってみたら意外と動いた」という体験をまず1つ作ることがゴールです。</p>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">お題の候補</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">A</div>
+        <div class="step-content">
+          <div class="step-title">紙のデータを1枚、電子化してみる</div>
+          <div class="step-desc">手元にある紙の書類（請求書・記録・メモなど）を写真またはPDFでAIに渡して、表に起こしてみる。<br>「これって使えるのかな？」の感触を確かめるのがゴール。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">B</div>
+        <div class="step-content">
+          <div class="step-title">経理の相談をAIにしてみる</div>
+          <div class="step-desc">いま迷っている処理、以前からよくわからないままにしていること、何でもOK。<br>AIを先生にして、実際に会話してみる。<br>「思ってたより理解できた」という体験をゴールにする。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">C</div>
+        <div class="step-content">
+          <div class="step-title">日常業務のメールや文書をAIで作ってみる</div>
+          <div class="step-desc">社内向けのお知らせ文、連絡メール、報告書のたたき台など。<br>前回のメタプロンプトを活用して、4つの要素（目的・相手・成果物・制約）を整理してから依頼してみる。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">OJTの進め方</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">お題を決める</div>
+          <div class="step-desc">A・B・Cの中から今日取り組むお題を一緒に決めます。<br>「やってみたいもの」「業務で困っているもの」どちらでもOKです。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">一緒に動かしてみる</div>
+          <div class="step-desc">今日学んだプロンプトを参考にしながら、実際にGeminiで操作します。<br>うまくいかなくても大丈夫。「なぜうまくいかないか」を一緒に考えるのも学習です。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">「今日の成果」を1つ持ち帰る</div>
+          <div class="step-desc">作ったプロンプト、出てきた表、学んだことのメモ——何でもいいので、<strong>今日動かしたものを手元に残して</strong>ください。<br>それが次回以降の土台になります。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card card-purple">
+    <div class="card-label cl-purple">次回に向けて</div>
+    <div class="prose"><p>次回も座学＋OJTの形で進めていきます。</p></div>
+    <div class="checklist">
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>電子化を1回やってみる</strong> — 手元の書類を1枚、今日の手順でAIに読ませてみてください。</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>経理の疑問をAIに聞いてみる</strong> — 仕事中に「あれってどうだっけ？」と思ったら、まずAIに聞いてみる習慣を。</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>毎日AIに話しかける</strong> — 仕事でなくてもOK。使う頻度が上がると、自然に使い方が身についてきます。</div></div>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(4)">← 前へ</button>
+    <span class="page-counter">5 / 5</span>
+    <button class="page-nav-btn hidden">次へ →</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const pages = document.querySelectorAll('.page');
+  function goPage(idx) {
+    tabBtns.forEach(b => b.classList.remove('active'));
+    tabBtns[idx].classList.add('active');
+    pages.forEach(p => p.classList.remove('active'));
+    pages[idx].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => goPage(parseInt(btn.dataset.page)));
+  });
+</script>
+</body>
+</html>
