@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Lesson Session 04 — AIを自分のものにする</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal-50: #e6f7f5; --teal-100: #b3ece6; --teal-200: #80e0d6;
+    --teal-500: #26a69a; --teal-600: #00897b; --teal-700: #00796b;
+    --orange-50: #fff3e0; --orange-100: #ffe0b2; --orange-600: #fb8c00;
+    --blue-50: #e8f0fe; --blue-100: #d2e3fc; --blue-200: #aecbfa;
+    --blue-600: #1a73e8; --blue-700: #1967d2;
+    --green-50: #e6f4ea; --green-100: #ceead6; --green-600: #1e8e3e; --green-700: #188038;
+    --yellow-50: #fef7e0; --yellow-100: #feefc3; --yellow-600: #f9ab00;
+    --red-50: #fce8e6; --red-100: #fad2cf; --red-600: #d93025;
+    --purple-50: #f3e8fd; --purple-100: #e8d0fb; --purple-600: #9334e6;
+    --gray-50: #f8f9fa; --gray-100: #f1f3f4; --gray-200: #e8eaed;
+    --gray-300: #dadce0; --gray-400: #bdc1c6; --gray-500: #9aa0a6;
+    --gray-600: #80868b; --gray-700: #5f6368; --gray-800: #3c4043; --gray-900: #202124;
+    --shadow-sm: 0 1px 2px rgba(60,64,67,0.1), 0 1px 3px rgba(60,64,67,0.08);
+    --shadow-md: 0 1px 3px rgba(60,64,67,0.12), 0 4px 8px rgba(60,64,67,0.08);
+    --radius: 12px; --radius-sm: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body {
+    font-family: 'Noto Sans JP', 'IBM Plex Sans', sans-serif;
+    background: var(--gray-50); color: var(--gray-900);
+    line-height: 1.9; font-size: 16px; min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  .hero {
+    background: linear-gradient(135deg, var(--teal-600) 0%, var(--teal-700) 40%, #004d40 100%);
+    color: white; padding: 68px 24px 48px; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -40%; right: -15%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-inner { max-width: 760px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-label { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; margin-bottom: 12px; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero h1 { font-size: 28px; font-weight: 700; line-height: 1.45; margin-bottom: 16px; }
+  .hero p { font-size: 15px; line-height: 1.8; opacity: 0.9; max-width: 600px; }
+  .hero-meta { margin-top: 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+  .hero-meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; opacity: 0.85; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero-meta-item svg { width: 18px; height: 18px; }
+
+  .tab-nav { position: sticky; top: 0; z-index: 100; background: white; border-bottom: 1px solid var(--gray-200); padding: 0 24px; box-shadow: var(--shadow-sm); }
+  .tab-nav-inner { max-width: 760px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
+  .tab-nav-inner::-webkit-scrollbar { display: none; }
+  .tab-btn { flex-shrink: 0; padding: 14px 16px; font-size: 13px; font-weight: 500; color: var(--gray-600); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: 'Noto Sans JP', sans-serif; }
+  .tab-btn:hover { color: var(--teal-600); background: var(--teal-50); }
+  .tab-btn.active { color: var(--teal-600); border-bottom-color: var(--teal-600); }
+
+  .page-container { flex: 1; }
+  .page { display: none; max-width: 760px; width: 100%; margin: 0 auto; padding: 48px 24px 80px; animation: pageIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes pageIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--gray-200); }
+  .page-nav-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--gray-300); background: white; color: var(--gray-700); transition: all 0.2s; font-family: 'Noto Sans JP', sans-serif; }
+  .page-nav-btn:hover { border-color: var(--teal-600); color: var(--teal-600); background: var(--teal-50); }
+  .page-nav-btn.primary { background: var(--teal-600); color: white; border-color: var(--teal-600); }
+  .page-nav-btn.primary:hover { background: var(--teal-700); }
+  .page-nav-btn.hidden { visibility: hidden; }
+  .page-counter { font-size: 13px; color: var(--gray-500); font-family: 'IBM Plex Sans', sans-serif; }
+
+  .section-header { margin-bottom: 32px; }
+  .section-number { font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--teal-600); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+  .section-title { font-size: 24px; font-weight: 700; line-height: 1.4; }
+  .prose { font-size: 16px; line-height: 2; color: var(--gray-800); }
+  .prose p { margin-bottom: 20px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { font-weight: 600; color: var(--gray-900); }
+
+  .card { background: white; border-radius: var(--radius); padding: 28px 32px; margin: 28px 0; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); }
+  .card-teal { background: var(--teal-50); border-color: var(--teal-200); }
+  .card-blue { background: var(--blue-50); border-color: var(--blue-200); }
+  .card-green { background: var(--green-50); border-color: var(--green-100); }
+  .card-orange { background: var(--orange-50); border-color: var(--orange-100); }
+  .card-yellow { background: var(--yellow-50); border-color: var(--yellow-100); }
+  .card-red { background: var(--red-50); border-color: var(--red-100); }
+  .card-purple { background: var(--purple-50); border-color: var(--purple-100); }
+  .card-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+  .cl-teal { color: var(--teal-600); } .cl-blue { color: var(--blue-600); } .cl-green { color: var(--green-700); }
+  .cl-orange { color: var(--orange-600); } .cl-yellow { color: var(--yellow-600); } .cl-red { color: var(--red-600); } .cl-purple { color: var(--purple-600); }
+
+  .steps { margin: 24px 0; }
+  .step { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
+  .step:last-child { margin-bottom: 0; }
+  .step-marker { flex-shrink: 0; width: 32px; height: 32px; background: var(--teal-600); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; font-weight: 600; margin-top: 2px; }
+  .step-content { flex: 1; }
+  .step-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .step-desc { font-size: 15px; color: var(--gray-700); line-height: 1.7; }
+
+  .prompt-box { background: var(--gray-900); color: #e8eaed; border-radius: var(--radius); padding: 24px 28px; margin: 24px 0; font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; line-height: 1.8; position: relative; }
+  .prompt-box::before { content: 'PROMPT'; position: absolute; top: 10px; right: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: var(--gray-500); }
+
+  .strength-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+  .strength-item { background: white; border-radius: var(--radius-sm); padding: 20px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); }
+  .strength-icon { font-size: 22px; margin-bottom: 8px; }
+  .strength-title { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+  .strength-desc { font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+
+  .approach-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin: 24px 0; }
+  .approach-card { background: white; border-radius: var(--radius); padding: 24px 28px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); }
+  .approach-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .approach-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .approach-name { font-weight: 700; font-size: 17px; }
+  .approach-sub { font-size: 13px; color: var(--gray-500); }
+  .approach-body { font-size: 14px; color: var(--gray-700); line-height: 1.8; margin-bottom: 16px; }
+  .approach-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .approach-tag { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; font-family: 'IBM Plex Sans', sans-serif; }
+  .tag-pro { background: var(--green-50); color: var(--green-700); }
+  .tag-con { background: var(--red-50); color: var(--red-600); }
+  .tag-best { background: var(--blue-50); color: var(--blue-600); }
+
+  .divider { height: 1px; background: var(--gray-200); margin: 40px 0; }
+  .note { background: var(--gray-100); border-radius: var(--radius-sm); padding: 20px 24px; margin: 24px 0; font-size: 14px; line-height: 1.8; color: var(--gray-700); }
+  .note-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-500); margin-bottom: 6px; }
+  .practice { background: white; border: 2px dashed var(--teal-200); border-radius: var(--radius); padding: 28px 32px; margin: 32px 0; }
+  .practice-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal-600); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .callout { background: linear-gradient(135deg, var(--teal-50) 0%, var(--blue-50) 100%); border: 1px solid var(--teal-200); border-radius: var(--radius); padding: 28px 32px; margin: 32px 0; text-align: center; }
+  .callout-icon { font-size: 28px; margin-bottom: 12px; }
+  .callout-text { font-size: 17px; font-weight: 600; line-height: 1.7; }
+  .callout-sub { font-size: 14px; color: var(--gray-600); margin-top: 10px; line-height: 1.7; }
+
+  .checklist { margin: 24px 0; }
+  .checklist-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--gray-100); }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-box { flex-shrink: 0; width: 22px; height: 22px; border: 2px solid var(--gray-300); border-radius: 4px; margin-top: 2px; }
+  .checklist-text { font-size: 15px; color: var(--gray-800); line-height: 1.6; }
+
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.6; margin: 24px 0; }
+  .compare-table th { text-align: left; padding: 12px 16px; color: var(--gray-600); font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; border-bottom: 2px solid var(--gray-300); }
+  .compare-table td { padding: 12px 16px; color: var(--gray-700); border-bottom: 1px solid var(--gray-100); vertical-align: top; }
+  .compare-table tr:last-child td { border-bottom: none; }
+
+  .cycle-grid { display: grid; grid-template-columns: 1fr; gap: 0; margin: 24px 0; }
+  .cycle-step { display: flex; gap: 16px; align-items: flex-start; position: relative; padding-bottom: 28px; }
+  .cycle-step:last-child { padding-bottom: 0; }
+  .cycle-step:not(:last-child)::after {
+    content: ''; position: absolute; left: 19px; top: 40px; bottom: 0;
+    width: 2px; background: var(--teal-200);
+  }
+  .cycle-marker { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; background: white; border: 2px solid var(--teal-200); position: relative; z-index: 1; }
+  .cycle-content { flex: 1; padding-top: 6px; }
+  .cycle-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .cycle-desc { font-size: 14px; color: var(--gray-700); line-height: 1.7; }
+
+  @media (max-width: 640px) {
+    .hero { padding: 48px 20px 36px; } .hero h1 { font-size: 23px; }
+    .page { padding: 36px 20px 64px; }
+    .strength-grid { grid-template-columns: 1fr; }
+    .card, .practice { padding: 22px 20px; }
+    .tab-btn { padding: 12px 12px; font-size: 12px; }
+    .compare-table { font-size: 13px; }
+    .compare-table th, .compare-table td { padding: 10px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">AI Lesson — Session 04</div>
+    <h1>AIを自分のものにする</h1>
+    <p>自分専用のAIを作り、育て、業務に根づかせる。<br>「教わる」から「自分で回す」への最終ステップです。</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        60分 ／ 座学20分＋実践40分
+      </div>
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        1 on 1 レクチャー
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <button class="tab-btn active" data-page="0">ふりかえり</button>
+    <button class="tab-btn" data-page="1">NotebookLM</button>
+    <button class="tab-btn" data-page="2">AIを育てる</button>
+    <button class="tab-btn" data-page="3">一緒に作ろう</button>
+    <button class="tab-btn" data-page="4">次回に向けて</button>
+  </div>
+</nav>
+
+<div class="page-container">
+
+<!-- ━━━ Page 0: ふりかえり ━━━ -->
+<div class="page active" data-page="0">
+  <div class="section-header">
+    <div class="section-number">Review</div>
+    <h2 class="section-title">前回のふりかえり</h2>
+  </div>
+  <div class="prose"><p>Session 03で学んだ、3つのポイントを振り返ります。</p></div>
+  <div class="card card-teal">
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">Gems ＝ 自分専用のAI</div>
+          <div class="step-desc">カスタム指示と知識（PDF等）を組み合わせて、業務に特化した専門AIを作れる。毎回ゼロから説明する手間がなくなる。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">引き継ぎ書とバージョン管理</div>
+          <div class="step-desc">チャットが長くなったら新しいチャットに引っ越す。コードは上書きせずv1, v2, v3と保存しておく。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">業務棚卸し → 1つ形にする</div>
+          <div class="step-desc">AIにインタビュー形式で業務を洗い出し、効果×難易度で優先順位をつけ、1つずつ形にしていく。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="prose">
+    <p>前回はGems（スパルタ上司）を実際に作って、<strong>カスタム指示の調整・資料アップロードで精度を上げる</strong>体験をしました。</p>
+    <p>後半では来店客数分析アプリの開発に着手し、CSVデータの読み込みまで進めました。</p>
+    <p>今日はSession 03で手に入れた道具をさらに強化しつつ、<strong>アプリの完成を目指します</strong>。</p>
+  </div>
+
+  <div class="note">
+    <div class="note-label">宿題の確認</div>
+    <p>前回お願いしていた宿題の進み具合を教えてください。</p>
+    <div class="checklist">
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>Gemを1つ作る（練習用）</strong> — スパルタ上司以外に、自分で1つ新しいGemを作れましたか？</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>来店客数分析アプリの続き</strong> — CSVの読み込みエラーは解消できましたか？Geminiとのやり取りはどうでした？</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>エリア分析の続き</strong> — 会社のGeminiアカウントでエリアマーケティングリストの作成は進みましたか？</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>コードのバージョン管理</strong> — 完成したコードをメモ帳に保存する習慣はつきましたか？</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>毎日AIと会話</strong> — 引き続き毎日使えていますか？</div></div>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn hidden">← 前へ</button>
+    <span class="page-counter">0 / 4</span>
+    <button class="page-nav-btn primary" onclick="goPage(1)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 1: NotebookLM入門 ━━━ -->
+<div class="page" data-page="1">
+  <div class="section-header">
+    <div class="section-number">Section 01</div>
+    <h2 class="section-title">NotebookLM — 資料をまるごと読んだAI</h2>
+  </div>
+  <div class="prose">
+    <p>前回Gemsで「自分専用のAI」を作りました。カスタム指示に業務知識を書き、PDFを渡して精度を上げました。</p>
+    <p>NotebookLMは、その考え方の<strong>さらに強力な発展形</strong>です。</p>
+    <p>以前YouTube動画の資料作成で使ったことがありましたね。今日はそこから一歩進めて、<strong>業務データを丸ごと食わせて専門家AIを作る</strong>使い方を学びます。</p>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">📓</div>
+    <div class="callout-text">NotebookLM ＝ 大量の資料を読み込んだ、<br>あなた専属のリサーチャー</div>
+    <div class="callout-sub">50本の資料を一度に読み込んで、その内容に基づいて回答してくれる。</div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">GemsとNotebookLMの違い</div>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th style="width: 25%;"></th>
+          <th style="width: 37%;">Gems</th>
+          <th style="width: 38%;">NotebookLM</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight: 600;">得意なこと</td>
+          <td>指示に従って作業する<br>（生成・分析・実行）</td>
+          <td>資料を理解して質問に答える<br>（検索・要約・解説）</td>
+        </tr>
+        <tr>
+          <td style="font-weight: 600;">読み込み量</td>
+          <td>PDF数本 ＋ カスタム指示</td>
+          <td>最大50ソース<br>（PDF・URL・テキスト・動画）</td>
+        </tr>
+        <tr>
+          <td style="font-weight: 600;">回答の根拠</td>
+          <td>一般知識 ＋ 渡した資料</td>
+          <td>渡した資料のみ（出典つき）</td>
+        </tr>
+        <tr>
+          <td style="font-weight: 600;">コード生成</td>
+          <td>できる</td>
+          <td>できない（知識特化）</td>
+        </tr>
+        <tr>
+          <td style="font-weight: 600;">最適な場面</td>
+          <td>「作って」「分析して」</td>
+          <td>「この中から探して」「教えて」</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card card-blue">
+    <div class="card-label cl-blue">ポイント — 使い分け</div>
+    <div class="prose">
+      <p><strong>Gems</strong>は「作業するAI」、<strong>NotebookLM</strong>は「調べて教えるAI」。</p>
+      <p>どちらが優れているという話ではなく、<strong>用途が違います</strong>。</p>
+      <p>例えば、来店客数分析アプリを<strong>作る</strong>のはGemini（Gems）の仕事。<br>そのアプリの使い方マニュアルを<strong>読み込ませて質問に答えてもらう</strong>のはNotebookLMの仕事です。</p>
+    </div>
+  </div>
+
+  <div class="card card-green">
+    <div class="card-label cl-green">NotebookLMの始め方 — 3ステップ</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">notebooklm.google.com にアクセス</div>
+          <div class="step-desc">Googleアカウントでログイン。「新しいノートブック」を作成します。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">ソース（資料）を追加する</div>
+          <div class="step-desc">PDF、Googleドキュメント、WebサイトのURL、テキストなどを追加。<strong>最大50ソース</strong>まで読み込めます。読み込んだ資料はすべてAIが「精読」します。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">チャットで質問する</div>
+          <div class="step-desc">追加した資料の内容について、チャット形式で質問できます。回答には<strong>出典（どの資料の何ページか）</strong>が表示されるので、根拠を確認できます。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-purple">
+    <div class="card-label cl-purple">業務での活用アイデア</div>
+    <div class="strength-grid">
+      <div class="strength-item" style="border-left: 4px solid var(--purple-600);">
+        <div class="strength-icon">📋</div>
+        <div class="strength-title">マニュアル知識ベース</div>
+        <div class="strength-desc">接客マニュアル・検査手順書をまとめて読み込ませる。「こういう場合どうする？」に即座に回答してくれる社内FAQ。</div>
+      </div>
+      <div class="strength-item" style="border-left: 4px solid var(--blue-600);">
+        <div class="strength-icon">📊</div>
+        <div class="strength-title">データ読み解きパートナー</div>
+        <div class="strength-desc">エリア分析の報告書や売上データの説明資料を読み込ませる。「このエリアの特徴は？」と聞けば資料に基づいて回答。</div>
+      </div>
+      <div class="strength-item" style="border-left: 4px solid var(--green-600);">
+        <div class="strength-icon">🎓</div>
+        <div class="strength-title">研修資料まとめ</div>
+        <div class="strength-desc">この研修のテキスト（Session 01〜04）を全部読み込ませれば、「あのとき教わったこと」を忘れても聞き直せる。</div>
+      </div>
+      <div class="strength-item" style="border-left: 4px solid var(--orange-600);">
+        <div class="strength-icon">🔍</div>
+        <div class="strength-title">競合・市場リサーチ</div>
+        <div class="strength-desc">競合店の情報や市場レポートを読み込ませて、「白河エリアのメガネ市場の傾向は？」のような分析に使う。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <div class="note-label">Gemsとの合わせ技</div>
+    <p>NotebookLMで調べた知識を、Gemsのカスタム指示や知識ファイルに反映させる——という<strong>循環</strong>が最強の使い方です。調べる→作る→また調べる、のループでAIが賢くなっていきます。</p>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(0)">← 前へ</button>
+    <span class="page-counter">1 / 4</span>
+    <button class="page-nav-btn primary" onclick="goPage(2)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 2: AIを育てるサイクル ━━━ -->
+<div class="page" data-page="2">
+  <div class="section-header">
+    <div class="section-number">Section 02</div>
+    <h2 class="section-title">AIを育てるサイクル</h2>
+  </div>
+  <div class="prose">
+    <p>ここまでの研修で、たくさんの道具を手に入れました。</p>
+    <p>Session 01のプロンプト、Session 02のモード使い分けとバイブコーディング、Session 03のGems、そして今日のNotebookLM。</p>
+    <p>ここで大事なのは、<strong>これらは「一度作ったら終わり」ではない</strong>ということです。</p>
+    <p>前回のスパルタ上司Gemを思い出してください。最初の回答は期待通りではなかった。資料を追加し、プロンプトを修正し、何度か調整したら、ぐっと良くなりました。</p>
+    <p>あの体験こそが、<strong>AIを育てるサイクル</strong>です。</p>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">AIを育てる4つのステップ</div>
+    <div class="cycle-grid">
+      <div class="cycle-step">
+        <div class="cycle-marker">🎯</div>
+        <div class="cycle-content">
+          <div class="cycle-title">① まず作る</div>
+          <div class="cycle-desc">完璧を目指さない。「とりあえず動くもの」を最速で作る。Gemでもアプリでもプロンプトでも同じ。</div>
+        </div>
+      </div>
+      <div class="cycle-step">
+        <div class="cycle-marker">🔍</div>
+        <div class="cycle-content">
+          <div class="cycle-title">② 使ってみる</div>
+          <div class="cycle-desc">実際の業務データ・実際の場面で試す。期待通りの結果が出ないのは当たり前。<strong>「何が違うか」を具体的にメモする</strong>。</div>
+        </div>
+      </div>
+      <div class="cycle-step">
+        <div class="cycle-marker">🛠️</div>
+        <div class="cycle-content">
+          <div class="cycle-title">③ AIに直してもらう</div>
+          <div class="cycle-desc">「ここがこう違う。こうしてほしい。理由はこう」——状況＋期待＋理由の3点セットでAIに伝える。スパルタ上司Gemの引用調整でやったのと同じ手順。</div>
+        </div>
+      </div>
+      <div class="cycle-step">
+        <div class="cycle-marker">📝</div>
+        <div class="cycle-content">
+          <div class="cycle-title">④ 良くなった部分を保存する</div>
+          <div class="cycle-desc">改善されたプロンプトはGemに反映。良いコードはバージョン保存。新しく分かった知識はNotebookLMに追加。<strong>「育てた結果」を蓄積する</strong>。</div>
+        </div>
+      </div>
+    </div>
+    <div class="prose" style="margin-top: 16px; text-align: center;">
+      <p><strong>そしてまた①に戻る。</strong></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-blue">修正依頼プロンプトのテンプレート</div>
+    <div class="prompt-box">【現状】<br>今、〇〇をAIにやらせている。<br><br>【問題】<br>△△の部分が期待通りではない。<br>具体的には、□□のように動いてほしいのに、××になってしまう。<br><br>【期待する動作】<br>△△の部分を□□のように修正してほしい。<br><br>【理由・背景】<br>この修正が必要な理由は、◇◇だから。</div>
+    <div class="prose" style="margin-top: 16px;">
+      <p>Session 03でスパルタ上司Gemの引用文言を調整したとき、まさにこのパターンで修正しましたね。<br><strong>「状況 → 問題 → 期待 → 理由」</strong>——この4点セットは、AIへの修正依頼の万能フレームワークです。</p>
+    </div>
+  </div>
+
+  <div class="card card-green">
+    <div class="card-label cl-green">道具の使い分けマップ</div>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th style="width: 30%;">やりたいこと</th>
+          <th style="width: 35%;">使う道具</th>
+          <th style="width: 35%;">サイクルでの役割</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight: 600;">プロンプトを書く</td>
+          <td>Gemini（チャット）</td>
+          <td>①まず作る</td>
+        </tr>
+        <tr>
+          <td style="font-weight: 600;">定型指示を保存する</td>
+          <td>Gems</td>
+          <td>④保存する</td>
+        </tr>
+        <tr>
+          <td style="font-weight: 600;">アプリを作る</td>
+          <td>Gemini Canvas</td>
+          <td>①まず作る → ③直す</td>
+        </tr>
+        <tr>
+          <td style="font-weight: 600;">資料を調べる</td>
+          <td>NotebookLM</td>
+          <td>②使う → ④保存する</td>
+        </tr>
+        <tr>
+          <td style="font-weight: 600;">コードを保存する</td>
+          <td>メモ帳（v1, v2…）</td>
+          <td>④保存する</td>
+        </tr>
+        <tr>
+          <td style="font-weight: 600;">チャットを引き継ぐ</td>
+          <td>引き継ぎ書プロンプト</td>
+          <td>③直す → ①作る</td>
+        </tr>
+        <tr>
+          <td style="font-weight: 600;">経験値を蓄積する</td>
+          <td>AI申し送りノート</td>
+          <td>④保存する（全体）</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card card-yellow">
+    <div class="card-label cl-orange">上級テクニック — AI申し送りノート</div>
+    <div class="prose">
+      <p>引き継ぎ書は「1つの作業の続き」を引き継ぐためのものでした。<br>ここで紹介するのは、もう一段上の仕組み——<strong>あなたとAIの「付き合い方全体」の記録</strong>です。</p>
+      <p>名付けて<strong>「AI申し送りノート」</strong>。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">AI申し送りノートとは？</div>
+    <div class="prose">
+      <p>AIは毎回、記憶がリセットされた状態で会話が始まります。<br>でも、あなたの中には「こう言うとうまくいく」「こう言うと失敗する」という<strong>経験値</strong>がどんどん貯まっていますよね。</p>
+      <p>その経験値を<strong>1つのテキストファイルに書き出しておく</strong>。<br>新しいチャットを始めるたびに、最初にそのファイルの内容を渡す。</p>
+      <p>すると、AIは毎回<strong>「あなたの好み・ルール・過去の教訓を最初から知っている状態」</strong>でスタートできるようになります。</p>
+    </div>
+  </div>
+
+  <div class="card card-green">
+    <div class="card-label cl-green">申し送りノートの中身（例）</div>
+    <div class="prompt-box">【私について】<br>・オーランド・オプチカル白河店勤務<br>・度数計算・エリアマーケティングが主な業務<br>・アプリはHTML形式でローカル利用（Reactは使わない）<br><br>【AIへの基本ルール】<br>・数値計算は必ずコードを書いて実行すること<br>・表はExcelに貼れる形式で出力すること<br>・1回の修正で大きく変えすぎない。小さく変えて確認を挟む<br><br>【過去の教訓】<br>・ExcelはCSVに変換してから渡す。シート1以外は削除してから<br>・Canvasモードでアプリを作るとき、React形式で出てきたら即座に「Reactを使わずHTML形式で」と指示する<br>・CSVの列構造（B列＝地名、AJ列＝増減）は最初に明示しないと読み取ってくれない<br>・チャットが長くなったら引き継ぎ書を作って新しいチャットに引っ越す<br>・プロンプトの修正は「現状→問題→期待→理由」の4点セットで伝える</div>
+  </div>
+
+  <div class="card card-blue">
+    <div class="card-label cl-blue">申し送りノートの育て方</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">メモ帳でファイルを1つ作る</div>
+          <div class="step-desc">名前は何でもOK。「AI申し送り.txt」など。まずは上の例を参考に、今わかっていることを書く。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">セッションの終わりにAIに追記してもらう</div>
+          <div class="step-desc">作業が終わるたびに、「今回のセッションで学んだ教訓を、この申し送りノートに追記して」とAIに頼む。AIが新しい項目を提案してくれます。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">次のセッションの冒頭で渡す</div>
+          <div class="step-desc">新しいチャットを開いたら、最初のメッセージでこのファイルの内容を貼り付ける。「以下は私との作業ルールです。これに従って作業してください」と添える。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-purple">申し送りノートの更新プロンプト</div>
+    <div class="prompt-box">今回の作業を振り返って、以下の「AI申し送りノート」に追記すべき教訓があれば提案してください。<br><br>追記のルール：<br>・既存の項目と重複しないこと<br>・具体的で、次回以降すぐに役立つ内容であること<br>・「〜すること」「〜しないこと」の形で簡潔に書くこと<br><br>---<br>（ここに現在の申し送りノートの内容を貼り付ける）<br>---</div>
+  </div>
+
+  <div class="note">
+    <div class="note-label">ここがポイント</div>
+    <p>最初は3〜5項目で十分です。使いながら増やしていけば、1ヶ月後には<strong>「あなた専用のAI取扱説明書」</strong>が出来上がります。これがあるだけで、毎回のAIとのやり取りの質が格段に上がります。</p>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🔄</div>
+    <div class="callout-text">AIは「使い捨て」ではなく「育てるもの」</div>
+    <div class="callout-sub">作る → 使う → 直す → 保存する。<br>このサイクルを回すほど、AIはあなたの業務にフィットしていきます。</div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(1)">← 前へ</button>
+    <span class="page-counter">2 / 4</span>
+    <button class="page-nav-btn primary" onclick="goPage(3)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 3: 一緒に作ろう（OJT） ━━━ -->
+<div class="page" data-page="3">
+  <div class="section-header">
+    <div class="section-number">Hands-on</div>
+    <h2 class="section-title">一緒に作ろう</h2>
+  </div>
+  <div class="prose">
+    <p>今日のOJTパートです。前回の続きから、<strong>来店客数分析アプリの完成</strong>を目指しましょう。</p>
+  </div>
+
+  <div class="card card-orange">
+    <div class="card-label cl-orange">前回の到達点</div>
+    <div class="prose">
+      <p>Session 03の後半で、以下のところまで進めました。</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">✓</div>
+        <div class="step-content">
+          <div class="step-title">新規チャットで背景コンテキストを設定</div>
+          <div class="step-desc">来店客数の前年比較 → 減少エリアにポスティング強化、という目的を共有。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">✓</div>
+        <div class="step-content">
+          <div class="step-title">HTML形式でアプリを生成</div>
+          <div class="step-desc">Canvasモードで、React不使用のローカルHTML形式を指定。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">✓</div>
+        <div class="step-content">
+          <div class="step-title">CSVデータの構造を指定</div>
+          <div class="step-desc">B列＝地名、AJ列＝来客数の増減サマリー。不要シートは削除済み。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--orange-600);">→</div>
+        <div class="step-content">
+          <div class="step-title">CSVアップロードで数値が読み込めなかった</div>
+          <div class="step-desc">分析対象は拾えたが、実際の来客数・費用が反映されず。プロモードで確認・修正を依頼して終了。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">今日のOJTメニュー</div>
+    <div class="approach-grid">
+      <div class="approach-card" style="border-left: 4px solid var(--teal-600);">
+        <div class="approach-header">
+          <div class="approach-icon" style="background: var(--teal-50);">🔧</div>
+          <div>
+            <div class="approach-name">Part A：CSVの問題を解決する</div>
+            <div class="approach-sub">所要時間：15〜20分</div>
+          </div>
+        </div>
+        <div class="approach-body">
+          <p>前回止まったCSVの読み込みエラーから再開します。</p>
+          <p>前回の引き継ぎ（どこまでやったか、何がうまくいかなかったか）をGeminiに伝えて、修正してもらいましょう。<strong>今日学んだ修正依頼のテンプレート</strong>が早速使えます。</p>
+        </div>
+      </div>
+      <div class="approach-card" style="border-left: 4px solid var(--blue-600);">
+        <div class="approach-header">
+          <div class="approach-icon" style="background: var(--blue-50);">📊</div>
+          <div>
+            <div class="approach-name">Part B：データを可視化する</div>
+            <div class="approach-sub">所要時間：15〜20分</div>
+          </div>
+        </div>
+        <div class="approach-body">
+          <p>CSVが読めたら、次は<strong>「減少エリアが一目でわかる表示」</strong>を目指します。</p>
+          <p>前年比でマイナスのエリアを赤く表示する、地域別にソートできるようにする、ポスティング優先度を自動計算する——こうした機能をインクリメンタルに追加していきます。</p>
+        </div>
+      </div>
+      <div class="approach-card" style="border-left: 4px solid var(--green-600);">
+        <div class="approach-header">
+          <div class="approach-icon" style="background: var(--green-50);">📓</div>
+          <div>
+            <div class="approach-name">Part C（余裕があれば）：NotebookLMを試す</div>
+            <div class="approach-sub">所要時間：5〜10分</div>
+          </div>
+        </div>
+        <div class="approach-body">
+          <p>アプリがいい感じになったら、NotebookLMに<strong>この研修のテキスト（Session 01〜04のHTML）</strong>を読み込ませて、自分専用の「研修復習AI」を作ってみましょう。</p>
+          <p>「バイブコーディングの3方式って何だっけ？」と聞けば、出典つきで教えてくれます。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">OJTの進め方</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">前回のチャットを確認する</div>
+          <div class="step-desc">前回の続きをそのまま使うか、引き継ぎ書を作って新しいチャットに引っ越すかを判断。チャットが長くなっていたら引っ越し推奨。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">修正依頼テンプレートでエラーを伝える</div>
+          <div class="step-desc">「現状→問題→期待→理由」の4点セットで、CSVが読み込めない問題をGeminiに伝える。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">動いたらバージョン保存 → 次の機能へ</div>
+          <div class="step-desc">CSVが読み込めたらコードを保存。その上で「次はこういう表示にしたい」とインクリメンタルに進める。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <div class="note-label">大事なこと</div>
+    <p>今日のゴールは<strong>「CSVを正しく読み込んで、データが表示される状態」</strong>を最低限作ること。可視化の細かい調整は次回以降でもOK。まず「動く」を優先しましょう。</p>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(2)">← 前へ</button>
+    <span class="page-counter">3 / 4</span>
+    <button class="page-nav-btn primary" onclick="goPage(4)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 4: 次回に向けて ━━━ -->
+<div class="page" data-page="4">
+  <div class="section-header">
+    <div class="section-number">Next Steps</div>
+    <h2 class="section-title">次回に向けて</h2>
+  </div>
+  <div class="prose">
+    <p>Session 04、お疲れさまでした。</p>
+    <p>今日は道具の使い分けを整理し、「AIを育てるサイクル」という考え方を手に入れました。<br>道具は揃いました。あとは<strong>回す</strong>だけです。</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">今日のまとめ</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">NotebookLM ＝ 資料をまるごと読んだ専門家AI</div>
+          <div class="step-desc">Gemsが「作業するAI」なら、NotebookLMは「調べて教えるAI」。大量の資料を読み込ませて、出典つきで回答してくれる。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">AIを育てるサイクル：作る → 使う → 直す → 保存する</div>
+          <div class="step-desc">一度で完璧を目指さない。修正依頼は「現状→問題→期待→理由」の4点セット。改善結果はGems・メモ帳・NotebookLMに蓄積。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">道具の使い分けができるようになった</div>
+          <div class="step-desc">プロンプト、Gems、Canvas、NotebookLM、引き継ぎ書、バージョン管理、AI申し送りノート——場面に応じて選べる状態。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-purple">
+    <div class="card-label cl-purple">次回までにやってほしいこと</div>
+    <div class="checklist">
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>来店客数分析アプリの続きを進める</strong> — 今日の到達点から、自分で機能追加やデータ調整を試みる。詰まったらスクショを撮ってGeminiに聞く。それでもダメなら喜多村までメール。</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>NotebookLMで1つノートブックを作る</strong> — 何の資料を読み込ませてもOK。研修テキスト、業務マニュアル、商品カタログなど。「聞いてみたら便利だった」という体験をしてみてください。</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>Gemsを1つ改善する</strong> — 前回作ったGem（スパルタ上司や練習用）を実際に使って、「ここが違う」と思ったらプロンプトを修正する。育てるサイクルの実践です。</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>AI申し送りノートを作り始める</strong> — メモ帳で「AI申し送り.txt」を作り、今わかっているルールや教訓を3〜5個書いてみる。次にAIを使うときの冒頭で渡してみてください。</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>毎日AIと会話を続ける</strong> — ここまで継続できているのは素晴らしい。引き続きお願いします。</div></div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🚀</div>
+    <div class="callout-text">道具は揃った。あとは回すだけ。</div>
+    <div class="callout-sub">作る → 使う → 直す → 保存する。<br>このサイクルを自分で回せるようになったら、もうAIは「あなたのもの」です。<br>次回も一緒にやっていきましょう。何か質問があればいつでもメールしてください。</div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(3)">← 前へ</button>
+    <span class="page-counter">4 / 4</span>
+    <button class="page-nav-btn hidden">次へ →</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const pages = document.querySelectorAll('.page');
+  function goPage(idx) {
+    tabBtns.forEach(b => b.classList.remove('active'));
+    tabBtns[idx].classList.add('active');
+    pages.forEach(p => p.classList.remove('active'));
+    pages[idx].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => goPage(parseInt(btn.dataset.page)));
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Lesson Session 04 — 前回の続き＋スプシGemini</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal-50: #e6f7f5; --teal-100: #b3ece6; --teal-200: #80e0d6;
+    --teal-500: #26a69a; --teal-600: #00897b; --teal-700: #00796b;
+    --orange-50: #fff3e0; --orange-100: #ffe0b2; --orange-600: #fb8c00;
+    --blue-50: #e8f0fe; --blue-100: #d2e3fc; --blue-200: #aecbfa;
+    --blue-600: #1a73e8; --blue-700: #1967d2;
+    --green-50: #e6f4ea; --green-100: #ceead6; --green-600: #1e8e3e; --green-700: #188038;
+    --yellow-50: #fef7e0; --yellow-100: #feefc3; --yellow-600: #f9ab00;
+    --red-50: #fce8e6; --red-100: #fad2cf; --red-600: #d93025;
+    --purple-50: #f3e8fd; --purple-100: #e8d0fb; --purple-600: #9334e6;
+    --gray-50: #f8f9fa; --gray-100: #f1f3f4; --gray-200: #e8eaed;
+    --gray-300: #dadce0; --gray-400: #bdc1c6; --gray-500: #9aa0a6;
+    --gray-600: #80868b; --gray-700: #5f6368; --gray-800: #3c4043; --gray-900: #202124;
+    --shadow-sm: 0 1px 2px rgba(60,64,67,0.1), 0 1px 3px rgba(60,64,67,0.08);
+    --shadow-md: 0 1px 3px rgba(60,64,67,0.12), 0 4px 8px rgba(60,64,67,0.08);
+    --radius: 12px; --radius-sm: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { font-family: 'Noto Sans JP', 'IBM Plex Sans', sans-serif; background: var(--gray-50); color: var(--gray-900); line-height: 1.9; font-size: 16px; min-height: 100vh; display: flex; flex-direction: column; }
+  .hero { background: linear-gradient(135deg, var(--teal-600) 0%, var(--teal-700) 40%, #004d40 100%); color: white; padding: 68px 24px 48px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -40%; right: -15%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%); border-radius: 50%; }
+  .hero-inner { max-width: 760px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-label { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; margin-bottom: 12px; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero h1 { font-size: 28px; font-weight: 700; line-height: 1.45; margin-bottom: 16px; }
+  .hero p { font-size: 15px; line-height: 1.8; opacity: 0.9; max-width: 600px; }
+  .hero-meta { margin-top: 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+  .hero-meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; opacity: 0.85; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero-meta-item svg { width: 18px; height: 18px; }
+  .tab-nav { position: sticky; top: 0; z-index: 100; background: white; border-bottom: 1px solid var(--gray-200); padding: 0 24px; box-shadow: var(--shadow-sm); }
+  .tab-nav-inner { max-width: 760px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
+  .tab-nav-inner::-webkit-scrollbar { display: none; }
+  .tab-btn { flex-shrink: 0; padding: 14px 16px; font-size: 13px; font-weight: 500; color: var(--gray-600); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: 'Noto Sans JP', sans-serif; }
+  .tab-btn:hover { color: var(--teal-600); background: var(--teal-50); }
+  .tab-btn.active { color: var(--teal-600); border-bottom-color: var(--teal-600); }
+  .tab-btn.appendix { color: var(--gray-500); font-style: italic; }
+  .tab-btn.appendix.active { color: var(--gray-700); border-bottom-color: var(--gray-400); }
+  .page-container { flex: 1; }
+  .page { display: none; max-width: 760px; width: 100%; margin: 0 auto; padding: 48px 24px 80px; animation: pageIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes pageIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--gray-200); }
+  .page-nav-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--gray-300); background: white; color: var(--gray-700); transition: all 0.2s; font-family: 'Noto Sans JP', sans-serif; }
+  .page-nav-btn:hover { border-color: var(--teal-600); color: var(--teal-600); background: var(--teal-50); }
+  .page-nav-btn.primary { background: var(--teal-600); color: white; border-color: var(--teal-600); }
+  .page-nav-btn.primary:hover { background: var(--teal-700); }
+  .page-nav-btn.hidden { visibility: hidden; }
+  .page-counter { font-size: 13px; color: var(--gray-500); font-family: 'IBM Plex Sans', sans-serif; }
+  .section-header { margin-bottom: 32px; }
+  .section-number { font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--teal-600); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+  .section-title { font-size: 24px; font-weight: 700; line-height: 1.4; }
+  .prose { font-size: 16px; line-height: 2; color: var(--gray-800); }
+  .prose p { margin-bottom: 20px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { font-weight: 600; color: var(--gray-900); }
+  .card { background: white; border-radius: var(--radius); padding: 28px 32px; margin: 28px 0; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); }
+  .card-teal { background: var(--teal-50); border-color: var(--teal-200); }
+  .card-blue { background: var(--blue-50); border-color: var(--blue-200); }
+  .card-green { background: var(--green-50); border-color: var(--green-100); }
+  .card-orange { background: var(--orange-50); border-color: var(--orange-100); }
+  .card-yellow { background: var(--yellow-50); border-color: var(--yellow-100); }
+  .card-red { background: var(--red-50); border-color: var(--red-100); }
+  .card-purple { background: var(--purple-50); border-color: var(--purple-100); }
+  .card-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+  .cl-teal { color: var(--teal-600); } .cl-blue { color: var(--blue-600); } .cl-green { color: var(--green-700); }
+  .cl-orange { color: var(--orange-600); } .cl-yellow { color: var(--yellow-600); } .cl-red { color: var(--red-600); } .cl-purple { color: var(--purple-600); }
+  .steps { margin: 24px 0; }
+  .step { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
+  .step:last-child { margin-bottom: 0; }
+  .step-marker { flex-shrink: 0; width: 32px; height: 32px; background: var(--teal-600); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; font-weight: 600; margin-top: 2px; }
+  .step-content { flex: 1; }
+  .step-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .step-desc { font-size: 15px; color: var(--gray-700); line-height: 1.7; }
+  .prompt-box { background: var(--gray-900); color: #e8eaed; border-radius: var(--radius); padding: 24px 28px; margin: 24px 0; font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; line-height: 1.8; position: relative; }
+  .prompt-box::before { content: 'PROMPT'; position: absolute; top: 10px; right: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: var(--gray-500); }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+  .judge-card { background: white; border-radius: var(--radius-sm); padding: 20px 22px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); }
+  .judge-card-icon { font-size: 22px; margin-bottom: 8px; }
+  .judge-card-title { font-weight: 700; font-size: 14px; margin-bottom: 8px; }
+  .judge-card-body { font-size: 13px; color: var(--gray-700); line-height: 1.7; }
+  .shortcut-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+  .shortcut-item { background: white; border-radius: var(--radius-sm); padding: 16px 20px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 14px; }
+  .shortcut-key { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; background: var(--gray-100); border: 1px solid var(--gray-300); border-radius: 6px; padding: 4px 10px; white-space: nowrap; color: var(--gray-800); flex-shrink: 0; }
+  .shortcut-desc { font-size: 14px; color: var(--gray-700); line-height: 1.5; }
+  .divider { height: 1px; background: var(--gray-200); margin: 40px 0; }
+  .note { background: var(--gray-100); border-radius: var(--radius-sm); padding: 20px 24px; margin: 24px 0; font-size: 14px; line-height: 1.8; color: var(--gray-700); }
+  .note-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-500); margin-bottom: 6px; }
+  .callout { background: linear-gradient(135deg, var(--teal-50) 0%, var(--blue-50) 100%); border: 1px solid var(--teal-200); border-radius: var(--radius); padding: 28px 32px; margin: 32px 0; text-align: center; }
+  .callout-icon { font-size: 28px; margin-bottom: 12px; }
+  .callout-text { font-size: 17px; font-weight: 600; line-height: 1.7; }
+  .callout-sub { font-size: 14px; color: var(--gray-600); margin-top: 10px; line-height: 1.7; }
+  .checklist { margin: 24px 0; }
+  .checklist-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--gray-100); }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-box { flex-shrink: 0; width: 22px; height: 22px; border: 2px solid var(--gray-300); border-radius: 4px; margin-top: 2px; }
+  .checklist-text { font-size: 15px; color: var(--gray-800); line-height: 1.6; }
+  .appendix-hero { background: var(--gray-100); border-bottom: 1px solid var(--gray-200); padding: 28px 24px; text-align: center; }
+  .appendix-hero-label { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-500); font-family: 'IBM Plex Sans', sans-serif; margin-bottom: 8px; }
+  .appendix-hero-title { font-size: 20px; font-weight: 700; color: var(--gray-800); }
+  .appendix-hero-sub { font-size: 14px; color: var(--gray-600); margin-top: 8px; }
+  @media (max-width: 640px) {
+    .hero { padding: 48px 20px 36px; } .hero h1 { font-size: 23px; }
+    .page { padding: 36px 20px 64px; }
+    .two-col, .shortcut-grid { grid-template-columns: 1fr; }
+    .card { padding: 22px 20px; }
+    .tab-btn { padding: 12px 12px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">AI Lesson — Session 04</div>
+    <h1>前回の続き＋スプレッドシートのAI</h1>
+    <p>前回のGem作成を仕上げて、新しいスキル「スプレッドシート内蔵Gemini」を体験します。<br><strong>今日のゴール：Gemが動く＋スプシでAIに話しかけられる。</strong></p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        60分 ／ ほぼ全て実践
+      </div>
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        1 on 1 レクチャー
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <button class="tab-btn active" data-page="0">ふりかえり</button>
+    <button class="tab-btn" data-page="1">Gem完成ハンズオン</button>
+    <button class="tab-btn" data-page="2">スプシのGemini</button>
+    <button class="tab-btn" data-page="3">次のステップ</button>
+    <button class="tab-btn appendix" data-page="4">付録：PC操作ガイド</button>
+  </div>
+</nav>
+
+<div class="page-container">
+
+<!-- ━━━ Page 0: ふりかえり ━━━ -->
+<div class="page active" data-page="0">
+  <div class="section-header">
+    <div class="section-number">Review</div>
+    <h2 class="section-title">前回のふりかえり＋環境チェック</h2>
+  </div>
+  <div class="prose">
+    <p>前回は<strong>リマインドメール自動生成Gem</strong>の作成に取り組みました。<br>要件定義→プロンプト作成→Excelアップロードまで進みましたが、PCの動作が重くなってしまい、時間切れで終了しました。</p>
+    <p>今日はその続きから始めます。まず、宿題の確認をさせてください。</p>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">🔧 環境チェック</div>
+    <div class="checklist">
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>ブラウザを再起動した</strong><br><span style="font-size:13px; color: var(--gray-600);">前回の重さの原因はタブの開きすぎ＋重いスプレッドシートでした。再起動で改善するはず。</span></div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>不要なタブを閉じた</strong><br><span style="font-size:13px; color: var(--gray-600);">Geminiで作業するときは、Geminiタブ以外は最小限に。特に重いスプレッドシートは閉じておく。</span></div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>Excelファイルのアップロードを再試行した</strong><br><span style="font-size:13px; color: var(--gray-600);">思考モードに切り替えて、売上実績集計ファイルをもう一度ドラッグ＆ドロップ。</span></div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>前回のプロンプトが付箋に保存されている</strong><br><span style="font-size:13px; color: var(--gray-600);">Windows付箋メモに貼り付けたプロンプト文がまだ残っていればOK。</span></div></div>
+    </div>
+  </div>
+
+  <div class="note">
+    <div class="note-label">宿題のおさらい</div>
+    <div class="checklist">
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text">メガネさん（経理コーチGem）を使ってみた</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text">毎日AIに何か話しかけた</div></div>
+    </div>
+  </div>
+
+  <div class="card card-orange">
+    <div class="card-label cl-orange">⚠️ もしアップロードがまだうまくいかない場合</div>
+    <div class="prose">
+      <p>大丈夫です。今日この場で一緒に解決します。<br>対処法は付録の「トラブルシューティング」にまとめてあるので、ここで詰まったら付録を見ましょう。</p>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn hidden">← 前へ</button>
+    <span class="page-counter">0 / 3</span>
+    <button class="page-nav-btn primary" onclick="goPage(1)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 1: Gem完成ハンズオン ━━━ -->
+<div class="page" data-page="1">
+  <div class="section-header">
+    <div class="section-number">Hands-on 01</div>
+    <h2 class="section-title">リマインドメールGemを完成させる</h2>
+  </div>
+  <div class="prose">
+    <p>ここが今日のメインです。<br>前回途中になっていた<strong>「入力ミス検出＋リマインドメール自動生成」</strong>を仕上げます。</p>
+    <p>完成形のイメージは——Excelファイルを渡すだけで、差異がある店舗への修正依頼メールが出てくる。<br>これが動けば、<strong>毎週の確認＋連絡作業が数分で終わる</strong>ようになります。</p>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">完成までの5ステップ</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">Excelファイルをアップロードする</div>
+          <div class="step-desc">売上実績集計ファイルをGeminiにドラッグ＆ドロップ。<br><strong>必ず思考モードで。</strong>高速モードだとExcelの中身を正確に読めない可能性があります。<br>アップロードが始まったら、完了するまで他の操作はしないでください。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">プロンプトを貼り付けて送信する</div>
+          <div class="step-desc">前回作ったプロンプトを付箋からコピーして、Geminiに貼り付けます。<br>プロンプトが見つからない場合は、下にバックアップを用意してあります。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">出力を確認する</div>
+          <div class="step-desc">Geminiが差異を検出してメール文面を出力してくれるはず。<br><strong>必ず確認してほしいポイント：</strong>店舗番号は合ってるか？差異の数字は正しいか？メールのトーンは適切か？</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">4</div>
+        <div class="step-content">
+          <div class="step-title">おかしい部分を修正指示する</div>
+          <div class="step-desc">「店舗番号ではなく店舗名を使ってほしい」「もう少し丁寧なトーンで」「差異がない店舗は省略して」——<br>気になる点をそのままGeminiに伝えると、修正してくれます。<strong>このやりとりがプロンプト改善の練習です。</strong></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">5</div>
+        <div class="step-content">
+          <div class="step-title">うまくいったらGemとして保存する</div>
+          <div class="step-desc">満足いく結果が出たら、その指示文をGemに保存します。<br>保存すると、次回から<strong>Excelを渡すだけで同じ品質のメールが出てくる</strong>状態になります。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card">
+    <div class="card-label cl-blue">📋 プロンプトのバックアップ</div>
+    <div class="prose" style="font-size: 14px; margin-bottom: 16px;">
+      <p>前回の付箋が消えてしまった場合はこちらを使ってください。</p>
+    </div>
+    <div class="prompt-box">Gemsを作るのを手伝ってほしい。<br><br>アップロードしたExcelデータの中にある売上日報のタブを見て、<br>数字のズレが表示されている場合に、<br>その該当店舗への修正依頼のメールを生成するGemを作りたい。<br><br>まずは該当のExcelを渡すので、内容を確認して、<br>Gemの指示文を一緒に作ってほしい。</div>
+  </div>
+
+  <div class="card card-green">
+    <div class="card-label cl-green">プロンプト改善のコツ</div>
+    <div class="two-col">
+      <div class="judge-card" style="border-left: 3px solid var(--green-600);">
+        <div class="judge-card-icon">🏷️</div>
+        <div class="judge-card-title">店舗名の対応表を渡す</div>
+        <div class="judge-card-body">「270=○○店、279=△△店」のように、店舗番号と店舗名の対応をGeminiに教えると、メール文面に店舗名が入るようになります。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--green-600);">
+        <div class="judge-card-icon">✉️</div>
+        <div class="judge-card-title">メールのトーンを指定する</div>
+        <div class="judge-card-body">「丁寧だが事務的に」「威圧感なく」「修正箇所を具体的に」など、メールの雰囲気を言葉で指定できます。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--green-600);">
+        <div class="judge-card-icon">🔍</div>
+        <div class="judge-card-title">確認ポイントを絞る</div>
+        <div class="judge-card-body">最初はすべての差異を拾わせるより、「金額の差異が1,000円以上のものだけ」のように条件をつけると実用的になります。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--green-600);">
+        <div class="judge-card-icon">📝</div>
+        <div class="judge-card-title">出力形式を指定する</div>
+        <div class="judge-card-body">「1店舗につき1通のメール」「全店舗分まとめて一覧表」など、出力の形を最初に決めておくとスムーズです。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🎯</div>
+    <div class="callout-text">Excelを渡すだけで修正依頼が出てくる。</div>
+    <div class="callout-sub">これが今日の第1ゴールです。完璧じゃなくていい。<br>「動いた、使えそう」の感触が掴めればOKです。</div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(0)">← 前へ</button>
+    <span class="page-counter">1 / 3</span>
+    <button class="page-nav-btn primary" onclick="goPage(2)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 2: スプシのGemini ━━━ -->
+<div class="page" data-page="2">
+  <div class="section-header">
+    <div class="section-number">Hands-on 02</div>
+    <h2 class="section-title">スプレッドシートの中にいるGemini</h2>
+  </div>
+  <div class="prose">
+    <p>ここからは新しいスキルです。</p>
+    <p>今まではGeminiを<strong>別のタブで開いて、結果をコピーして、Excelに貼り付けて</strong>いました。<br>でも実は、<strong>Googleスプレッドシートの中に直接Geminiがいます。</strong><br>作業している場所でそのままAIに話しかけられるので、コピー＆ペーストの往復が不要になります。</p>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">💡</div>
+    <div class="callout-text">別タブのAIに聞く → 作業中の画面でAIに聞く</div>
+    <div class="callout-sub">この違いが、日常業務のスピードを大きく変えます。<br>今の契約（Google Workspace Business Starter）で追加費用なしで使えます。</div>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">起動方法（2つのやり方）</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker" style="background: var(--blue-600);">A</div>
+        <div class="step-content">
+          <div class="step-title">サイドパネルから開く</div>
+          <div class="step-desc">スプレッドシートの右側に<strong>Geminiのアイコン（✨マーク）</strong>があります。<br>クリックするとサイドパネルが開き、チャット形式でAIに話しかけられます。<br>データの分析や質問にはこちらが便利です。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--blue-600);">B</div>
+        <div class="step-content">
+          <div class="step-title">セルの中で「=」を入力して呼び出す</div>
+          <div class="step-desc">セルに<strong>「=」と入力すると候補にGemini関数</strong>が出てきます。<br>「この列の合計を出して」のように日本語で指示すると、正しい関数を入力してくれます。<br>関数の書き方を覚えなくていいのがポイントです。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="prose"><p><strong>実際にやってみましょう。</strong>簡単なものから順番に試します。</p></div>
+
+  <div class="card">
+    <div class="card-label cl-blue">体験 ① — 関数を日本語で頼む</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">適当なスプレッドシートを開く</div>
+          <div class="step-desc">普段使っているシートでOKです。数字が入っている表があれば何でも。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">サイドパネルのGeminiに話しかける</div>
+          <div class="step-desc">「B列の数字の合計を教えて」「C2からC10の平均は？」<br>日本語で聞くだけで、計算結果や関数の提案が返ってきます。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">提案された関数をセルに挿入する</div>
+          <div class="step-desc">Geminiが「=SUM(B2:B10)」のような関数を提案してくれたら、ボタンを押すだけでセルに入ります。<br><strong>関数の書き方を知らなくても、やりたいことを日本語で伝えれば動きます。</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-blue">体験 ② — 表の整理を頼む</div>
+    <div class="prompt-box" style="font-size: 13px;">このシートのデータを、日付の新しい順に並べ替えてください。</div>
+    <div class="prompt-box" style="font-size: 13px;">A列の店舗名でグループ分けして、各店舗の売上合計を新しいシートにまとめてください。</div>
+    <div class="note" style="margin-top: 16px;">
+      <p>💡 並べ替えやグループ集計のやり方がわからなくても、<strong>やりたいことを日本語で書くだけ</strong>でGeminiがやってくれます。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-blue">体験 ③ — グラフを作ってみる（余裕があれば）</div>
+    <div class="prompt-box" style="font-size: 13px;">この表のデータを棒グラフにしてください。横軸は月、縦軸は売上金額で。</div>
+    <div class="note" style="margin-top: 16px;">
+      <p>💡 グラフの種類（棒・折れ線・円）や軸の設定も日本語で指定できます。<br>経営会議の資料準備に使えるスキルです。</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="prose"><p>もう1つ、知っておくと強力な機能があります。</p></div>
+
+  <div class="card" style="border-left: 4px solid var(--purple-600);">
+    <div class="card-label cl-purple">✨ =AI() 関数 — セルの中でAIを使う</div>
+    <div class="prose">
+      <p>サイドパネルとは別に、<strong>セルの中に直接AIの命令を書く</strong>方法があります。<br>普通の関数（=SUMとか=IFとか）と同じ感覚で、=AI() と書いてプロンプトを入れるだけ。</p>
+    </div>
+    <div class="prompt-box" style="margin-top: 16px; font-size: 13px;">=AI("この経費を「交通費」「消耗品費」「通信費」のどれかに分類して", B2)</div>
+    <div class="prose" style="margin-top: 16px;">
+      <p>これだけで、B2セルの内容を読んでAIが自動で分類してくれます。<br>下にドラッグすれば、<strong>何十行でも一括で分類</strong>できます。</p>
+    </div>
+    <div class="note" style="margin-top: 16px;">
+      <p>💡 <strong>=AI() と =Gemini() はまったく同じ機能です。</strong>どちらを使ってもOK。</p>
+    </div>
+  </div>
+
+  <div class="card card-green">
+    <div class="card-label cl-green">=AI() 関数でできること</div>
+    <div class="two-col">
+      <div class="judge-card" style="border-left: 3px solid var(--green-600);">
+        <div class="judge-card-icon">🏷️</div>
+        <div class="judge-card-title">分類・仕分け</div>
+        <div class="judge-card-body">=AI("「旅費」「消耗品」「通信費」のどれ？", B2)<br>勘定科目の自動振り分けに使える。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--green-600);">
+        <div class="judge-card-icon">📝</div>
+        <div class="judge-card-title">テキスト生成</div>
+        <div class="judge-card-body">=AI("この売上データから3行のコメントを作成して", A2:F2)<br>報告書のコメント欄を自動で埋められる。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--green-600);">
+        <div class="judge-card-icon">📊</div>
+        <div class="judge-card-title">要約</div>
+        <div class="judge-card-body">=AI("この内容を1文で要約して", C2)<br>長いテキストデータの要点だけ抜き出せる。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--green-600);">
+        <div class="judge-card-icon">😊</div>
+        <div class="judge-card-title">感情分析</div>
+        <div class="judge-card-body">=AI("このフィードバックはポジティブ？ネガティブ？", D2)<br>お客様の声の傾向分析に。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-yellow">
+    <div class="card-label cl-yellow">⚠️ =AI() 関数の注意点</div>
+    <div class="prose">
+      <p><strong>結果は「その時点のスナップショット」</strong>です。元データを変更しても自動では更新されません。更新したいときは「リフレッシュ」ボタンを押す必要があります。</p>
+      <p>また、<strong>参照したセルの内容だけ</strong>がAIに渡されます。シート全体を見てくれるわけではないので、必要なデータはセル範囲で指定してください。</p>
+      <p>金額の計算など<strong>正確さが必要な数値処理</strong>には、従来の関数（SUM、AVERAGEなど）を使いましょう。AI関数はテキスト処理（分類・要約・生成）が得意です。</p>
+    </div>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">これがなぜ小島さんの仕事に効くか</div>
+    <div class="two-col">
+      <div class="judge-card" style="border-left: 3px solid var(--teal-600);">
+        <div class="judge-card-icon">📄</div>
+        <div class="judge-card-title">紙→Excel→会計ソフト</div>
+        <div class="judge-card-body">読み取ったデータをスプシに貼ったら、その場で関数を組んでもらえる。列の並び替えやフォーマット変換もAIに頼める。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--teal-600);">
+        <div class="judge-card-icon">📊</div>
+        <div class="judge-card-title">経営会議の準備</div>
+        <div class="judge-card-body">会計データのグラフ化、前月比の計算、異常値の抽出——スプシ内で全部完結。別タブでGeminiに聞く手間がなくなる。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--teal-600);">
+        <div class="judge-card-icon">📋</div>
+        <div class="judge-card-title">個人実績表の作成</div>
+        <div class="judge-card-body">複数の表を統合する作業も「これとこれを1つの表にまとめて」で済む。手作業の貼り付け地獄から解放。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--teal-600);">
+        <div class="judge-card-icon">🔢</div>
+        <div class="judge-card-title">関数が覚えられなくてもOK</div>
+        <div class="judge-card-body">SUMもVLOOKUPも覚えなくていい。やりたいことを日本語で書けば、AIが正しい関数を提案してくれる。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🎯</div>
+    <div class="callout-text">「スプシの中でAIに話しかけられる」を体験する。</div>
+    <div class="callout-sub">これが今日の第2ゴール。使いこなすのは次回以降でいいので、<br>まずは「こんなことができるんだ」を知ることが大事です。</div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(1)">← 前へ</button>
+    <span class="page-counter">2 / 3</span>
+    <button class="page-nav-btn primary" onclick="goPage(3)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 3: 次のステップ ━━━ -->
+<div class="page" data-page="3">
+  <div class="section-header">
+    <div class="section-number">Next Step</div>
+    <h2 class="section-title">次のステップ</h2>
+  </div>
+  <div class="prose">
+    <p>Session 04お疲れさまでした。<br>今日は<strong>「前回の完成」と「新しいスキルの体験」</strong>の2つをやりました。</p>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">次回までにやってみてほしいこと</div>
+    <div class="checklist">
+      <div class="checklist-item">
+        <div class="checklist-box"></div>
+        <div class="checklist-text"><strong>今日作ったGemを実業務で1回使ってみる</strong><br><span style="font-size:13px; color: var(--gray-600);">次の週次チェックのタイミングで、実際のExcelファイルを渡してみてください。「研修で作ったやつ、本当に動いた」が一番のモチベーションになります。</span></div>
+      </div>
+      <div class="checklist-item">
+        <div class="checklist-box"></div>
+        <div class="checklist-text"><strong>スプシGeminiで関数を1回頼んでみる</strong><br><span style="font-size:13px; color: var(--gray-600);">何でもいいです。「この列の合計は？」だけでOK。使う習慣のきっかけを1回作ることが大事。</span></div>
+      </div>
+      <div class="checklist-item">
+        <div class="checklist-box"></div>
+        <div class="checklist-text"><strong>次にAI化したい業務を1つ決めてくる</strong><br><span style="font-size:13px; color: var(--gray-600);">前回の棚卸しリストの中から、次に取り組みたいものを選んでおいてください。候補：楽天の紙書類Excel化、試算表の分析・要約、個人実績表の作成など。</span></div>
+      </div>
+      <div class="checklist-item">
+        <div class="checklist-box"></div>
+        <div class="checklist-text"><strong>メガネさんに毎日5分話しかける</strong><br><span style="font-size:13px; color: var(--gray-600);">「今日この仕訳でよかったのかな？」レベルでOK。続けることで経理の知識が体に入ります。</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-purple" style="margin-top: 28px;">
+    <div class="card-label cl-purple">次回以降のロードマップ</div>
+    <div class="prose">
+      <p>小島さんの最終ゴールに向けて、今後はこの順番で進めていきます。</p>
+    </div>
+    <div class="steps" style="margin-top: 16px;">
+      <div class="step">
+        <div class="step-marker" style="background: var(--green-600);">✓</div>
+        <div class="step-content">
+          <div class="step-title" style="color: var(--gray-500); text-decoration: line-through;">入力ミス検出＋リマインドメール自動生成</div>
+          <div class="step-desc" style="color: var(--gray-400);">← 今日完成！</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--green-600);">✓</div>
+        <div class="step-content">
+          <div class="step-title" style="color: var(--gray-500); text-decoration: line-through;">スプシ内蔵Geminiの基本</div>
+          <div class="step-desc" style="color: var(--gray-400);">← 今日体験済み！</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--purple-600);">次</div>
+        <div class="step-content">
+          <div class="step-title">紙の書類 → Excel → PCA会計データ作成</div>
+          <div class="step-desc">楽天からの紙書類を読み取り、勘定科目を自動で補完し、会計ソフト用のデータに変換する。<br>スプシGeminiとの組み合わせで、手入力をさらに減らす。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--gray-400);">▷</div>
+        <div class="step-content">
+          <div class="step-title">試算表の分析・要約＋経営会議の壁打ち</div>
+          <div class="step-desc">会計データをAIに分析させ、ポイントを要約してもらう。経営会議の準備がぐっと楽になる。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--gray-400);">▷</div>
+        <div class="step-content">
+          <div class="step-title">個人実績表の自動統合</div>
+          <div class="step-desc">複数の表を貼り合わせる手作業を、スプシGemini＋関数で自動化。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🚀</div>
+    <div class="callout-text">1つずつ、確実に。</div>
+    <div class="callout-sub">全部一度にやる必要はありません。<br>毎回1つの業務を形にしていけば、気づいたら日常が変わっています。</div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(2)">← 前へ</button>
+    <span class="page-counter">3 / 3</span>
+    <button class="page-nav-btn hidden">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 4: 付録 ━━━ -->
+<div class="page" data-page="4">
+  <div class="appendix-hero">
+    <div class="appendix-hero-label">Appendix</div>
+    <div class="appendix-hero-title">PC操作ガイド＋トラブルシューティング</div>
+    <div class="appendix-hero-sub">前回の付録に加えて、よくあるトラブルの対処法を追加しました。</div>
+  </div>
+
+  <div class="card" style="margin-top: 32px; border-left: 4px solid var(--red-600);">
+    <div class="card-label cl-red">🆘 トラブルシューティング</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker" style="background: var(--red-600); font-size: 11px;">Q1</div>
+        <div class="step-content">
+          <div class="step-title">画面が重くて動かない</div>
+          <div class="step-desc">
+            <strong>原因：</strong>タブの開きすぎ、重いスプレッドシートの同時表示が主な原因です。<br>
+            <strong>対処：</strong>①不要なタブをすべて閉じる → ②特に重いスプレッドシートやExcelファイルを閉じる → ③それでもダメならブラウザを一度閉じて開き直す<br>
+            <strong>目安：</strong>Geminiで作業するときは、開いているタブは3つ以下が理想。
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--red-600); font-size: 11px;">Q2</div>
+        <div class="step-content">
+          <div class="step-title">ファイルのアップロードが失敗する</div>
+          <div class="step-desc">
+            <strong>Step 1：</strong>ブラウザを再起動する（Chromeを完全に閉じてから開き直す）<br>
+            <strong>Step 2：</strong>アップロード中は他の操作をしない（完了まで待つ）<br>
+            <strong>Step 3：</strong>それでもダメなら、ExcelをCSV形式で保存し直してからアップする<br>
+            <span style="font-size: 13px; color: var(--gray-600);">CSV変換の方法：Excelで「ファイル」→「名前をつけて保存」→「ファイルの種類」で「CSV（コンマ区切り）」を選ぶ</span>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--red-600); font-size: 11px;">Q3</div>
+        <div class="step-content">
+          <div class="step-title">Geminiが途中で止まる・エラーが出る</div>
+          <div class="step-desc">
+            <strong>対処：</strong>慌てずにもう一度同じメッセージを送り直す。<br>
+            それでもダメなら「新しいチャット」を開いて、ファイルのアップロードからやり直す。<br>
+            <strong>前のチャットは消えません。</strong>左サイドバーから戻れます。
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--red-600); font-size: 11px;">Q4</div>
+        <div class="step-content">
+          <div class="step-title">HTMLファイルをダウンロードしたら「ウイルスを検出」と出る</div>
+          <div class="step-desc">
+            <strong>原因：</strong>HTMLファイルはウェブページの形式なので、セキュリティソフトが「悪意のあるプログラムかもしれない」と警告を出すことがあります。研修資料にウイルスは含まれていません。<br>
+            <strong>対処：</strong>ダウンロードせず、メールに記載されたURLから直接ブラウザで開いてください。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">📸 スクリーンショットの撮り方（おさらい）</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker" style="background: var(--blue-600); font-size: 11px; width: 40px; border-radius: 8px;">Win</div>
+        <div class="step-content">
+          <div class="step-title">一部だけ切り取る（おすすめ）</div>
+          <div class="step-desc">「Windowsキー＋Shift＋S」を同時押し → 画面が暗くなる → 撮りたい範囲をドラッグ → 自動でクリップボードにコピーされる</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">⌨️ よく使うショートカット（おさらい）</div>
+    <div class="shortcut-grid">
+      <div class="shortcut-item">
+        <div class="shortcut-key">Ctrl + C</div>
+        <div class="shortcut-desc"><strong>コピー</strong></div>
+      </div>
+      <div class="shortcut-item">
+        <div class="shortcut-key">Ctrl + V</div>
+        <div class="shortcut-desc"><strong>貼り付け</strong></div>
+      </div>
+      <div class="shortcut-item">
+        <div class="shortcut-key">Ctrl + Z</div>
+        <div class="shortcut-desc"><strong>元に戻す</strong></div>
+      </div>
+      <div class="shortcut-item">
+        <div class="shortcut-key">Ctrl + S</div>
+        <div class="shortcut-desc"><strong>保存</strong></div>
+      </div>
+      <div class="shortcut-item">
+        <div class="shortcut-key">Ctrl + A</div>
+        <div class="shortcut-desc"><strong>全選択</strong></div>
+      </div>
+      <div class="shortcut-item">
+        <div class="shortcut-key">Alt + Tab</div>
+        <div class="shortcut-desc"><strong>ウィンドウ切り替え</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">🆘 困ったらまずAIに聞く</div>
+    <div class="prompt-box" style="font-size: 13px;">Geminiにファイルをアップロードしようとしたら、エラーが出てできません。<br>エラーメッセージは「○○○○」です。<br>パソコンに詳しくないので、ステップごとに対処法を教えてください。</div>
+    <div class="note" style="margin-top: 12px;">
+      <p>💡 エラーメッセージをそのままコピーしてAIに渡すのが最速の解決法です。<br>スクリーンショットを撮って画像で渡すのもOKです。</p>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(3)">← 本編に戻る</button>
+    <span class="page-counter" style="color: var(--gray-400);">付録</span>
+    <button class="page-nav-btn hidden">次へ →</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const pages = document.querySelectorAll('.page');
+  function goPage(idx) {
+    tabBtns.forEach(b => b.classList.remove('active'));
+    tabBtns[idx].classList.add('active');
+    pages.forEach(p => p.classList.remove('active'));
+    pages[idx].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => goPage(parseInt(btn.dataset.page)));
+  });
+</script>
+</body>
+</html>

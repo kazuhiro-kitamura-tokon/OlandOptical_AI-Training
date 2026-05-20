@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Lesson Session 04 — Gemを武器に変える</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal-50: #e6f7f5; --teal-100: #b3ece6; --teal-200: #80e0d6;
+    --teal-500: #26a69a; --teal-600: #00897b; --teal-700: #00796b;
+    --orange-50: #fff3e0; --orange-100: #ffe0b2; --orange-600: #fb8c00;
+    --blue-50: #e8f0fe; --blue-100: #d2e3fc; --blue-200: #aecbfa;
+    --blue-600: #1a73e8; --blue-700: #1967d2;
+    --green-50: #e6f4ea; --green-100: #ceead6; --green-600: #1e8e3e; --green-700: #188038;
+    --yellow-50: #fef7e0; --yellow-100: #feefc3; --yellow-600: #f9ab00;
+    --red-50: #fce8e6; --red-100: #fad2cf; --red-600: #d93025;
+    --purple-50: #f3e8fd; --purple-100: #e8d0fb; --purple-600: #9334e6;
+    --gray-50: #f8f9fa; --gray-100: #f1f3f4; --gray-200: #e8eaed;
+    --gray-300: #dadce0; --gray-400: #bdc1c6; --gray-500: #9aa0a6;
+    --gray-600: #80868b; --gray-700: #5f6368; --gray-800: #3c4043; --gray-900: #202124;
+    --shadow-sm: 0 1px 2px rgba(60,64,67,0.1), 0 1px 3px rgba(60,64,67,0.08);
+    --shadow-md: 0 1px 3px rgba(60,64,67,0.12), 0 4px 8px rgba(60,64,67,0.08);
+    --radius: 12px; --radius-sm: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { font-family: 'Noto Sans JP', 'IBM Plex Sans', sans-serif; background: var(--gray-50); color: var(--gray-900); line-height: 1.9; font-size: 16px; min-height: 100vh; display: flex; flex-direction: column; }
+  .hero { background: linear-gradient(135deg, var(--teal-600) 0%, var(--teal-700) 40%, #004d40 100%); color: white; padding: 68px 24px 48px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -40%; right: -15%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%); border-radius: 50%; }
+  .hero-inner { max-width: 760px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-label { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; margin-bottom: 12px; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero h1 { font-size: 28px; font-weight: 700; line-height: 1.45; margin-bottom: 16px; }
+  .hero p { font-size: 15px; line-height: 1.8; opacity: 0.9; max-width: 600px; }
+  .hero-meta { margin-top: 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+  .hero-meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; opacity: 0.85; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero-meta-item svg { width: 18px; height: 18px; }
+  .tab-nav { position: sticky; top: 0; z-index: 100; background: white; border-bottom: 1px solid var(--gray-200); padding: 0 24px; box-shadow: var(--shadow-sm); }
+  .tab-nav-inner { max-width: 760px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
+  .tab-nav-inner::-webkit-scrollbar { display: none; }
+  .tab-btn { flex-shrink: 0; padding: 14px 16px; font-size: 13px; font-weight: 500; color: var(--gray-600); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: 'Noto Sans JP', sans-serif; }
+  .tab-btn:hover { color: var(--teal-600); background: var(--teal-50); }
+  .tab-btn.active { color: var(--teal-600); border-bottom-color: var(--teal-600); }
+  .page-container { flex: 1; }
+  .page { display: none; max-width: 760px; width: 100%; margin: 0 auto; padding: 48px 24px 80px; animation: pageIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes pageIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--gray-200); }
+  .page-nav-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--gray-300); background: white; color: var(--gray-700); transition: all 0.2s; font-family: 'Noto Sans JP', sans-serif; }
+  .page-nav-btn:hover { border-color: var(--teal-600); color: var(--teal-600); background: var(--teal-50); }
+  .page-nav-btn.primary { background: var(--teal-600); color: white; border-color: var(--teal-600); }
+  .page-nav-btn.primary:hover { background: var(--teal-700); }
+  .page-nav-btn.hidden { visibility: hidden; }
+  .page-counter { font-size: 13px; color: var(--gray-500); font-family: 'IBM Plex Sans', sans-serif; }
+  .section-header { margin-bottom: 32px; }
+  .section-number { font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--teal-600); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+  .section-title { font-size: 24px; font-weight: 700; line-height: 1.4; }
+  .prose { font-size: 16px; line-height: 2; color: var(--gray-800); }
+  .prose p { margin-bottom: 20px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { font-weight: 600; color: var(--gray-900); }
+  .card { background: white; border-radius: var(--radius); padding: 28px 32px; margin: 28px 0; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); }
+  .card-teal { background: var(--teal-50); border-color: var(--teal-200); }
+  .card-blue { background: var(--blue-50); border-color: var(--blue-200); }
+  .card-green { background: var(--green-50); border-color: var(--green-100); }
+  .card-orange { background: var(--orange-50); border-color: var(--orange-100); }
+  .card-purple { background: var(--purple-50); border-color: var(--purple-100); }
+  .card-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+  .cl-teal { color: var(--teal-600); } .cl-blue { color: var(--blue-600); } .cl-green { color: var(--green-700); }
+  .cl-orange { color: var(--orange-600); } .cl-purple { color: var(--purple-600); }
+  .steps { margin: 24px 0; }
+  .step { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
+  .step:last-child { margin-bottom: 0; }
+  .step-marker { flex-shrink: 0; width: 32px; height: 32px; background: var(--teal-600); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; font-weight: 600; margin-top: 2px; }
+  .step-content { flex: 1; }
+  .step-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .step-desc { font-size: 15px; color: var(--gray-700); line-height: 1.7; }
+  .prompt-box { background: var(--gray-900); color: #e8eaed; border-radius: var(--radius); padding: 24px 28px; margin: 24px 0; font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; line-height: 1.8; position: relative; }
+  .prompt-box::before { content: 'PROMPT'; position: absolute; top: 10px; right: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: var(--gray-500); }
+  .divider { height: 1px; background: var(--gray-200); margin: 40px 0; }
+  .note { background: var(--gray-100); border-radius: var(--radius-sm); padding: 20px 24px; margin: 24px 0; font-size: 14px; line-height: 1.8; color: var(--gray-700); }
+  .note-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-500); margin-bottom: 6px; }
+  .callout { background: linear-gradient(135deg, var(--teal-50) 0%, var(--blue-50) 100%); border: 1px solid var(--teal-200); border-radius: var(--radius); padding: 28px 32px; margin: 32px 0; text-align: center; }
+  .callout-icon { font-size: 28px; margin-bottom: 12px; }
+  .callout-text { font-size: 17px; font-weight: 600; line-height: 1.7; }
+  .callout-sub { font-size: 14px; color: var(--gray-600); margin-top: 10px; line-height: 1.7; }
+  .checklist { margin: 24px 0; }
+  .checklist-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--gray-100); }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-box { flex-shrink: 0; width: 22px; height: 22px; border: 2px solid var(--gray-300); border-radius: 4px; margin-top: 2px; }
+  .checklist-text { font-size: 15px; color: var(--gray-800); line-height: 1.6; }
+  .ojt-option { background: white; border-radius: var(--radius); padding: 24px 28px; margin-bottom: 16px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); transition: border-color 0.2s, box-shadow 0.2s; }
+  .ojt-option:hover { border-color: var(--teal-500); box-shadow: var(--shadow-md); }
+  .ojt-option-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal-600); margin-bottom: 8px; }
+  .ojt-option h4 { font-weight: 700; font-size: 17px; margin-bottom: 8px; }
+  .ojt-option p { font-size: 14px; color: var(--gray-600); line-height: 1.8; }
+  @media (max-width: 640px) {
+    .hero { padding: 48px 20px 36px; } .hero h1 { font-size: 23px; }
+    .page { padding: 36px 20px 64px; }
+    .card { padding: 22px 20px; }
+    .tab-btn { padding: 12px 12px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">AI Lesson — Session 04</div>
+    <h1>Gemを武器に変える</h1>
+    <p>会議資料Gemの改善、営業報告メールのGem化、<br>評価シートの設計着手。3つを一気に前へ進めます。</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        60分 ／ 座学15分＋実践45分
+      </div>
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        1 on 1 レクチャー
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <button class="tab-btn active" data-page="0">ふりかえり</button>
+    <button class="tab-btn" data-page="1">Gemを育てるコツ</button>
+    <button class="tab-btn" data-page="2">営業報告メール</button>
+    <button class="tab-btn" data-page="3">評価シートの設計</button>
+    <button class="tab-btn" data-page="4">バージョン管理</button>
+    <button class="tab-btn" data-page="5">一緒に作ろう</button>
+  </div>
+</nav>
+
+<div class="page-container">
+
+<!-- ━━━ Page 0: ふりかえり ━━━ -->
+<div class="page active" data-page="0">
+  <div class="section-header">
+    <div class="section-number">Review</div>
+    <h2 class="section-title">前回のふりかえり</h2>
+  </div>
+  <div class="prose"><p>Session 3では、Gemsの仕組みを学び、「業績壁打ちマスター」を実際に作りました。</p></div>
+  <div class="card card-teal">
+    <div class="card-label cl-teal">Session 3 で身につけたこと</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">Gemsの作り方 — メタプロンプトで指示文を作る</div>
+          <div class="step-desc">「Gemを作りたい」とGeminiに相談し、カスタム指示を一緒に設計する流れを実践。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">壁打ち型Gemの設計 — いきなり作らせない</div>
+          <div class="step-desc">会議資料をいきなり自動生成するのではなく、「分析→提案→フィードバック→最終出力」の壁打ち型に方針転換。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">ハルシネーション対策 — 嘘を防ぐプロンプト</div>
+          <div class="step-desc">知らない数字を捏造する問題が発生。「嘘をつかないように指示を追加して」とGeminiに依頼する方法を学んだ。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <div class="note-label">宿題の確認</div>
+    <div class="checklist">
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>「業績壁打ちマスター」を使ってみた？</strong> — 実際の営業データで試して、改善点は見つかった？</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>プロンプトを改善した？</strong> — ハルシネーション対策や出力フォーマットの調整をやってみた？</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>パーソナライズ設定を正しい場所でやった？</strong> — チャット内ではなく、設定画面のカスタマイズ欄で</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>Excelデータの準備</strong> — 入力データ（営業管理シート）と出力フォーマット（報告書テンプレート）の整理はできた？</div></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card card-green">
+    <div class="card-label cl-green">朗報：Gemini Flash 3.5 がリリースされました</div>
+    <div class="prose">
+      <p>ちょうど今日、Geminiに新しいモデル<strong>「Flash 3.5」</strong>が追加されました。これまでのFlash（高速モード）より大幅に賢くなっていて、Pro（プロモード）に匹敵するか、場合によっては上回る性能があると言われています。</p>
+      <p>つまり、<strong>プランアップを待たなくても、Flash 3.5で精度の高い作業ができるようになる可能性がある</strong>ということです。</p>
+      <p>まだ出たばかりなので、今日の研修で実際に試してみましょう。会議資料Gemや営業報告メールの作業で、思考モードの代わりにFlash 3.5を使って精度を比較してみます。</p>
+    </div>
+  </div>
+
+  <div class="prose">
+    <p>今日のSession 4は<strong>実践に全振り</strong>です。会議資料Gemの改善を確認したら、すぐに次のGem作成と評価シートの設計に入ります。</p>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn hidden">← 前へ</button>
+    <span class="page-counter">0 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(1)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 1: Gemを育てるコツ ━━━ -->
+<div class="page" data-page="1">
+  <div class="section-header">
+    <div class="section-number">Section 01</div>
+    <h2 class="section-title">Gemを育てるコツ</h2>
+  </div>
+  <div class="prose">
+    <p>前回「大変ですね」とおっしゃっていましたが、コツをつかめば<strong>1日1ラリーで十分</strong>磨いていけます。Gemの改善は、会議資料にも営業報告にも評価シートにも共通するスキルなので、ここで覚えたことは全部に使い回せます。</p>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">改善の3パターン</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">嘘を防ぐ — ハルシネーション対策</div>
+          <div class="step-desc">前回、知らない数字を捏造する問題が起きました。以下のような指示をカスタム指示に追加してください。</div>
+        </div>
+      </div>
+    </div>
+    <div class="prompt-box">【重要ルール】<br>・添付されたデータに存在しない数値は絶対に使わないこと<br>・データから読み取れない場合は「この情報はデータに含まれていません」と正直に答えること<br>・推測や仮定で数値を補完しないこと<br>・計算が必要な場合は、必ずコードを使って計算すること</div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">改善の3パターン（続き）</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">出力の質を上げる — フォーマット指定</div>
+          <div class="step-desc">「短すぎる」「項目が抜けてる」「数字じゃなくて文章で書いてほしい」——こういう不満はフォーマット指示で解決できます。</div>
+        </div>
+      </div>
+    </div>
+    <div class="prompt-box">【出力のルール】<br>・各報告項目について最低200文字以上の考察を書くこと<br>・数字を述べるだけでなく、その数字が意味することを解釈すること<br>・前月比・前年同月比の両方に言及すること<br>・改善アクションは必ず3つ以上提案すること</div>
+  </div>
+
+  <div class="card">
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">制約を教える — 業務固有のルール</div>
+          <div class="step-desc">前回「公式LINEは使ってない」のに提案されてしまう問題がありました。こういう業務固有の制約を指示に入れておくと、的外れな提案がなくなります。</div>
+        </div>
+      </div>
+    </div>
+    <div class="prompt-box">【当店の制約】<br>・公式LINEやSNSプロモーションは現在実施していない<br>・スタッフは常時3名体制（大幅な人員変更は不可）<br>・商圏は半径○km以内の住宅地<br>※ 上記に該当しない施策を提案しないこと</div>
+    <div class="note">
+      <div class="note-label">ここを埋めるのが最初のハードル</div>
+      <p>「当店の制約」を言語化するのが一番難しいところです。でも、ここを整理すること自体が業務の棚卸しになるので、Gemを磨く作業＝業務を見つめ直す作業でもあります。</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🔄</div>
+    <div class="callout-text">改善のリズム：使う → 違和感メモ → AIに直させる → 反映</div>
+    <div class="callout-sub">
+      1日1ラリーでOK。月曜に使って、火曜に「ここが変」をメモして、<br>
+      水曜にカスタム指示を修正する。それだけで2週間後には別物になります。<br>
+      <strong>この改善サイクルは、今日作る営業報告メールGemにもそのまま適用できます。</strong>
+    </div>
+  </div>
+
+  <div class="card card-green">
+    <div class="card-label cl-green">大事なコツ：改善プロンプトも自分で書かなくていい</div>
+    <div class="prose">
+      <p>上の3パターンのプロンプト例を見て「こういうのを自分で書くのは大変……」と思ったかもしれません。<strong>書かなくて大丈夫です。</strong></p>
+      <p>Gemとやりとりして問題が起きたら、<strong>そのやりとりの中で</strong>こう頼んでください：</p>
+    </div>
+    <div class="prompt-box">今のやりとりで起きた問題を振り返って。<br><br>この問題が今後起きないようにするためのルールを、<br>カスタム指示に追加できる形で書いてくれる？<br><br>今のカスタム指示はこれ：<br>[現在のカスタム指示をコピペ]</div>
+    <div class="prose" style="font-size: 14px; color: var(--gray-600); margin-top: 12px;">
+      <p>Geminiはやりとりの文脈を覚えているので、「さっき数字を捏造してたよね？それを防ぐルールを書いて」と言えば、的確な改善プロンプトを提案してくれます。それをそのままGemのカスタム指示にコピペするだけ。</p>
+      <p><strong>つまり、改善作業すらAIに手伝わせられる</strong>——これがSession 1で学んだメタプロンプトの応用です。</p>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(0)">← 前へ</button>
+    <span class="page-counter">1 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(2)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 2: 営業報告メール ━━━ -->
+<div class="page" data-page="2">
+  <div class="section-header">
+    <div class="section-number">Section 02</div>
+    <h2 class="section-title">営業報告メールをGem化する</h2>
+  </div>
+  <div class="prose">
+    <p>Session 2のときに<strong>自発的に</strong>営業報告メールの半自動化を試していましたね。プロモードの回数制限で数値がズレてしまい断念しましたが、あのアプローチは正しかった。</p>
+    <p>今回は<strong>Gemとして仕組み化</strong>することで、毎回の指示なしで安定した出力が出るようにします。しかもFlash 3.5が使えるようになったので、回数制限を気にせず試せます。</p>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-blue">営業報告メールGemの設計</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker" style="background: var(--blue-600);">1</div>
+        <div class="step-content">
+          <div class="step-title">素材を集める（事前準備）</div>
+          <div class="step-desc">
+            <strong>必要なもの：</strong><br>
+            ・過去の営業報告メール 5〜10通（「いつもこんな感じで書いてる」のサンプル）<br>
+            ・当日の営業管理シート（Excelブック。対象日のタブだけ残してエクスポート）<br><br>
+            <strong>決めること：</strong><br>
+            ・メールに必ず含める項目（売上実績、前日比、特記事項…）<br>
+            ・トーン（かしこまった文体？ カジュアル？）<br>
+            ・宛先（社長向け？ 全店舗向け？）
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--blue-600);">2</div>
+        <div class="step-content">
+          <div class="step-title">メタプロンプトで指示文を作る</div>
+          <div class="step-desc">
+            会議資料Gemと同じやり方です。Geminiの新規チャットで：<br><br>
+            「営業報告メールを毎日書いてるんだけど、これをGem化したい。過去のメールサンプルを渡すから、そのトーンと構成を再現するカスタム指示を作ってほしい」<br><br>
+            サンプルメールを貼りつけて送信。Geminiが指示文を提案してくれます。
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--blue-600);">3</div>
+        <div class="step-content">
+          <div class="step-title">Gemを作成してテスト</div>
+          <div class="step-desc">
+            指示文をGemに貼り、知識には出力フォーマット（サンプルメール）をアップロード。<br>
+            昨日の営業データで試してみて、実際に送ったメールと比較。<br><br>
+            <strong>テストの判定基準：</strong><br>
+            ・数字が合ってる？ → ハルシネーション対策が効いてるか<br>
+            ・トーンは自分の書き方に近い？ → サンプルの学習度合い<br>
+            ・項目は全部埋まってる？ → フォーマット指示の網羅性
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">会議資料Gemとの違い</div>
+    <div class="prose">
+      <p>会議資料Gemは「壁打ち型」にしました。分析→提案→フィードバック→最終出力の対話形式です。</p>
+      <p>営業報告メールは<strong>「一発出力型」の方が向いています</strong>。毎日やることなので、データを渡したら一発でメールの下書きが出てきて、サッと確認して送れる形がベスト。</p>
+      <p>この使い分け——壁打ち型か一発出力型か——は、Gemを設計するときの最初の判断ポイントです。</p>
+    </div>
+  </div>
+
+  <div class="prompt-box">【営業報告メールGem 指示文のたたき台】<br><br>あなたは相馬店の営業報告メール作成アシスタントです。<br><br>## 役割<br>毎日の営業データを受け取り、報告メールの下書きを生成する。<br><br>## ワークフロー<br>1. 営業管理シート（Excel）を受け取る<br>2. データを読み取り、必要な数値を抽出する<br>3. 以下のフォーマットで報告メール下書きを生成する<br><br>## 出力フォーマット<br>件名：【相馬店】○月○日 営業報告<br>本文：<br>・本日の売上実績（金額・前日比・目標達成率）<br>・客数と客単価<br>・特記事項（好調だった商品、来店傾向など）<br>・明日のアクション<br><br>## ルール<br>・データにない数字は絶対に使わない<br>・計算はコードで実行する<br>・トーンは簡潔かつ丁寧に<br>・添付ファイルの知識にあるサンプルメールのトーンを参考にする</div>
+  <div class="prose" style="font-size: 14px; color: var(--gray-500); margin-top: -16px;">
+    <p>↑ これはたたき台。実際のメールサンプルを見ながら一緒にカスタマイズしましょう。</p>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(1)">← 前へ</button>
+    <span class="page-counter">2 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(3)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 3: 評価シートの設計 ━━━ -->
+<div class="page" data-page="3">
+  <div class="section-header">
+    <div class="section-number">Section 03</div>
+    <h2 class="section-title">評価シート/シフト管理 — まず設計する</h2>
+  </div>
+  <div class="prose">
+    <p>Session 1で話が出て以来、ずっと候補リストにあった評価シートとシフト管理のAI化。今日は<strong>いきなり作るのではなく「何が必要か」を整理する</strong>ところまでやります。</p>
+    <p>会議資料と営業報告メールで「Gemの作り方」はもう身についています。3つ目は<strong>設計さえ終われば、あとは同じ手順で作れる</strong>ということを実感してもらいたい。</p>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-purple">まず決めること — AIと壁打ちで整理する</div>
+    <div class="prose">
+      <p>以下の質問に答えていくと、Gemの設計に必要な情報が揃います。答えがすぐ出なくても大丈夫。<strong>「この質問に今答えられない」こと自体が、まず何を準備すべきかの手がかり</strong>になります。</p>
+    </div>
+    <div class="checklist">
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>評価の目的は？</strong> — 昇給判定？ フィードバック面談の材料？ モチベーション管理？</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>評価基準はすでにある？</strong> — 既存の評価シートや基準書のファイルがあるか？</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>評価の入力データは何？</strong> — 売上実績、接客件数、日報、店長の観察メモ？</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>AIに任せたいのはどこまで？</strong> — データ集計だけ？ 評価案の提案まで？ フィードバック文の下書きまで？</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>最終判断は必ず人間がやる？</strong> — AIの出力はあくまで「たたき台」として使う想定？</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>機密性の配慮は？</strong> — 個人名を伏せてテストする？ 実名OKの環境？</div></div>
+    </div>
+  </div>
+
+  <div class="card card-purple">
+    <div class="card-label cl-purple">この質問リスト自体をAIに作ってもらう方法</div>
+    <div class="prompt-box">メガネ店の店長です。スタッフの評価シートをAIで効率化したい。<br><br>Gemを作る前に、まず何を決めるべきか整理したい。<br>「設計を始める前に決めるべきこと」の質問リストを作ってくれる？<br><br>私の状況：<br>・スタッフ数名<br>・評価は半年に1回<br>・基準書は一応あるが、運用が属人的<br>・フィードバック面談の材料として使いたい</div>
+    <div class="prose" style="font-size: 14px; color: var(--gray-500); margin-top: 12px;">
+      <p>💡 こうやってAIに「何を決めるべきか」を聞くのがメタプロンプトの応用です。自分で全部整理しなくても、AIと対話しながら要件が見えてきます。</p>
+    </div>
+  </div>
+
+  <div class="card card-orange">
+    <div class="card-label cl-orange">シフト管理も同じアプローチで設計できる</div>
+    <div class="prose">
+      <p>シフト管理のAI化も、考え方は同じです。「何曜日に誰が出勤できるか」のデータがあれば、AIに「公平にバランスよくシフトを組んで」と依頼できます。</p>
+      <p>ただし、シフトには<strong>「この人とこの人は一緒にしない」「土日はベテランを必ず1人入れる」</strong>のような暗黙のルールが多い。これを言語化するのが設計のキモです。</p>
+      <p>今日は評価シートに集中して、シフト管理は次回以降のテーマにしましょう。</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">📋</div>
+    <div class="callout-text">設計 = 「何が必要か」を言語化する作業</div>
+    <div class="callout-sub">
+      Gemの指示文を書くのに必要な情報を揃えるのが設計。<br>
+      設計が終われば、あとはSession 3でやったのと全く同じ手順で作れます。<br>
+      <strong>つまり、今日この質問リストが埋まれば、次回Gemが完成する。</strong>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(2)">← 前へ</button>
+    <span class="page-counter">3 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(4)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 4: バージョン管理 ━━━ -->
+<div class="page" data-page="4">
+  <div class="section-header">
+    <div class="section-number">Section 04</div>
+    <h2 class="section-title">バージョン管理の実践</h2>
+  </div>
+  <div class="prose">
+    <p>前回、インクリメンタル方式で刺繍プログラムを改善したとき、<strong>バージョン管理のタイミングがわからず断念した</strong>とのことでした。これはGem作りでもアプリ作りでも同じ問題が起きます。</p>
+    <p>ルールはシンプルです。<strong>「動いた」「良くなった」と思った瞬間に保存する</strong>。それだけ。</p>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">保存のタイミング — 3つの「今だ！」</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">初めて動いたとき → v1</div>
+          <div class="step-desc">とりあえず動いた。完璧じゃなくてもいい。この状態を残しておく。あとで全部壊れても、ここに戻れる。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">改善が成功したとき → v2, v3...</div>
+          <div class="step-desc">「ここを直して」→ 動いた → 前よりいい！ このタイミングで保存。上書きしないこと。新しいバージョン番号をつける。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">大きな変更をする前 → 保険として</div>
+          <div class="step-desc">「構造を変えたい」「大幅に書き直したい」の前に必ず保存。これが保険になる。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-blue">
+    <div class="card-label cl-blue">具体的なやり方 — メモ帳で十分</div>
+    <div class="prose">
+      <p><strong>Gemのカスタム指示の場合：</strong></p>
+      <p>メモ帳を開いて、上の方に「===== v1 (5/7 初版) =====」と書いて、その下にカスタム指示を全文コピペ。改善するたびに「===== v2 (5/14 ハルシネ対策追加) =====」と追加して下にペースト。これだけです。</p>
+      <p><strong>コード（アプリ）の場合：</strong></p>
+      <p>キャンバスで作ったHTMLは、「コピー」ボタンでコード全体をコピーして、メモ帳に同じように貼り付け。ファイル名を「会議資料app_v1.txt」「会議資料app_v2.txt」にして保存するだけでもOKです。</p>
+    </div>
+  </div>
+
+  <div class="note">
+    <div class="note-label">引き継ぎ書の更新もセットで</div>
+    <p>バージョンを保存するタイミングで、引き継ぎ書も更新しましょう。「今何ができていて、次は何をやりたいか」を一緒にメモしておくと、2週間後の自分が助かります。</p>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">Tips：管理ツール自体もAIに作ってもらえる</div>
+    <div class="prose">
+      <p>メモ帳でのバージョン管理が面倒になってきたら、<strong>管理用のツールをAIに作ってもらう</strong>のも1つのテクニックです。</p>
+      <p>参考までに、私も「バージョン管理できるWebアプリを作って。ブラウザで開くだけで動くHTMLファイルにして。保存はテキストファイルとしてダウンロードして、再度読み込めるようにして」と頼んで作ってもらいました。</p>
+      <p>こういう<strong>「自分の作業を楽にする小さなツール」をAIにサクッと作ってもらう</strong>のが、バイブコーディングの本領です。気に入らないところがあれば、自分で「ここをこう変えて」と頼んで改造もできます。</p>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(3)">← 前へ</button>
+    <span class="page-counter">4 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(5)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 5: 一緒に作ろう ━━━ -->
+<div class="page" data-page="5">
+  <div class="section-header">
+    <div class="section-number">Hands-on</div>
+    <h2 class="section-title">一緒に作ろう</h2>
+  </div>
+  <div class="prose">
+    <p>残り時間で、<strong>実際に手を動かします</strong>。<br>今日は3つの中から優先順位をつけて取り組みましょう。</p>
+  </div>
+
+  <div class="ojt-option">
+    <div class="ojt-option-label">Option A — おすすめ</div>
+    <h4>✉️ 営業報告メールGemを作る</h4>
+    <p>過去のメールサンプルがあれば、今日中にGemが完成します。毎日使うものなので、完成した瞬間から効果を実感できます。Flash 3.5で精度を確認しながら進めましょう。</p>
+  </div>
+
+  <div class="ojt-option">
+    <div class="ojt-option-label">Option B</div>
+    <h4>💎 会議資料Gemを磨く</h4>
+    <p>前回作った「業績壁打ちマスター」の改善。ハルシネーション対策、出力フォーマットの調整、業務固有の制約の追加。Flash 3.5に切り替えて精度が上がるかも一緒にテストします。</p>
+  </div>
+
+  <div class="ojt-option">
+    <div class="ojt-option-label">Option C</div>
+    <h4>📋 評価シートの設計をAIと壁打ち</h4>
+    <p>Page 3の質問リストを埋めていきます。Geminiに「設計を手伝って」と相談しながら、評価基準の言語化と必要素材のリストアップを行います。今日中にGemの設計書が完成すれば、次回作るだけ。</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card card-purple">
+    <div class="card-label cl-purple">次回に向けて</div>
+    <div class="checklist">
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>今日作ったGemを実際の業務で使う</strong> — 営業報告メールGemなら明日から毎日試せる</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>違和感をメモして、カスタム指示を1行ずつ改善する</strong> — 1日1ラリーで十分</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>バージョン管理を実践する</strong> — メモ帳でv1/v2を保存。上書きしない</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>評価シートの素材を集める</strong> — 評価基準書、過去の評価シート、日報など</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>Flash 3.5を積極的に使ってみる</strong> — 思考モードやプロモードとの精度差を体感する</div></div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🏁</div>
+    <div class="callout-text">研修ゴールに近づいています</div>
+    <div class="callout-sub">
+      Session 1で掲げた「会議資料のAI化」は形になりつつあります。<br>
+      営業報告メールのGem化が完成すれば、毎日の業務が変わる。<br>
+      評価シートの設計が終われば、次回で3つ目のGemが完成する。<br>
+      <strong>研修が終わった後も、このやり方で何個でもGemを作れる状態を目指しています。</strong>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(4)">← 前へ</button>
+    <span class="page-counter">5 / 5</span>
+    <button class="page-nav-btn hidden">次へ →</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const pages = document.querySelectorAll('.page');
+  function goPage(idx) {
+    tabBtns.forEach(b => b.classList.remove('active'));
+    tabBtns[idx].classList.add('active');
+    pages.forEach(p => p.classList.remove('active'));
+    pages[idx].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => goPage(parseInt(btn.dataset.page)));
+  });
+</script>
+</body>
+</html>
