@@ -389,6 +389,7 @@
   .card-accent.day1 { background: linear-gradient(90deg, var(--blue-600), var(--purple-500)); }
   .card-accent.day2 { background: linear-gradient(90deg, var(--teal-600), var(--green-600)); }
   .card-accent.day3 { background: linear-gradient(90deg, var(--orange-600), #e65100); }
+  .card-accent.day4 { background: linear-gradient(90deg, var(--purple-600), #5b21b6); }
 
   .card-body {
     padding: 24px;
@@ -408,6 +409,7 @@
   .card-day.day1 { background: var(--blue-50); color: var(--blue-700); }
   .card-day.day2 { background: var(--teal-50); color: var(--teal-600); }
   .card-day.day3 { background: var(--orange-50); color: var(--orange-600); }
+  .card-day.day4 { background: var(--purple-50); color: var(--purple-600); }
 
   .card-title {
     font-size: 17px;
@@ -572,21 +574,25 @@ const SESSIONS = {
     { day: 1, label: 'DAY 1', title: 'AIを実務で使うための土台づくり', desc: 'AI概論・プロンプト設計の基礎・ツール比較', file: 'sessions/session01.html', accent: 'day1' },
     { day: 2, label: 'DAY 2', title: 'AIの力を引き出す実践テクニック', desc: 'プロンプトエンジニアリング深掘り・Gemini Gems', file: 'sessions/session02-misawa.html', accent: 'day2' },
     { day: 3, label: 'DAY 3', title: 'AIで「自分の武器」をつくる', desc: 'Claude Code デモ・Canvas バイブコーディング', file: 'sessions/session03-misawa.html', accent: 'day3' },
+    { day: 4, label: 'DAY 4', title: '予算シミュレーターを仕上げる', desc: 'バイブコーディング実践・成果物の完成', file: 'sessions/session04-misawa.html', accent: 'day4' },
   ],
   kuboki: [
     { day: 1, label: 'DAY 1', title: 'AIを実務で使うための土台づくり', desc: 'AI概論・プロンプト設計の基礎・ツール比較', file: 'sessions/session01.html', accent: 'day1' },
     { day: 2, label: 'DAY 2', title: 'AIの力を引き出す実践テクニック', desc: 'プロンプトエンジニアリング深掘り・業務タスク棚卸し', file: 'sessions/session02-kuboki.html', accent: 'day2' },
     { day: 3, label: 'DAY 3', title: 'AIで「自分の武器」をつくる', desc: 'Claude Code デモ・Canvas バイブコーディング', file: 'sessions/session03-kuboki.html', accent: 'day3' },
+    { day: 4, label: 'DAY 4', title: 'AIを自分のものにする', desc: '実践の振り返り・活用定着', file: 'sessions/session04-kuboki.html', accent: 'day4' },
   ],
   ojima: [
     { day: 1, label: 'DAY 1', title: 'AIを実務で使うための土台づくり', desc: 'AI概論・プロンプト設計の基礎・ツール比較', file: 'sessions/session01.html', accent: 'day1' },
     { day: 2, label: 'DAY 2', title: 'AIの力を引き出す実践テクニック', desc: 'プロンプトエンジニアリング深掘り・業務タスク棚卸し', file: 'sessions/session02-ojima.html', accent: 'day2' },
     { day: 3, label: 'DAY 3', title: 'AIで「自分の武器」をつくる', desc: 'Claude Code デモ・Canvas バイブコーディング', file: 'sessions/session03-ojima.html', accent: 'day3' },
+    { day: 4, label: 'DAY 4', title: '前回の続き＋スプシGemini', desc: 'スプレッドシート×Gemini連携', file: 'sessions/session04-ojima.html', accent: 'day4' },
   ],
   osada: [
     { day: 1, label: 'DAY 1', title: 'AIを実務で使うための土台づくり', desc: 'AI概論・プロンプト設計の基礎・ツール比較', file: 'sessions/session01.html', accent: 'day1' },
     { day: 2, label: 'DAY 2', title: 'AIの力を引き出す実践テクニック', desc: 'プロンプトエンジニアリング深掘り・業務タスク棚卸し', file: 'sessions/session02-osada.html', accent: 'day2' },
     { day: 3, label: 'DAY 3', title: 'AIで「自分の武器」をつくる', desc: 'Claude Code デモ・Canvas バイブコーディング', file: 'sessions/session03-osada.html', accent: 'day3' },
+    { day: 4, label: 'DAY 4', title: 'Gemを武器に変える', desc: 'Gemini Gems 実践活用', file: 'sessions/session04-osada.html', accent: 'day4' },
   ],
 };
 
