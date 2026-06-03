@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Lesson Session 05 — AIと一緒にGASアプリを作る</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal-50: #e6f7f5; --teal-100: #b3ece6; --teal-200: #80e0d6;
+    --teal-500: #26a69a; --teal-600: #00897b; --teal-700: #00796b;
+    --orange-50: #fff3e0; --orange-100: #ffe0b2; --orange-600: #fb8c00;
+    --blue-50: #e8f0fe; --blue-100: #d2e3fc; --blue-200: #aecbfa;
+    --blue-600: #1a73e8; --blue-700: #1967d2;
+    --green-50: #e6f4ea; --green-100: #ceead6; --green-600: #1e8e3e; --green-700: #188038;
+    --yellow-50: #fef7e0; --yellow-100: #feefc3; --yellow-600: #f9ab00;
+    --red-50: #fce8e6; --red-100: #fad2cf; --red-600: #d93025;
+    --purple-50: #f3e8fd; --purple-100: #e8d0fb; --purple-600: #9334e6;
+    --gray-50: #f8f9fa; --gray-100: #f1f3f4; --gray-200: #e8eaed;
+    --gray-300: #dadce0; --gray-400: #bdc1c6; --gray-500: #9aa0a6;
+    --gray-600: #80868b; --gray-700: #5f6368; --gray-800: #3c4043; --gray-900: #202124;
+    --shadow-sm: 0 1px 2px rgba(60,64,67,0.1), 0 1px 3px rgba(60,64,67,0.08);
+    --shadow-md: 0 1px 3px rgba(60,64,67,0.12), 0 4px 8px rgba(60,64,67,0.08);
+    --radius: 12px; --radius-sm: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { font-family: 'Noto Sans JP', 'IBM Plex Sans', sans-serif; background: var(--gray-50); color: var(--gray-900); line-height: 1.9; font-size: 16px; min-height: 100vh; display: flex; flex-direction: column; }
+  .hero { background: linear-gradient(135deg, var(--teal-600) 0%, var(--teal-700) 40%, #004d40 100%); color: white; padding: 68px 24px 48px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -40%; right: -15%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%); border-radius: 50%; }
+  .hero-inner { max-width: 760px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-label { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; margin-bottom: 12px; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero h1 { font-size: 28px; font-weight: 700; line-height: 1.45; margin-bottom: 16px; }
+  .hero p { font-size: 15px; line-height: 1.8; opacity: 0.9; max-width: 600px; }
+  .hero-meta { margin-top: 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+  .hero-meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; opacity: 0.85; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero-meta-item svg { width: 18px; height: 18px; }
+  .tab-nav { position: sticky; top: 0; z-index: 100; background: white; border-bottom: 1px solid var(--gray-200); padding: 0 24px; box-shadow: var(--shadow-sm); }
+  .tab-nav-inner { max-width: 760px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
+  .tab-nav-inner::-webkit-scrollbar { display: none; }
+  .tab-btn { flex-shrink: 0; padding: 14px 16px; font-size: 13px; font-weight: 500; color: var(--gray-600); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: 'Noto Sans JP', sans-serif; }
+  .tab-btn:hover { color: var(--teal-600); background: var(--teal-50); }
+  .tab-btn.active { color: var(--teal-600); border-bottom-color: var(--teal-600); }
+  .page-container { flex: 1; }
+  .page { display: none; max-width: 760px; width: 100%; margin: 0 auto; padding: 48px 24px 80px; animation: pageIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes pageIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--gray-200); }
+  .page-nav-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--gray-300); background: white; color: var(--gray-700); transition: all 0.2s; font-family: 'Noto Sans JP', sans-serif; }
+  .page-nav-btn:hover { border-color: var(--teal-600); color: var(--teal-600); background: var(--teal-50); }
+  .page-nav-btn.primary { background: var(--teal-600); color: white; border-color: var(--teal-600); }
+  .page-nav-btn.primary:hover { background: var(--teal-700); }
+  .page-nav-btn.hidden { visibility: hidden; }
+  .page-counter { font-size: 13px; color: var(--gray-500); font-family: 'IBM Plex Sans', sans-serif; }
+  .section-header { margin-bottom: 32px; }
+  .section-number { font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--teal-600); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+  .section-title { font-size: 24px; font-weight: 700; line-height: 1.4; }
+  .prose { font-size: 16px; line-height: 2; color: var(--gray-800); }
+  .prose p { margin-bottom: 20px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { font-weight: 600; color: var(--gray-900); }
+  .card { background: white; border-radius: var(--radius); padding: 28px 32px; margin: 28px 0; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); }
+  .card-teal { background: var(--teal-50); border-color: var(--teal-200); }
+  .card-blue { background: var(--blue-50); border-color: var(--blue-200); }
+  .card-green { background: var(--green-50); border-color: var(--green-100); }
+  .card-orange { background: var(--orange-50); border-color: var(--orange-100); }
+  .card-yellow { background: var(--yellow-50); border-color: var(--yellow-100); }
+  .card-red { background: var(--red-50); border-color: var(--red-100); }
+  .card-purple { background: var(--purple-50); border-color: var(--purple-100); }
+  .card-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+  .cl-teal { color: var(--teal-600); } .cl-blue { color: var(--blue-600); } .cl-green { color: var(--green-700); }
+  .cl-orange { color: var(--orange-600); } .cl-yellow { color: var(--yellow-600); } .cl-red { color: var(--red-600); } .cl-purple { color: var(--purple-600); }
+  .steps { margin: 24px 0; }
+  .step { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
+  .step:last-child { margin-bottom: 0; }
+  .step-marker { flex-shrink: 0; width: 32px; height: 32px; background: var(--teal-600); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; font-weight: 600; margin-top: 2px; }
+  .step-content { flex: 1; }
+  .step-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .step-desc { font-size: 15px; color: var(--gray-700); line-height: 1.7; }
+  .prompt-box { background: var(--gray-900); color: #e8eaed; border-radius: var(--radius); padding: 24px 28px; margin: 24px 0; font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; line-height: 1.8; position: relative; }
+  .prompt-box::before { content: 'PROMPT'; position: absolute; top: 10px; right: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: var(--gray-500); }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+  .judge-card { background: white; border-radius: var(--radius-sm); padding: 20px 22px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); }
+  .judge-card-icon { font-size: 22px; margin-bottom: 8px; }
+  .judge-card-title { font-weight: 700; font-size: 14px; margin-bottom: 8px; }
+  .judge-card-body { font-size: 13px; color: var(--gray-700); line-height: 1.7; }
+  .divider { height: 1px; background: var(--gray-200); margin: 40px 0; }
+  .note { background: var(--gray-100); border-radius: var(--radius-sm); padding: 20px 24px; margin: 24px 0; font-size: 14px; line-height: 1.8; color: var(--gray-700); }
+  .note-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-500); margin-bottom: 6px; }
+  .callout { background: linear-gradient(135deg, var(--teal-50) 0%, var(--blue-50) 100%); border: 1px solid var(--teal-200); border-radius: var(--radius); padding: 28px 32px; margin: 32px 0; text-align: center; }
+  .callout-icon { font-size: 28px; margin-bottom: 12px; }
+  .callout-text { font-size: 17px; font-weight: 600; line-height: 1.7; }
+  .callout-sub { font-size: 14px; color: var(--gray-600); margin-top: 10px; line-height: 1.7; }
+  .checklist { margin: 24px 0; }
+  .checklist-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--gray-100); }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-box { flex-shrink: 0; width: 22px; height: 22px; border: 2px solid var(--gray-300); border-radius: 4px; margin-top: 2px; }
+  .checklist-text { font-size: 15px; color: var(--gray-800); line-height: 1.6; }
+  .flow-row { display: flex; align-items: center; gap: 10px; margin: 16px 0; flex-wrap: wrap; }
+  .flow-item { background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 10px 18px; font-size: 14px; font-weight: 500; box-shadow: var(--shadow-sm); text-align: center; }
+  .flow-arrow { color: var(--teal-600); font-size: 18px; font-weight: 700; }
+  .code-block { background: var(--gray-900); color: #a5d6a7; border-radius: var(--radius); padding: 20px 24px; margin: 20px 0; font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.7; overflow-x: auto; }
+  .code-comment { color: var(--gray-500); }
+  @media (max-width: 640px) {
+    .hero { padding: 48px 20px 36px; } .hero h1 { font-size: 23px; }
+    .page { padding: 36px 20px 64px; }
+    .two-col { grid-template-columns: 1fr; }
+    .card { padding: 22px 20px; }
+    .tab-btn { padding: 12px 12px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">AI Lesson — Session 05</div>
+    <h1>AIと一緒に「動く仕組み」を作る</h1>
+    <p>これまで学んだ「AIとの相談力」を使って、<br><strong>ボタン1つで14店舗のデータが集計されるアプリ</strong>を作り始めます。</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        60分 ／ ほぼ全て実践
+      </div>
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        1 on 1 レクチャー
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <button class="tab-btn active" data-page="0">ふりかえり</button>
+    <button class="tab-btn" data-page="1">GASって何？</button>
+    <button class="tab-btn" data-page="2">一緒に作ってみよう</button>
+    <button class="tab-btn" data-page="3">次のステップ</button>
+  </div>
+</nav>
+
+<div class="page-container">
+
+<!-- ━━━ Page 0: ふりかえり ━━━ -->
+<div class="page active" data-page="0">
+  <div class="section-header">
+    <div class="section-number">Review</div>
+    <h2 class="section-title">前回のふりかえり＋宿題確認</h2>
+  </div>
+  <div class="prose">
+    <p>前回は大きく3つのことをやりました。</p>
+  </div>
+  <div class="card card-teal">
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">Flash 3.5＋Proプランに移行</div>
+          <div class="step-desc">新しいPCのセットアップも完了。社長がプランをアップグレードしてくれて、Flash 3.5がデフォルトに。環境面のブロッカーはすべて解消。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">スプシGemini＋=AI()関数を体験</div>
+          <div class="step-desc">サイドパネルから関数を組んでもらう、=AI()でセル内にプロンプトを書く、グラフ生成——スプシの中でAIに話しかけるスキルを習得。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">14店舗データ集約の要件をAIと言語化</div>
+          <div class="step-desc">1店舗分のExcelデータをGeminiに渡して「自動化したいけどうまく説明できない」から対話で要件を具体化。消費税計算・端数処理・集計先まで整理した。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="note">
+    <div class="note-label">宿題の確認</div>
+    <div class="checklist">
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>Gemをテストした</strong>（月曜のデータで動作確認）<br><span style="font-size:13px; color: var(--gray-600);">リマインドメールGem、実データで回してみた？結果はどうだった？</span></div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>スプシの自動化を試みた</strong><br><span style="font-size:13px; color: var(--gray-600);">前回学んだスプシGemini＋=AI()関数を業務に1回でも使ってみた？</span></div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>Flash 3.5をデフォルトで使い続けている</strong><br><span style="font-size:13px; color: var(--gray-600);">高速モードではなくFlash 3.5で日常のAI利用を続けているか確認。</span></div></div>
+    </div>
+  </div>
+
+  <div class="card card-blue">
+    <div class="card-label cl-blue">🎯 今日のゴール</div>
+    <div class="prose">
+      <p>前回、Geminiとの対話で言語化した「14店舗のデータ集約」の要件。<br>今日はこれを<strong>ボタン1つで動くアプリ</strong>にします。</p>
+      <p>まずは1店舗分。これが動けば、次回14店舗に拡張して完成です。</p>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn hidden">← 前へ</button>
+    <span class="page-counter">0 / 3</span>
+    <button class="page-nav-btn primary" onclick="goPage(1)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 1: GASって何？ ━━━ -->
+<div class="page" data-page="1">
+  <div class="section-header">
+    <div class="section-number">Section 01</div>
+    <h2 class="section-title">GASって何？</h2>
+  </div>
+  <div class="prose">
+    <p>GAS（Google Apps Script）って聞くと「プログラミング？無理！」と思うかもしれません。<br>でも安心してください。<strong>小島さんがコードを書く必要はありません。</strong></p>
+    <p>前回やった「Geminiに日本語で相談して、やりたいことを伝える」——あれと全く同じです。<br>違いは、<strong>Geminiが出してくれた答えをスプレッドシートに貼り付けると、ボタン1つで動く仕組みになる</strong>こと。</p>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">💡</div>
+    <div class="callout-text">小島さんの仕事は「日本語で説明すること」。<br>コードを書くのはAIの仕事。</div>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">今までとの違い</div>
+    <div class="two-col">
+      <div class="judge-card" style="border-left: 3px solid var(--gray-400);">
+        <div class="judge-card-icon">📋</div>
+        <div class="judge-card-title">今まで（スプシ関数）</div>
+        <div class="judge-card-body">決まったセルに決まった関数を入れる。データの位置がずれると壊れる。毎回同じ作業を手動で繰り返す。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--teal-600);">
+        <div class="judge-card-icon">⚡</div>
+        <div class="judge-card-title">これから（GAS）</div>
+        <div class="judge-card-body">ボタンを押すだけで自動実行。データの位置がずれても対応可能。14店舗分でも1回のクリックで完了。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-blue">GASでできることの具体例</div>
+    <div class="two-col">
+      <div class="judge-card" style="border-left: 3px solid var(--blue-600);">
+        <div class="judge-card-icon">📊</div>
+        <div class="judge-card-title">データの自動集計</div>
+        <div class="judge-card-body">14店舗のExcelデータを読み込んで、消費税計算・端数処理・店舗別集計を全自動で実行。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--blue-600);">
+        <div class="judge-card-icon">📄</div>
+        <div class="judge-card-title">フォーマットの自動整形</div>
+        <div class="judge-card-body">PCA会計ソフトに渡す形式に自動変換。列の順序、日付フォーマット、金額形式もすべて指定通りに。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--blue-600);">
+        <div class="judge-card-icon">🔘</div>
+        <div class="judge-card-title">ワンクリック実行</div>
+        <div class="judge-card-body">スプシ上に「集計実行」ボタンを設置。押すだけで全処理が走る。毎月同じ操作で回せる。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--blue-600);">
+        <div class="judge-card-icon">🔧</div>
+        <div class="judge-card-title">壊れてもAIで直せる</div>
+        <div class="judge-card-body">エラーが出たらそのままGeminiに貼って「直して」。仕様変更があっても「店舗が15になった」で対応可能。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-green">
+    <div class="card-label cl-green">これが「AIとの相談力」の集大成</div>
+    <div class="prose">
+      <p>Session 1で学んだメタプロンプト、Session 4で体験した「断片的に相談して要件を言語化する」、スプシGeminiの操作——<strong>全部がここに繋がっています。</strong></p>
+      <p>GASアプリを作るのに必要なスキルは、すでに全部持っています。<br>今日は新しいことを覚えるのではなく、<strong>今持っている力を組み合わせるだけ</strong>です。</p>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(0)">← 前へ</button>
+    <span class="page-counter">1 / 3</span>
+    <button class="page-nav-btn primary" onclick="goPage(2)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 2: 一緒に作ってみよう ━━━ -->
+<div class="page" data-page="2">
+  <div class="section-header">
+    <div class="section-number">Hands-on</div>
+    <h2 class="section-title">一緒に作ってみよう</h2>
+  </div>
+  <div class="prose">
+    <p>ここからが今日のメインです。<br>前回Geminiと一緒に言語化した要件を使って、<strong>1店舗分のデータ集約GASアプリ</strong>を作ります。</p>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">完成イメージ</div>
+    <div class="flow-row" style="justify-content: center;">
+      <div class="flow-item">📊 店舗のExcelデータ</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item">📋 スプシに貼り付け</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item">🔘 ボタンを押す</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item">✅ 集計完了！</div>
+    </div>
+    <div class="prose" style="margin-top: 16px; font-size: 14px; color: var(--gray-700); text-align: center;">
+      <p>消費税計算・端数処理・フォーマット整形がすべて自動。<br>これが毎月ボタン1つで回る状態を目指します。</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card">
+    <div class="card-label cl-teal">Phase 1 — Geminiに要件を渡す（10分）</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">前回の対話を呼び出す</div>
+          <div class="step-desc">Geminiの左サイドバーから、前回の「自動化したいけどうまく説明できない」のチャットを開きます。<br>前回の文脈がまるごと残っているので、そこから続けられます。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">「これをGASで作りたい」と伝える</div>
+          <div class="step-desc">前回整理した要件をもとに、GASのコードを書いてもらいます。</div>
+        </div>
+      </div>
+    </div>
+    <div class="prompt-box">前回整理した内容をもとに、Google Apps Script（GAS）で自動化したいです。<br><br>【やりたいこと】<br>・1店舗分の売上データ（元データシート）を読み込む<br>・消費税の計算（税抜き金額 × 1.10、小数点以下切り捨て）<br>・指定したフォーマット（集計シート）に自動で整形・転記する<br>・スプレッドシート上に「実行」ボタンを設置して、ワンクリックで動くようにしたい<br><br>まずは1店舗分で動くものを作ってください。<br>あとで14店舗に拡張する予定です。<br><br>コードと、スプレッドシートへの設定手順を両方教えてください。</div>
+    <div class="note" style="margin-top: 16px;">
+      <p>💡 このプロンプトはたたき台です。前回の対話で出てきた具体的な列名やシート名があれば、それに差し替えてください。<strong>具体的であるほどAIの出力精度が上がります。</strong></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">Phase 2 — コードをスプシに貼り付ける（10分）</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">スクリプトエディタを開く</div>
+          <div class="step-desc">スプレッドシートのメニューから<strong>「拡張機能」→「Apps Script」</strong>をクリック。<br>新しいタブでスクリプトエディタが開きます。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">Geminiが出してくれたコードをコピー＆ペースト</div>
+          <div class="step-desc">エディタに最初から書いてある文字を全選択（Ctrl+A）→削除→Geminiのコードを貼り付け（Ctrl+V）。<br><strong>1文字も変える必要はありません。</strong>Geminiが書いたものをそのまま貼るだけ。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">保存する</div>
+          <div class="step-desc">Ctrl+S で保存。上のフロッピーディスクアイコンでもOK。<br>名前を聞かれたら「データ集約」とか適当につけて大丈夫です。</div>
+        </div>
+      </div>
+    </div>
+    <div class="note" style="margin-top: 16px;">
+      <p>💡 初回の実行時に「承認が必要です」というポップアップが出ます。これはGASがスプレッドシートのデータにアクセスする許可を求めているだけなので、<strong>「許可」を押してください。</strong>怪しいものではありません。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">Phase 3 — テスト＆デバッグ（15分）</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">実行ボタンを押してみる</div>
+          <div class="step-desc">スクリプトエディタ上部の「▶」ボタン、またはスプシに設置した実行ボタンを押します。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">結果を確認する</div>
+          <div class="step-desc">集計シートにデータが転記されているか確認。消費税の計算は合っているか。端数は切り捨てられているか。<br><strong>元のExcelデータと見比べて、1件ずつ確認します。</strong></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">おかしい部分をGeminiに相談する</div>
+          <div class="step-desc">一発で完璧に動かなくて当然です。エラーが出たら<strong>エラーメッセージをそのままコピーしてGeminiに貼る</strong>。<br>「この行がおかしい」「この列が空になってる」——日本語で伝えれば修正コードが返ってきます。</div>
+        </div>
+      </div>
+    </div>
+    <div class="prompt-box" style="font-size: 13px;">さっき作ってもらったGASを実行したら、こんなエラーが出ました。<br><br>[ここにエラーメッセージをコピペ]<br><br>原因と修正方法を教えてください。修正後のコード全体も出力してください。</div>
+    <div class="note" style="margin-top: 16px;">
+      <p>💡 <strong>「修正後のコード全体も出力して」</strong>を入れるのがポイント。差分だけ出されると、どこに何を入れればいいかわからなくなるので、毎回全体を出してもらってまるごと貼り替える方が確実です。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">Phase 4 — 実行ボタンを設置する（5分）</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">スプシに戻って「挿入」→「図形描画」</div>
+          <div class="step-desc">好きな形のボタンを作ります。中に「集計実行」と文字を入れてください。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">ボタンにスクリプトを割り当てる</div>
+          <div class="step-desc">作ったボタンを右クリック→「スクリプトを割り当て」→関数名を入力。<br>関数名はGeminiがコードの中で教えてくれます（例：<code>main</code> とか <code>aggregateData</code> とか）。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">ボタンを押して動作確認</div>
+          <div class="step-desc">これで完成！ボタンを押すだけでデータ集約が走ります。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🎯</div>
+    <div class="callout-text">「ボタンを押したらデータが集計された」</div>
+    <div class="callout-sub">これが今日のゴール。1店舗分でOK。<br>14店舗への拡張は次回やります。</div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(1)">← 前へ</button>
+    <span class="page-counter">2 / 3</span>
+    <button class="page-nav-btn primary" onclick="goPage(3)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 3: 次のステップ ━━━ -->
+<div class="page" data-page="3">
+  <div class="section-header">
+    <div class="section-number">Next Step</div>
+    <h2 class="section-title">次のステップ</h2>
+  </div>
+  <div class="prose">
+    <p>Session 05お疲れさまでした。<br>今日、<strong>AIにコードを書いてもらって、それが実際に動く</strong>体験をしました。</p>
+    <p>Session 1で「AIって何？」から始まって、ここまで来ました。すごいことです。</p>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">次回までにやってみてほしいこと</div>
+    <div class="checklist">
+      <div class="checklist-item">
+        <div class="checklist-box"></div>
+        <div class="checklist-text"><strong>今日作ったGASを実データで1回動かしてみる</strong><br><span style="font-size:13px; color: var(--gray-600);">来週の実データが届いたら、今日と同じ手順でボタンを押してみてください。うまくいかなかったらエラーをGeminiに渡すだけ。</span></div>
+      </div>
+      <div class="checklist-item">
+        <div class="checklist-box"></div>
+        <div class="checklist-text"><strong>「ここも自動化したい」を書き出す</strong><br><span style="font-size:13px; color: var(--gray-600);">使ってみて「ここも自動でやってほしい」と感じたことをメモしておいてください。次回の拡張に活かします。</span></div>
+      </div>
+      <div class="checklist-item">
+        <div class="checklist-box"></div>
+        <div class="checklist-text"><strong>リマインドメールGemも引き続きテスト</strong><br><span style="font-size:13px; color: var(--gray-600);">こちらも実データで回し続けて、精度や使い勝手を確認してください。</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-purple" style="margin-top: 28px;">
+    <div class="card-label cl-purple">ロードマップ</div>
+    <div class="steps" style="margin-top: 16px;">
+      <div class="step">
+        <div class="step-marker" style="background: var(--green-600);">✓</div>
+        <div class="step-content">
+          <div class="step-title" style="color: var(--gray-500); text-decoration: line-through;">AIの基礎＋メタプロンプト</div>
+          <div class="step-desc" style="color: var(--gray-400);">Session 1〜2</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--green-600);">✓</div>
+        <div class="step-content">
+          <div class="step-title" style="color: var(--gray-500); text-decoration: line-through;">業務棚卸し＋Gem作成＋スプシGemini</div>
+          <div class="step-desc" style="color: var(--gray-400);">Session 3〜4</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--green-600);">✓</div>
+        <div class="step-content">
+          <div class="step-title" style="color: var(--gray-500); text-decoration: line-through;">GASアプリ作成（1店舗分）</div>
+          <div class="step-desc" style="color: var(--gray-400);">← 今日ここまで！</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--purple-600);">次</div>
+        <div class="step-content">
+          <div class="step-title">14店舗に拡張＋本番運用へ</div>
+          <div class="step-desc">1店舗分のロジックを14店舗に拡張。実運用に耐える形に仕上げる。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--gray-400);">▷</div>
+        <div class="step-content">
+          <div class="step-title">試算表分析＋経営会議の壁打ち</div>
+          <div class="step-desc">データ集約が自動化されたら、そのデータを使って分析・報告準備へ。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🚀</div>
+    <div class="callout-text">コードを書いたのはAI。でも、それを作らせたのは小島さんです。</div>
+    <div class="callout-sub">「何を作りたいか」を日本語で伝える力——それが、<br>この研修で身につけた<strong>いちばん大きなスキル</strong>です。</div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(2)">← 前へ</button>
+    <span class="page-counter">3 / 3</span>
+    <button class="page-nav-btn hidden">次へ →</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const pages = document.querySelectorAll('.page');
+  function goPage(idx) {
+    tabBtns.forEach(b => b.classList.remove('active'));
+    tabBtns[idx].classList.add('active');
+    pages.forEach(p => p.classList.remove('active'));
+    pages[idx].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => goPage(parseInt(btn.dataset.page)));
+  });
+</script>
+</body>
+</html>
