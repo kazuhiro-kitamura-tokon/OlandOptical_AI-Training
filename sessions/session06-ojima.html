@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Lesson Session 06 — 最終回：ポータルサイトを作る＋自走キット</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal-50: #e6f7f5; --teal-100: #b3ece6; --teal-200: #80e0d6;
+    --teal-500: #26a69a; --teal-600: #00897b; --teal-700: #00796b;
+    --orange-50: #fff3e0; --orange-100: #ffe0b2; --orange-600: #fb8c00;
+    --blue-50: #e8f0fe; --blue-100: #d2e3fc; --blue-200: #aecbfa;
+    --blue-600: #1a73e8; --blue-700: #1967d2;
+    --green-50: #e6f4ea; --green-100: #ceead6; --green-600: #1e8e3e; --green-700: #188038;
+    --yellow-50: #fef7e0; --yellow-100: #feefc3; --yellow-600: #f9ab00;
+    --red-50: #fce8e6; --red-100: #fad2cf; --red-600: #d93025;
+    --purple-50: #f3e8fd; --purple-100: #e8d0fb; --purple-600: #9334e6;
+    --gray-50: #f8f9fa; --gray-100: #f1f3f4; --gray-200: #e8eaed;
+    --gray-300: #dadce0; --gray-400: #bdc1c6; --gray-500: #9aa0a6;
+    --gray-600: #80868b; --gray-700: #5f6368; --gray-800: #3c4043; --gray-900: #202124;
+    --shadow-sm: 0 1px 2px rgba(60,64,67,0.1), 0 1px 3px rgba(60,64,67,0.08);
+    --shadow-md: 0 1px 3px rgba(60,64,67,0.12), 0 4px 8px rgba(60,64,67,0.08);
+    --radius: 12px; --radius-sm: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { font-family: 'Noto Sans JP', 'IBM Plex Sans', sans-serif; background: var(--gray-50); color: var(--gray-900); line-height: 1.9; font-size: 16px; min-height: 100vh; display: flex; flex-direction: column; }
+  .hero { background: linear-gradient(135deg, var(--teal-600) 0%, var(--teal-700) 40%, #004d40 100%); color: white; padding: 68px 24px 48px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -40%; right: -15%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%); border-radius: 50%; }
+  .hero-inner { max-width: 760px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-label { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; margin-bottom: 12px; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero h1 { font-size: 28px; font-weight: 700; line-height: 1.45; margin-bottom: 16px; }
+  .hero p { font-size: 15px; line-height: 1.8; opacity: 0.9; max-width: 600px; }
+  .hero-meta { margin-top: 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+  .hero-meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; opacity: 0.85; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero-meta-item svg { width: 18px; height: 18px; }
+  .tab-nav { position: sticky; top: 0; z-index: 100; background: white; border-bottom: 1px solid var(--gray-200); padding: 0 24px; box-shadow: var(--shadow-sm); }
+  .tab-nav-inner { max-width: 760px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
+  .tab-nav-inner::-webkit-scrollbar { display: none; }
+  .tab-btn { flex-shrink: 0; padding: 14px 16px; font-size: 13px; font-weight: 500; color: var(--gray-600); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: 'Noto Sans JP', sans-serif; }
+  .tab-btn:hover { color: var(--teal-600); background: var(--teal-50); }
+  .tab-btn.active { color: var(--teal-600); border-bottom-color: var(--teal-600); }
+  .page-container { flex: 1; }
+  .page { display: none; max-width: 760px; width: 100%; margin: 0 auto; padding: 48px 24px 80px; animation: pageIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes pageIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--gray-200); }
+  .page-nav-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--gray-300); background: white; color: var(--gray-700); transition: all 0.2s; font-family: 'Noto Sans JP', sans-serif; }
+  .page-nav-btn:hover { border-color: var(--teal-600); color: var(--teal-600); background: var(--teal-50); }
+  .page-nav-btn.primary { background: var(--teal-600); color: white; border-color: var(--teal-600); }
+  .page-nav-btn.primary:hover { background: var(--teal-700); }
+  .page-nav-btn.hidden { visibility: hidden; }
+  .page-counter { font-size: 13px; color: var(--gray-500); font-family: 'IBM Plex Sans', sans-serif; }
+  .section-header { margin-bottom: 32px; }
+  .section-number { font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--teal-600); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+  .section-title { font-size: 24px; font-weight: 700; line-height: 1.4; }
+  .prose { font-size: 16px; line-height: 2; color: var(--gray-800); }
+  .prose p { margin-bottom: 20px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { font-weight: 600; color: var(--gray-900); }
+  .card { background: white; border-radius: var(--radius); padding: 28px 32px; margin: 28px 0; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); }
+  .card-teal { background: var(--teal-50); border-color: var(--teal-200); }
+  .card-blue { background: var(--blue-50); border-color: var(--blue-200); }
+  .card-green { background: var(--green-50); border-color: var(--green-100); }
+  .card-orange { background: var(--orange-50); border-color: var(--orange-100); }
+  .card-yellow { background: var(--yellow-50); border-color: var(--yellow-100); }
+  .card-red { background: var(--red-50); border-color: var(--red-100); }
+  .card-purple { background: var(--purple-50); border-color: var(--purple-100); }
+  .card-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+  .cl-teal { color: var(--teal-600); } .cl-blue { color: var(--blue-600); } .cl-green { color: var(--green-700); }
+  .cl-orange { color: var(--orange-600); } .cl-yellow { color: var(--yellow-600); } .cl-red { color: var(--red-600); } .cl-purple { color: var(--purple-600); }
+  .steps { margin: 24px 0; }
+  .step { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
+  .step:last-child { margin-bottom: 0; }
+  .step-marker { flex-shrink: 0; width: 32px; height: 32px; background: var(--teal-600); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; font-weight: 600; margin-top: 2px; }
+  .step-content { flex: 1; }
+  .step-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .step-desc { font-size: 15px; color: var(--gray-700); line-height: 1.7; }
+  .prompt-box { background: var(--gray-900); color: #e8eaed; border-radius: var(--radius); padding: 24px 28px; margin: 24px 0; font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; line-height: 1.8; position: relative; }
+  .prompt-box::before { content: 'PROMPT'; position: absolute; top: 10px; right: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: var(--gray-500); }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+  .judge-card { background: white; border-radius: var(--radius-sm); padding: 20px 22px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); }
+  .judge-card-icon { font-size: 22px; margin-bottom: 8px; }
+  .judge-card-title { font-weight: 700; font-size: 14px; margin-bottom: 8px; }
+  .judge-card-body { font-size: 13px; color: var(--gray-700); line-height: 1.7; }
+  .flow-row { display: flex; align-items: center; gap: 10px; margin: 16px 0; flex-wrap: wrap; }
+  .flow-item { background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 10px 18px; font-size: 14px; font-weight: 500; box-shadow: var(--shadow-sm); text-align: center; }
+  .flow-arrow { color: var(--teal-600); font-size: 18px; font-weight: 700; }
+  .divider { height: 1px; background: var(--gray-200); margin: 40px 0; }
+  .note { background: var(--gray-100); border-radius: var(--radius-sm); padding: 20px 24px; margin: 24px 0; font-size: 14px; line-height: 1.8; color: var(--gray-700); }
+  .note-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-500); margin-bottom: 6px; }
+  .callout { background: linear-gradient(135deg, var(--teal-50) 0%, var(--blue-50) 100%); border: 1px solid var(--teal-200); border-radius: var(--radius); padding: 28px 32px; margin: 32px 0; text-align: center; }
+  .callout-icon { font-size: 28px; margin-bottom: 12px; }
+  .callout-text { font-size: 17px; font-weight: 600; line-height: 1.7; }
+  .callout-sub { font-size: 14px; color: var(--gray-600); margin-top: 10px; line-height: 1.7; }
+  .checklist { margin: 24px 0; }
+  .checklist-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--gray-100); }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-box { flex-shrink: 0; width: 22px; height: 22px; border: 2px solid var(--gray-300); border-radius: 4px; margin-top: 2px; }
+  .checklist-text { font-size: 15px; color: var(--gray-800); line-height: 1.6; }
+  .grad-card { background: linear-gradient(135deg, var(--teal-600) 0%, #004d40 100%); color: white; border-radius: var(--radius); padding: 36px 32px; margin: 32px 0; text-align: center; }
+  .grad-title { font-size: 22px; font-weight: 700; margin-bottom: 16px; }
+  .grad-body { font-size: 15px; line-height: 2; opacity: 0.92; }
+  @media (max-width: 640px) {
+    .hero { padding: 48px 20px 36px; } .hero h1 { font-size: 23px; }
+    .page { padding: 36px 20px 64px; }
+    .two-col { grid-template-columns: 1fr; }
+    .card { padding: 22px 20px; }
+    .tab-btn { padding: 12px 12px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">AI Lesson — Session 06 ／ Final</div>
+    <h1>最終回：ポータルサイトを作る</h1>
+    <p>今日が最後のセッションです。<br>個人実績ポータルを作って公開し、<strong>研修後も一人で走り続けるための道具</strong>を持ち帰りましょう。</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        60分 ／ ほぼ全て実践
+      </div>
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        1 on 1 レクチャー
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <button class="tab-btn active" data-page="0">ふりかえり</button>
+    <button class="tab-btn" data-page="1">ポータルを作る</button>
+    <button class="tab-btn" data-page="2">自走キット</button>
+    <button class="tab-btn" data-page="3">卒業</button>
+  </div>
+</nav>
+
+<div class="page-container">
+
+<!-- ━━━ Page 0: ふりかえり ━━━ -->
+<div class="page active" data-page="0">
+  <div class="section-header">
+    <div class="section-number">Review</div>
+    <h2 class="section-title">前回のふりかえり＋宿題確認</h2>
+  </div>
+  <div class="prose">
+    <p>前回は大きなことが起きました。</p>
+  </div>
+  <div class="card card-teal">
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">GASアプリを自分で先に作ってきた</div>
+          <div class="step-desc">ボタン設置→集計実行まで動いた。合計金額の不一致があったけど、デバッグの方法（スクショ→AIに共有→セルフチェック指示）を学んで修正に取り組んだ。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">HTMLダッシュボードをWebアプリとしてデプロイ</div>
+          <div class="step-desc">GASで作ったダッシュボードを社内に公開。URLを共有すれば誰でも見られる状態に。前回の「ボタン1つ」から「みんなで使えるWebアプリ」へステップアップ。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">秘伝のたれ戦略を導入</div>
+          <div class="step-desc">エラー対応の履歴をテキストファイルにまとめて、次の作業時にAIに読み込ませる手法。知見が蓄積されるほどAIの精度が上がる仕組み。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="checklist">
+    <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>計算ロジックの検証・修正を進めた</strong><br><span style="font-size:13px; color: var(--gray-600);">金額の不一致は解消した？どこまで進んだか教えてください。</span></div></div>
+    <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>秘伝のたれファイルを作成した</strong><br><span style="font-size:13px; color: var(--gray-600);">エラーと対処法をまとめたテキスト、デスクトップに保存してある？</span></div></div>
+    <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>個人実績ポータル用のExcelデータを準備した</strong><br><span style="font-size:13px; color: var(--gray-600);">今日使うデータがまとまっていればスムーズに進めます。</span></div></div>
+    <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>自分で先に作り始めた？</strong><br><span style="font-size:13px; color: var(--gray-600);">もし始めてたら、今日はその続きから。行き詰まっていたらそこから一緒にやりましょう。</span></div></div>
+  </div>
+
+  <div class="card card-blue">
+    <div class="card-label cl-blue">🎯 今日のゴール</div>
+    <div class="prose">
+      <p><strong>個人実績ポータルサイトを作って、社内に公開する。</strong></p>
+      <p>今まで各店舗にメールで送っていた個人実績を、URLをポチっと開くだけで見られる状態にします。前回のダッシュボードと同じ流れです。</p>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn hidden">← 前へ</button>
+    <span class="page-counter">0 / 3</span>
+    <button class="page-nav-btn primary" onclick="goPage(1)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 1: ポータルを作る ━━━ -->
+<div class="page" data-page="1">
+  <div class="section-header">
+    <div class="section-number">Hands-on</div>
+    <h2 class="section-title">個人実績ポータルを作る</h2>
+  </div>
+  <div class="prose">
+    <p>ここが今日のメインです。<br>前回のダッシュボードと同じ流れで、<strong>今度は小島さんが主導</strong>で進めます。</p>
+    <p>困ったらいつでも聞いてください。でも、まずは自分で動かしてみること。<br>前回までの経験で、もう全部できるはずです。</p>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">完成イメージ</div>
+    <div class="flow-row" style="justify-content: center;">
+      <div class="flow-item">📊 実績Excel</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item">🤖 GASで読み込み</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item">🎨 HTMLで表示</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item">🌐 URL公開</div>
+    </div>
+    <div class="prose" style="margin-top: 16px; font-size: 14px; color: var(--gray-700); text-align: center;">
+      <p>店舗ごとの個人実績を、URLを開くだけで確認できるポータルサイト。<br>メール送信の手間がなくなり、いつでも最新データが見られる状態に。</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card">
+    <div class="card-label cl-teal">Phase 1 — Geminiに相談する</div>
+    <div class="prose" style="font-size: 14px; margin-bottom: 16px;">
+      <p>まず、やりたいことをGeminiに伝えます。前回の対話の続きでも、新しいチャットでもOK。<br>秘伝のたれファイルがあれば、最初に渡してから始めてください。</p>
+    </div>
+    <div class="prompt-box">（秘伝のたれファイルを先に添付してから↓）<br><br>Google Apps Scriptで、個人実績表のポータルサイトを作りたいです。<br><br>【やりたいこと】<br>・スプレッドシートに入っている個人実績データを読み込む<br>・店舗ごと／個人ごとに実績を表示するHTMLページを作る<br>・社内の人がURLを開くだけで見られるようにWebアプリとしてデプロイする<br><br>【添付するデータ】<br>（ここにExcelファイルの構成を簡単に説明：列名、シート構成など）<br><br>前回のダッシュボードと同じ流れで作りたいです。<br>GASのコードとindex.htmlの両方を出力してください。</div>
+    <div class="note" style="margin-top: 16px;">
+      <p>💡 前回のダッシュボードを作った経験があるから、「前回と同じ流れで」と書くだけでGeminiに意図が伝わります。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">Phase 2 — コードを貼り付けてテスト</div>
+    <div class="prose" style="font-size: 14px; margin-bottom: 16px;">
+      <p>前回と同じ手順です。もう覚えていますか？</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">拡張機能 → Apps Script</div>
+          <div class="step-desc">スプレッドシートからスクリプトエディタを開く。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">コード.gsにGASコードを貼る</div>
+          <div class="step-desc">Ctrl+A → Delete → Ctrl+V。Geminiの出力をまるごと貼り替え。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">index.htmlファイルを作成してHTMLコードを貼る</div>
+          <div class="step-desc">「＋」ボタン → HTMLファイル → 名前を「index」にして保存 → Geminiが出したHTMLコードを貼る。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">4</div>
+        <div class="step-content">
+          <div class="step-title">デプロイ → Webアプリ → 社内全員</div>
+          <div class="step-desc">右上の「デプロイ」→「新しいデプロイ」→ 種類：Webアプリ → アクセス：社内全員 → デプロイ。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">5</div>
+        <div class="step-content">
+          <div class="step-title">URLを開いて確認</div>
+          <div class="step-desc">表示されたURLをクリック。データが正しく表示されているか確認。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">Phase 3 — 見た目を整える・機能を追加する</div>
+    <div class="prose" style="font-size: 14px; margin-bottom: 16px;">
+      <p>基本が動いたら、見た目や使い勝手を改善します。ここがいちばん楽しいところ。</p>
+    </div>
+    <div class="prompt-box" style="font-size: 13px; margin-bottom: 12px;">もう少しデザインをきれいにしたいです。<br>Googleのサイトみたいなシンプルでスタイリッシュな見た目にしてください。</div>
+    <div class="prompt-box" style="font-size: 13px; margin-bottom: 12px;">店舗ごとにタブで切り替えられるようにしてください。<br>タブを押すとその店舗の実績だけが表示される形にしたいです。</div>
+    <div class="prompt-box" style="font-size: 13px;">好きなウェブサイトのURLまたはスクリーンショットを渡して→<br>「このサイトみたいな雰囲気にしてください」</div>
+    <div class="note" style="margin-top: 16px;">
+      <p>💡 修正するたびに「デプロイを更新」する必要があります。「デプロイ」→「デプロイを管理」→ 鉛筆マーク → バージョン「新バージョン」→「デプロイ」でURLはそのまま中身だけ更新されます。</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🎯</div>
+    <div class="callout-text">URLを開いたら実績が見える。</div>
+    <div class="callout-sub">これが今日のゴール。<br>完成したURLを社長や店長に共有できる状態を目指しましょう。</div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(0)">← 前へ</button>
+    <span class="page-counter">1 / 3</span>
+    <button class="page-nav-btn primary" onclick="goPage(2)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 2: 自走キット ━━━ -->
+<div class="page" data-page="2">
+  <div class="section-header">
+    <div class="section-number">Toolkit</div>
+    <h2 class="section-title">自走のための道具箱</h2>
+  </div>
+  <div class="prose">
+    <p>研修は今日で最後ですが、<strong>AIとの仕事はここからが本番</strong>です。</p>
+    <p>一人で進めていくときに困らないよう、「道具箱」を用意しました。いつでも見返してください。</p>
+  </div>
+
+  <div class="card" style="border-left: 4px solid var(--teal-600);">
+    <div class="card-label cl-teal">🍶 秘伝のたれの育て方</div>
+    <div class="prose">
+      <p>秘伝のたれは<strong>使うほど、追記するほど価値が上がる</strong>資産です。</p>
+    </div>
+    <div class="steps" style="margin-top: 16px;">
+      <div class="step">
+        <div class="step-marker" style="background: var(--teal-600);">1</div>
+        <div class="step-content">
+          <div class="step-title">作業を始める前に、たれファイルを渡す</div>
+          <div class="step-desc">新しいチャットを開いたら、まず秘伝のたれファイルを添付。これで前回までの知見がAIに引き継がれる。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--teal-600);">2</div>
+        <div class="step-content">
+          <div class="step-title">作業が終わったら、たれを更新する</div>
+          <div class="step-desc">「今日起きた問題と対処法と今後の学びを、秘伝のたれに追記して」とGeminiに頼む。出力されたテキストでファイルを上書き保存。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--teal-600);">3</div>
+        <div class="step-content">
+          <div class="step-title">定期的に整理する</div>
+          <div class="step-desc">たれが長くなってきたら「重複を消して整理して」と頼む。常にコンパクトに保つのがコツ。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="border-left: 4px solid var(--red-600);">
+    <div class="card-label cl-red">🆘 エラーが出たときの対処フロー</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker" style="background: var(--red-600);">1</div>
+        <div class="step-content">
+          <div class="step-title">慌てない。エラーは「普通のこと」</div>
+          <div class="step-desc">GASでもGemでもスプシでも、エラーは日常的に起きます。プロのエンジニアもエラーの連続です。壊したわけじゃない。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--red-600);">2</div>
+        <div class="step-content">
+          <div class="step-title">スクリーンショットを撮る（Win+Shift+S）</div>
+          <div class="step-desc">エラー画面をそのまま撮る。言葉で説明するよりこれが最速・最正確。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--red-600);">3</div>
+        <div class="step-content">
+          <div class="step-title">Geminiにスクショ＋エラーメッセージを渡す</div>
+          <div class="step-desc">「このエラーが出ました。原因と修正方法を教えて。修正後のコード全体を出して」——このワンフレーズで大体解決します。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--red-600);">4</div>
+        <div class="step-content">
+          <div class="step-title">直ったら秘伝のたれに追記</div>
+          <div class="step-desc">同じエラーを二度踏まないための保険。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="border-left: 4px solid var(--blue-600);">
+    <div class="card-label cl-blue">💡 「次に作りたいもの」の見つけ方</div>
+    <div class="two-col">
+      <div class="judge-card" style="border-left: 3px solid var(--blue-600);">
+        <div class="judge-card-icon">⏱️</div>
+        <div class="judge-card-title">毎月繰り返してる作業</div>
+        <div class="judge-card-body">「毎月これやってるんだよな」と思ったら自動化候補。特にコピペ、集計、転記系。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--blue-600);">
+        <div class="judge-card-icon">😩</div>
+        <div class="judge-card-title">「めんどくさい」と感じた瞬間</div>
+        <div class="judge-card-body">めんどくさい＝自動化チャンス。その感覚をメモしておいて、Geminiに「これ自動化できる？」と聞く。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--blue-600);">
+        <div class="judge-card-icon">📧</div>
+        <div class="judge-card-title">誰かに「送ってる」もの</div>
+        <div class="judge-card-body">メールで送ってるデータはポータル化できる。今日やったのと同じ方法で。</div>
+      </div>
+      <div class="judge-card" style="border-left: 3px solid var(--blue-600);">
+        <div class="judge-card-icon">🤔</div>
+        <div class="judge-card-title">「これどうだっけ？」と思った瞬間</div>
+        <div class="judge-card-body">まずGeminiに聞く。経理のこと、GASのこと、Excelのこと、何でも。メガネさんもまだ使い続けてください。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">📋 研修で手に入れたスキルの一覧</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker" style="background: var(--teal-600);">✓</div>
+        <div class="step-content">
+          <div class="step-title">メタプロンプト</div>
+          <div class="step-desc">目的・相手・成果物・制約を整理してからAIに依頼する技術。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--teal-600);">✓</div>
+        <div class="step-content">
+          <div class="step-title">Gems（カスタムAI）</div>
+          <div class="step-desc">メガネさん（経理コーチ）、リマインドメール生成など、用途特化AIを自分で作る。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--teal-600);">✓</div>
+        <div class="step-content">
+          <div class="step-title">スプシGemini ＋ =AI()関数</div>
+          <div class="step-desc">スプレッドシートの中でAIに話しかける。関数を日本語で頼む。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--teal-600);">✓</div>
+        <div class="step-content">
+          <div class="step-title">GASアプリの作成＋Webアプリ公開</div>
+          <div class="step-desc">AIにコードを書かせて、スプシの裏で自動実行。HTMLダッシュボードを社内公開。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--teal-600);">✓</div>
+        <div class="step-content">
+          <div class="step-title">デバッグ力</div>
+          <div class="step-desc">エラーを怖がらず、スクショ→AI→修正→確認のサイクルを自分で回せる。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--teal-600);">✓</div>
+        <div class="step-content">
+          <div class="step-title">秘伝のたれ（知見の蓄積）</div>
+          <div class="step-desc">AIとの作業履歴を資産にする手法。使うほど精度が上がる仕組み。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(1)">← 前へ</button>
+    <span class="page-counter">2 / 3</span>
+    <button class="page-nav-btn primary" onclick="goPage(3)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 3: 卒業 ━━━ -->
+<div class="page" data-page="3">
+  <div class="section-header">
+    <div class="section-number">Graduation</div>
+    <h2 class="section-title">卒業</h2>
+  </div>
+  <div class="prose">
+    <p>6回の研修、お疲れさまでした。<br>最後に、ここまでの歩みを振り返ります。</p>
+  </div>
+
+  <div class="card card-purple">
+    <div class="card-label cl-purple">🗓️ 小島さんの6回の軌跡</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker" style="background: var(--gray-400);">1</div>
+        <div class="step-content">
+          <div class="step-title">Session 1 — 「AIって何ができるの？」</div>
+          <div class="step-desc">仕事の分解、メタプロンプト。AIとの最初の対話。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--gray-400);">2</div>
+        <div class="step-content">
+          <div class="step-title">Session 2 — 紙をデータに変える＋経理コーチ誕生</div>
+          <div class="step-desc">スキャン→AI読み取り→CSV出力。ディープリサーチ→Gems→「メガネさん」完成。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--gray-400);">3</div>
+        <div class="step-content">
+          <div class="step-title">Session 3 — 業務をAIに任せる</div>
+          <div class="step-desc">業務棚卸し→仕分け→実践。「今すぐできる」を実際に動かす体験。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--gray-400);">4</div>
+        <div class="step-content">
+          <div class="step-title">Session 4 — スプシの中のAI</div>
+          <div class="step-desc">スプシGemini＋=AI()関数。14店舗データ集約の要件をAIと言語化。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--gray-400);">5</div>
+        <div class="step-content">
+          <div class="step-title">Session 5 — 自分でアプリを作った</div>
+          <div class="step-desc">GASアプリを自力で構築。HTMLダッシュボードをデプロイ。秘伝のたれ導入。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker" style="background: var(--teal-600);">6</div>
+        <div class="step-content">
+          <div class="step-title">Session 6 — ポータルサイトを作って公開</div>
+          <div class="step-desc">個人実績ポータルを主導で構築。研修後も一人で走り続ける道具を手に入れた。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grad-card">
+    <div class="grad-title">🎓 コードを書いたのはAI。<br>でも、何を作るか決めて、作らせたのは小島さんです。</div>
+    <div class="grad-body">
+      「AIって何？」から始まって、自分でアプリを作って社内に公開するところまで来ました。<br><br>この研修で身につけた力は「AIの使い方」ではありません。<br><strong>「何を作りたいかを考え、それをAIに伝える力」</strong>です。<br><br>この力は、AIがどれだけ進化しても変わりません。<br>ずっと使い続けてください。
+    </div>
+  </div>
+
+  <div class="card card-teal" style="margin-top: 32px;">
+    <div class="card-label cl-teal">これからも続けてほしいこと</div>
+    <div class="checklist">
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text">毎日AIに話しかける（仕事でも、そうでなくても）</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text">「めんどくさい」と思ったら「これ自動化できる？」とまず聞く</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text">秘伝のたれを育て続ける</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text">メガネさんに経理の相談を続ける</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text">エラーが出ても慌てない。スクショ→AIに渡す→直してもらう</div></div>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top: 32px;">
+    <div class="callout-icon">🚀</div>
+    <div class="callout-text">研修は終わっても、AIとの仕事は今日から始まります。</div>
+    <div class="callout-sub">お疲れさまでした。これからの小島さんの活躍を楽しみにしています。</div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(2)">← 前へ</button>
+    <span class="page-counter">3 / 3</span>
+    <button class="page-nav-btn hidden">次へ →</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const pages = document.querySelectorAll('.page');
+  function goPage(idx) {
+    tabBtns.forEach(b => b.classList.remove('active'));
+    tabBtns[idx].classList.add('active');
+    pages.forEach(p => p.classList.remove('active'));
+    pages[idx].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => goPage(parseInt(btn.dataset.page)));
+  });
+</script>
+</body>
+</html>
