@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Lesson Session 06 — 最終回：ここから先は、自分の力で</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal-50: #e6f7f5; --teal-100: #b3ece6; --teal-200: #80e0d6;
+    --teal-500: #26a69a; --teal-600: #00897b; --teal-700: #00796b;
+    --orange-50: #fff3e0; --orange-100: #ffe0b2; --orange-600: #fb8c00;
+    --blue-50: #e8f0fe; --blue-100: #d2e3fc; --blue-200: #aecbfa;
+    --blue-600: #1a73e8; --blue-700: #1967d2;
+    --green-50: #e6f4ea; --green-100: #ceead6; --green-600: #1e8e3e; --green-700: #188038;
+    --yellow-50: #fef7e0; --yellow-100: #feefc3; --yellow-600: #f9ab00;
+    --red-50: #fce8e6; --red-100: #fad2cf; --red-600: #d93025;
+    --purple-50: #f3e8fd; --purple-100: #e8d0fb; --purple-600: #9334e6;
+    --gray-50: #f8f9fa; --gray-100: #f1f3f4; --gray-200: #e8eaed;
+    --gray-300: #dadce0; --gray-400: #bdc1c6; --gray-500: #9aa0a6;
+    --gray-600: #80868b; --gray-700: #5f6368; --gray-800: #3c4043; --gray-900: #202124;
+    --shadow-sm: 0 1px 2px rgba(60,64,67,0.1), 0 1px 3px rgba(60,64,67,0.08);
+    --shadow-md: 0 1px 3px rgba(60,64,67,0.12), 0 4px 8px rgba(60,64,67,0.08);
+    --radius: 12px; --radius-sm: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { font-family: 'Noto Sans JP', 'IBM Plex Sans', sans-serif; background: var(--gray-50); color: var(--gray-900); line-height: 1.9; font-size: 16px; min-height: 100vh; display: flex; flex-direction: column; }
+  .hero { background: linear-gradient(135deg, var(--teal-600) 0%, var(--teal-700) 40%, #004d40 100%); color: white; padding: 68px 24px 48px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -40%; right: -15%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%); border-radius: 50%; }
+  .hero-inner { max-width: 760px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-label { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; margin-bottom: 12px; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero h1 { font-size: 28px; font-weight: 700; line-height: 1.45; margin-bottom: 16px; }
+  .hero p { font-size: 15px; line-height: 1.8; opacity: 0.9; max-width: 600px; }
+  .hero-meta { margin-top: 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+  .hero-meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; opacity: 0.85; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero-meta-item svg { width: 18px; height: 18px; }
+  .tab-nav { position: sticky; top: 0; z-index: 100; background: white; border-bottom: 1px solid var(--gray-200); padding: 0 24px; box-shadow: var(--shadow-sm); }
+  .tab-nav-inner { max-width: 760px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
+  .tab-nav-inner::-webkit-scrollbar { display: none; }
+  .tab-btn { flex-shrink: 0; padding: 14px 16px; font-size: 13px; font-weight: 500; color: var(--gray-600); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: 'Noto Sans JP', sans-serif; }
+  .tab-btn:hover { color: var(--teal-600); background: var(--teal-50); }
+  .tab-btn.active { color: var(--teal-600); border-bottom-color: var(--teal-600); }
+  .page-container { flex: 1; }
+  .page { display: none; max-width: 760px; width: 100%; margin: 0 auto; padding: 48px 24px 80px; animation: pageIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes pageIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--gray-200); }
+  .page-nav-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--gray-300); background: white; color: var(--gray-700); transition: all 0.2s; font-family: 'Noto Sans JP', sans-serif; }
+  .page-nav-btn:hover { border-color: var(--teal-600); color: var(--teal-600); background: var(--teal-50); }
+  .page-nav-btn.primary { background: var(--teal-600); color: white; border-color: var(--teal-600); }
+  .page-nav-btn.primary:hover { background: var(--teal-700); }
+  .page-nav-btn.hidden { visibility: hidden; }
+  .page-counter { font-size: 13px; color: var(--gray-500); font-family: 'IBM Plex Sans', sans-serif; }
+  .section-header { margin-bottom: 32px; }
+  .section-number { font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--teal-600); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+  .section-title { font-size: 24px; font-weight: 700; line-height: 1.4; }
+  .prose { font-size: 16px; line-height: 2; color: var(--gray-800); }
+  .prose p { margin-bottom: 20px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { font-weight: 600; color: var(--gray-900); }
+  .card { background: white; border-radius: var(--radius); padding: 28px 32px; margin: 28px 0; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); }
+  .card-teal { background: var(--teal-50); border-color: var(--teal-200); }
+  .card-blue { background: var(--blue-50); border-color: var(--blue-200); }
+  .card-green { background: var(--green-50); border-color: var(--green-100); }
+  .card-orange { background: var(--orange-50); border-color: var(--orange-100); }
+  .card-purple { background: var(--purple-50); border-color: var(--purple-100); }
+  .card-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+  .cl-teal { color: var(--teal-600); } .cl-blue { color: var(--blue-600); } .cl-green { color: var(--green-700); }
+  .cl-orange { color: var(--orange-600); } .cl-purple { color: var(--purple-600); }
+  .steps { margin: 24px 0; }
+  .step { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
+  .step:last-child { margin-bottom: 0; }
+  .step-marker { flex-shrink: 0; width: 32px; height: 32px; background: var(--teal-600); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; font-weight: 600; margin-top: 2px; }
+  .step-content { flex: 1; }
+  .step-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .step-desc { font-size: 15px; color: var(--gray-700); line-height: 1.7; }
+  .prompt-box { background: var(--gray-900); color: #e8eaed; border-radius: var(--radius); padding: 24px 28px; margin: 24px 0; font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; line-height: 1.8; position: relative; }
+  .prompt-box::before { content: 'PROMPT'; position: absolute; top: 10px; right: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: var(--gray-500); }
+  .divider { height: 1px; background: var(--gray-200); margin: 40px 0; }
+  .note { background: var(--gray-100); border-radius: var(--radius-sm); padding: 20px 24px; margin: 24px 0; font-size: 14px; line-height: 1.8; color: var(--gray-700); }
+  .note-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-500); margin-bottom: 6px; }
+  .callout { background: linear-gradient(135deg, var(--teal-50) 0%, var(--blue-50) 100%); border: 1px solid var(--teal-200); border-radius: var(--radius); padding: 28px 32px; margin: 32px 0; text-align: center; }
+  .callout-icon { font-size: 28px; margin-bottom: 12px; }
+  .callout-text { font-size: 17px; font-weight: 600; line-height: 1.7; }
+  .callout-sub { font-size: 14px; color: var(--gray-600); margin-top: 10px; line-height: 1.7; }
+  .checklist { margin: 24px 0; }
+  .checklist-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--gray-100); }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-box { flex-shrink: 0; width: 22px; height: 22px; border: 2px solid var(--gray-300); border-radius: 4px; margin-top: 2px; }
+  .checklist-text { font-size: 15px; color: var(--gray-800); line-height: 1.6; }
+  .ojt-option { background: white; border-radius: var(--radius); padding: 24px 28px; margin-bottom: 16px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); transition: border-color 0.2s, box-shadow 0.2s; }
+  .ojt-option:hover { border-color: var(--teal-500); box-shadow: var(--shadow-md); }
+  .ojt-option-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal-600); margin-bottom: 8px; }
+  .ojt-option h4 { font-weight: 700; font-size: 17px; margin-bottom: 8px; }
+  .ojt-option p { font-size: 14px; color: var(--gray-600); line-height: 1.8; }
+  .roadmap { margin: 28px 0; }
+  .roadmap-item { display: flex; gap: 16px; margin-bottom: 16px; align-items: flex-start; }
+  .roadmap-status { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; margin-top: 2px; }
+  .status-done { background: var(--green-50); }
+  .status-wip { background: var(--yellow-50); }
+  .status-todo { background: var(--gray-100); }
+  .roadmap-body { flex: 1; }
+  .roadmap-title { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
+  .roadmap-desc { font-size: 14px; color: var(--gray-600); line-height: 1.6; }
+  @media (max-width: 640px) {
+    .hero { padding: 48px 20px 36px; } .hero h1 { font-size: 23px; }
+    .page { padding: 36px 20px 64px; }
+    .card { padding: 22px 20px; }
+    .tab-btn { padding: 12px 12px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">AI Lesson — Session 06 ／ Final</div>
+    <h1>最終回：ここから先は、自分の力で</h1>
+    <p>ダッシュボードを完成させて、<br>研修後も自走するための武器を手に入れます。</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        60分 ／ 座学10分＋実践50分
+      </div>
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        1 on 1 レクチャー（最終回）
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <button class="tab-btn active" data-page="0">ふりかえり</button>
+    <button class="tab-btn" data-page="1">GAS入門</button>
+    <button class="tab-btn" data-page="2">ダッシュボード</button>
+    <button class="tab-btn" data-page="3">残りの宿題</button>
+    <button class="tab-btn" data-page="4">自走ガイド</button>
+    <button class="tab-btn" data-page="5">まとめ</button>
+  </div>
+</nav>
+
+<div class="page-container">
+
+<!-- ━━━ Page 0: ふりかえり ━━━ -->
+<div class="page active" data-page="0">
+  <div class="section-header">
+    <div class="section-number">Review</div>
+    <h2 class="section-title">前回のふりかえり</h2>
+  </div>
+  <div class="prose"><p>Session 5では、PDF→Excel変換の試行、評価シートGemの方向性確定、そしてGASダッシュボードという新しいゴールが見えました。</p></div>
+  <div class="card card-teal">
+    <div class="card-label cl-teal">Session 5 で決まったこと</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">PDF→Excel変換Gem — シンプルに作り直す</div>
+          <div class="step-desc">列ずれ問題はモデルの性能に依存する部分が大きい。複雑なレイアウト調整よりテキスト・数字の抽出を優先する方針に。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">評価シート — AIと人間の役割分担が鍵</div>
+          <div class="step-desc">AIには客観的データの集計と見落とし補完を。最終判断と定性評価は店長が行う。この線引きをGemのカスタム指示に組み込む。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">スプレッドシート移行＋GASダッシュボード</div>
+          <div class="step-desc">ExcelをGoogleスプレッドシートに完全移行し、GASで売上ダッシュボードを構築する。データを蓄積できる構造に。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <div class="note-label">宿題の確認</div>
+    <div class="checklist">
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>スプレッドシートへの移行は完了した？</strong> — ExcelファイルをGoogleスプレッドシートとして保存した？</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>GeminiにGASダッシュボードの相談をした？</strong> — スプレッドシートのURLを共有して「GASで見やすいダッシュボードを作りたい」と送った？</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>売上変換Gemのプロンプトを修正した？</strong> — シンプルに「見たままExcelにして」の方針で書き直した？</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>セカンドオピニオン（ChatGPT）を試した？</strong> — Geminiの出力をChatGPTに検証させてみた？</div></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="prose">
+    <p>今日が最終回です。<strong>ダッシュボード構築</strong>にしっかり時間を使い、未完了のテーマは自走用のガイドとして整理して持ち帰ります。</p>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn hidden">← 前へ</button>
+    <span class="page-counter">0 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(1)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 1: GAS入門 ━━━ -->
+<div class="page" data-page="1">
+  <div class="section-header">
+    <div class="section-number">Section 01</div>
+    <h2 class="section-title">Google Apps Script（GAS）とは</h2>
+  </div>
+  <div class="prose">
+    <p>前回、スプレッドシートの拡張機能にあった「Apps Script」。これが今日の主役です。</p>
+    <p>GASは、<strong>Googleスプレッドシートのデータを使って何かを自動化したり、表示したりできるプログラムの仕組み</strong>です。スプレッドシートの中にあるデータを読み取って、グラフや表を並べた「ダッシュボード」をWebページとして公開できます。</p>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">GASで何ができるか</div>
+    <div class="prose">
+      <p><strong>今日やること：</strong>スプレッドシートの売上データを読み取って、ブラウザで見られるダッシュボードを作る。URLを共有すれば、他の人もアクセスできる。</p>
+      <p><strong>将来的にできること：</strong>日報を自動集計してメールで送る、シフト表を自動生成する、スプレッドシートが更新されたら自動でグラフを更新する…など。</p>
+    </div>
+  </div>
+
+  <div class="card card-blue">
+    <div class="card-label cl-blue">前回の問題 — なぜダッシュボードが必要なのか</div>
+    <div class="prose">
+      <p>現状の課題を整理します：</p>
+      <p><strong>① データが月単位で分断されている</strong> — 1つのスプレッドシートに1ヶ月分しか入ってない。月間・四半期・年間の比較をするたびに複数ファイルを開く必要がある。</p>
+      <p><strong>② 証券集計（来店経路）の比較が手作業</strong> — 過去3ヶ月の平均値と比べたいのに、いちいちファイルを開いて手計算。</p>
+      <p><strong>③ 売上の波が見えにくい</strong> — 日別・曜日別のトレンドがスプレッドシートの数字だけだと把握しにくい。</p>
+      <p>ダッシュボードを作れば、<strong>1つのURLを開くだけで全部見える</strong>ようになります。</p>
+    </div>
+  </div>
+
+  <div class="card card-green">
+    <div class="card-label cl-green">データを蓄積する構造を先に作る</div>
+    <div class="prose">
+      <p>ダッシュボードを作る前に、<strong>データの蓄積方法</strong>を決める必要があります。今のように月ごとにファイルが分かれていると、ダッシュボードが複数ファイルを横断して読む必要が出て複雑になります。</p>
+      <p>いちばんシンプルな方法は、<strong>1つのスプレッドシートに全月のデータを追加していく</strong>こと。毎月の締め作業で、その月のデータを「マスター」シートにコピペで追加する。この「マスター」をGASが読み取ってダッシュボードを描画する形です。</p>
+    </div>
+  </div>
+
+  <div class="prompt-box">このスプレッドシートを見てほしい。[URL]<br><br>やりたいこと：<br>1. このデータを元に、GASでWebダッシュボードを作りたい<br>2. 月別の売上推移、カテゴリ別の内訳、前年同月比をグラフで表示<br>3. URLを発行して、社内の他のメンバーも見られるようにしたい<br><br>まず、このスプレッドシートの構造を確認して、<br>ダッシュボードに適した形かどうか教えてほしい。<br>改善が必要ならデータ構造の修正案も提案して。</div>
+
+  <div class="note">
+    <div class="note-label">ポイント</div>
+    <p>いきなり「ダッシュボード作って」ではなく、まず「データ構造を確認して」から始める。Session 2で学んだ4ステップ分析と同じ考え方です。データの構造が整っていないと、ダッシュボードの精度も落ちます。</p>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(0)">← 前へ</button>
+    <span class="page-counter">1 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(2)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 2: ダッシュボードを作る ━━━ -->
+<div class="page" data-page="2">
+  <div class="section-header">
+    <div class="section-number">Section 02</div>
+    <h2 class="section-title">ダッシュボードを一緒に作る</h2>
+  </div>
+  <div class="prose">
+    <p>ここからは実践です。前回のセッションでGeminiにスプレッドシートのURLを共有済みなので、その続きから進めます。</p>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">ダッシュボード構築の流れ</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">データ構造の確認と修正</div>
+          <div class="step-desc">Geminiにスプレッドシートの構造を確認させ、ダッシュボードに適した形に整える。列名の統一、データ型の確認など。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">GASコードの生成</div>
+          <div class="step-desc">「このスプレッドシートからダッシュボードのGASコードを書いて」とGeminiに依頼。HTMLとGASの2つのファイルが生成される。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">Apps Scriptに貼り付けて実行</div>
+          <div class="step-desc">スプレッドシートの「拡張機能 → Apps Script」を開き、生成されたコードを貼り付ける。「デプロイ」ボタンでWebページとして公開。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">4</div>
+        <div class="step-content">
+          <div class="step-title">テストと調整</div>
+          <div class="step-desc">表示されたダッシュボードを確認。数字のズレ、グラフの見づらさなどがあればGeminiにスクショを送って修正依頼。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-orange">
+    <div class="card-label cl-orange">GASでハマりやすいポイント</div>
+    <div class="prose">
+      <p><strong>権限の問題：</strong>初回デプロイ時に「承認が必要です」と出ます。自分のGoogleアカウントで承認すればOK。「安全でないページに移動」をクリックする必要がある場合もあります。</p>
+      <p><strong>コードの貼り間違い：</strong>GASには「コード.gs」と「HTMLファイル」の2箇所に貼る場合があります。Geminiが「ここに貼って」と指示してくれるので、その通りに。</p>
+      <p><strong>更新が反映されない：</strong>コードを修正したら、再度「デプロイ → 新しいデプロイ」が必要です。上書きではなく新規デプロイ。</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🎯</div>
+    <div class="callout-text">今日のゴール：URLを1つ発行して、ダッシュボードが見える状態</div>
+    <div class="callout-sub">完璧じゃなくていい。「開いたらグラフが見える」状態まで持っていく。<br>細かい調整は研修後に自分でGeminiと一緒にやれます。</div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(1)">← 前へ</button>
+    <span class="page-counter">2 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(3)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 3: 残りの宿題 ━━━ -->
+<div class="page" data-page="3">
+  <div class="section-header">
+    <div class="section-number">Section 03</div>
+    <h2 class="section-title">残りの宿題を整理する</h2>
+  </div>
+  <div class="prose">
+    <p>6回の研修で着手したテーマのうち、完成したものと、まだ途中のものがあります。<br>ここでは<strong>「研修後に自分で完成させるための手順」</strong>を整理しておきます。</p>
+  </div>
+
+  <div class="roadmap">
+    <div class="roadmap-item">
+      <div class="roadmap-status status-done">✅</div>
+      <div class="roadmap-body">
+        <div class="roadmap-title">予算組み太郎（予算目標Gem）</div>
+        <div class="roadmap-desc">完成。実務で使い物になっている。改善は1日1ラリーで継続。</div>
+      </div>
+    </div>
+    <div class="roadmap-item">
+      <div class="roadmap-status status-done">✅</div>
+      <div class="roadmap-body">
+        <div class="roadmap-title">資料作成ボーイ mk2（会議資料Gem）</div>
+        <div class="roadmap-desc">完成。壁打ち型でExcel出力まで対応。Flash 3.5 + Proの使い分けが定着。</div>
+      </div>
+    </div>
+    <div class="roadmap-item">
+      <div class="roadmap-status status-wip">🔧</div>
+      <div class="roadmap-body">
+        <div class="roadmap-title">GASダッシュボード</div>
+        <div class="roadmap-desc">今日のセッションで骨格を完成させる。データ蓄積の構造とグラフ表示まで。細かい調整は自走で。</div>
+      </div>
+    </div>
+    <div class="roadmap-item">
+      <div class="roadmap-status status-wip">🔧</div>
+      <div class="roadmap-body">
+        <div class="roadmap-title">売上変換Gem（PDF→Excel）</div>
+        <div class="roadmap-desc">方針は確定（シンプルに見たまま変換）。プロンプトを修正して、テストして、保存するだけ。</div>
+      </div>
+    </div>
+    <div class="roadmap-item">
+      <div class="roadmap-status status-wip">🔧</div>
+      <div class="roadmap-body">
+        <div class="roadmap-title">評価シートGem</div>
+        <div class="roadmap-desc">設計方針は確定。AIインタビューで要件を整理し、Session 4のたたき台をベースにGem作成。機密データは仮名でテスト。</div>
+      </div>
+    </div>
+    <div class="roadmap-item">
+      <div class="roadmap-status status-todo">📋</div>
+      <div class="roadmap-body">
+        <div class="roadmap-title">シフト管理Gem</div>
+        <div class="roadmap-desc">未着手。まず暗黙のルールを書き出す（Session 5の質問リスト参照）。ルール一覧ができればGem化は30分。</div>
+      </div>
+    </div>
+    <div class="roadmap-item">
+      <div class="roadmap-status status-todo">📋</div>
+      <div class="roadmap-body">
+        <div class="roadmap-title">証券集計の自動比較</div>
+        <div class="roadmap-desc">ダッシュボードに組み込むか、別Gemで対応するか。データ構造の統一が先。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">どれもやり方は同じ</div>
+    <div class="prose">
+      <p>ここまでの研修で、<strong>Gemの作り方の「型」</strong>は完全に身についています。</p>
+      <p>① メタプロンプトで「こういうGemを作りたい」と相談する<br>② カスタム指示のたたき台を生成する<br>③ テストデータで試す<br>④ うまくいかなかったらAIに反省させて修正する<br>⑤ バージョンを保存する</p>
+      <p>この型は評価シートでもシフト管理でも証券集計でも、<strong>全部同じ</strong>です。テーマが変わっても手順は変わりません。</p>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(2)">← 前へ</button>
+    <span class="page-counter">3 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(4)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 4: 自走ガイド ━━━ -->
+<div class="page" data-page="4">
+  <div class="section-header">
+    <div class="section-number">Section 04</div>
+    <h2 class="section-title">自走ガイド — 研修後の歩き方</h2>
+  </div>
+  <div class="prose">
+    <p>ここからは、研修が終わった後も自分で走り続けるためのガイドです。困ったときに見返してください。</p>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-teal">困ったときの対処法チートシート</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">AIの回答がおかしい → 新しいセッションでやり直す</div>
+          <div class="step-desc">長い会話で混乱したら、引き継ぎ書を書かせて新規チャットに移動。失敗の記憶に引っ張られない。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">数字が間違ってる → 「コードで計算して」と言う</div>
+          <div class="step-desc">AIの暗算は信用しない。コード実行させると正確になる。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">何を依頼すればいいかわからない → AIにインタビューしてもらう</div>
+          <div class="step-desc">「○○したいけど何を教えればいいかわからない。インタビューして」で始まる。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">4</div>
+        <div class="step-content">
+          <div class="step-title">Gemの出力がイマイチ → AIに反省させてプロンプトを直す</div>
+          <div class="step-desc">「今のやりとりで起きた問題を振り返って、防ぐルールをカスタム指示の形で書いて」。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">5</div>
+        <div class="step-content">
+          <div class="step-title">1つのAIで不安 → セカンドオピニオンに出す</div>
+          <div class="step-desc">Geminiの出力をChatGPTに検証させる。逆も同様。複数の視点で確認。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ===== AIと一緒に働くということ ===== -->
+  <div class="card" style="border-left: 4px solid var(--teal-600);">
+    <div class="card-label cl-teal">AIと一緒に働くということ</div>
+    <div class="prose">
+      <p>この3ヶ月で、長田さんはAIにいろんな仕事を任せられるようになりました。数字の集計、資料の下書き、予算のたたき台、データのExcel変換。これまで手作業で何時間もかかっていたことが、数分で終わるようになった。</p>
+      <p>ここで1つだけ、大事なことを伝えさせてください。</p>
+      <p><strong>AIが巻き取った作業の分だけ、あなたの時間と頭が空きます。</strong><br>問題は、その空いた時間と頭で何をするかです。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="prose">
+      <p>集まった数字を見て、AIの分析結果を眺めながら、<strong>「なぜこうなったか」を考える。</strong></p>
+      <p>事実情報を「正確に」読み込ませたAIが出した評価の叩き台を見て、<strong>「この人にはこう伝えよう」と決める。</strong></p>
+      <p>AIがシミュレーションしてくれた予算の根拠を並べた上で、<strong>「この月はこの戦略で行く」と決断する。</strong></p>
+      <p>これらは全部、<strong>AIと一緒にやるからこそ、より良い判断ができる仕事</strong>です。AIが作業を巻き取ってくれた分だけ、あなたの時間と頭は「判断する」「戦略を立てる」「人を動かす」に集中できる。ここに時間を使えるようになることが、AIで仕事を効率化する本当の意味です。</p>
+    </div>
+  </div>
+
+  <div class="card card-green">
+    <div class="prose">
+      <p>長田さんはこの研修で「こういうのできますか？」と一番多くアイデアを出してくれました。予算組み太郎も、営業報告メールの半自動化も、ダッシュボードのアイデアも、全部長田さんから出てきたものです。</p>
+      <p><strong>「何を作るか」を考えられる人は、AIが進化するほど価値が上がります。</strong><br>AIは指示されたことを実行するのは得意ですが、「何を指示すべきか」を考えるのは人間の仕事です。そしてそれは、長田さんがすでにやっていることです。</p>
+      <p>作業を任せたら、その分だけ上流へ。<br>数字を集めてもらったら、その数字で考える。<br>たたき台をもらったら、自分の判断を載せる。</p>
+      <p>このサイクルを回し続ける限り、<strong>AIはあなたの武器であり続けます。</strong></p>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(3)">← 前へ</button>
+    <span class="page-counter">4 / 5</span>
+    <button class="page-nav-btn primary" onclick="goPage(5)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 5: まとめ ━━━ -->
+<div class="page" data-page="5">
+  <div class="section-header">
+    <div class="section-number">Final</div>
+    <h2 class="section-title">3ヶ月間、お疲れさまでした</h2>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">6回の研修で身につけたこと</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-marker">1</div>
+        <div class="step-content">
+          <div class="step-title">Session 1 — 仕事の分解とメタプロンプト</div>
+          <div class="step-desc">AIへの依頼は「目的・相手・成果物・制約」の4つを言語化すること。その分解すらAIに手伝わせられる。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">2</div>
+        <div class="step-content">
+          <div class="step-title">Session 2 — モード使い分け、データ分析4ステップ、バイブコーディング</div>
+          <div class="step-desc">高速/思考/プロの使い分け。データは4ステップで渡す。コードが書けなくてもアプリが作れる。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">3</div>
+        <div class="step-content">
+          <div class="step-title">Session 3 — Gemsで「自分専用AI」を作る</div>
+          <div class="step-desc">メタプロンプトでGemの指示文を設計し、テストし、改善する。業績壁打ちマスターが誕生。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">4</div>
+        <div class="step-content">
+          <div class="step-title">Session 4 — Gemの改善サイクル、営業報告メール、評価シート設計</div>
+          <div class="step-desc">自己反省サイクル、1日1ラリーの改善リズム。AIに改善プロンプト自体を書かせる技術。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">5</div>
+        <div class="step-content">
+          <div class="step-title">Session 5 — PDF変換、セカンドオピニオン、スプシ移行</div>
+          <div class="step-desc">AIの得意・不得意を見極めて、適切な方法を選ぶ。複数AIの併用。データ基盤の整備。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-marker">6</div>
+        <div class="step-content">
+          <div class="step-title">Session 6 — GASダッシュボード、自走の武器</div>
+          <div class="step-desc">スプレッドシート＋GASでデータを可視化する。そして、研修後も自分で走り続ける力。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card">
+    <div class="card-label cl-purple">完成したもの・これから完成させるもの</div>
+    <div class="roadmap">
+      <div class="roadmap-item"><div class="roadmap-status status-done">✅</div><div class="roadmap-body"><div class="roadmap-title">予算組み太郎</div></div></div>
+      <div class="roadmap-item"><div class="roadmap-status status-done">✅</div><div class="roadmap-body"><div class="roadmap-title">資料作成ボーイ mk2</div></div></div>
+      <div class="roadmap-item"><div class="roadmap-status status-wip">🔧</div><div class="roadmap-body"><div class="roadmap-title">GASダッシュボード</div></div></div>
+      <div class="roadmap-item"><div class="roadmap-status status-wip">🔧</div><div class="roadmap-body"><div class="roadmap-title">売上変換Gem</div></div></div>
+      <div class="roadmap-item"><div class="roadmap-status status-wip">🔧</div><div class="roadmap-body"><div class="roadmap-title">評価シートGem</div></div></div>
+      <div class="roadmap-item"><div class="roadmap-status status-todo">📋</div><div class="roadmap-body"><div class="roadmap-title">シフト管理Gem</div></div></div>
+      <div class="roadmap-item"><div class="roadmap-status status-todo">📋</div><div class="roadmap-body"><div class="roadmap-title">証券集計の自動比較</div></div></div>
+    </div>
+    <div class="prose" style="font-size: 14px; color: var(--gray-600); margin-top: 12px;">
+      <p>🔧は「やり方はわかっていて、あとは手を動かすだけ」の状態。📋は「設計から始める」もの。どちらも、この研修で身につけた型で完成させられます。</p>
+    </div>
+  </div>
+
+  <div class="callout" style="background: linear-gradient(135deg, var(--teal-600) 0%, #004d40 100%); border: none; color: white;">
+    <div class="callout-icon">🚀</div>
+    <div class="callout-text" style="color: white;">AIは道具。使うのはあなたです。</div>
+    <div class="callout-sub" style="color: rgba(255,255,255,0.85);">
+      3ヶ月間、毎回新しいことに挑戦してくれました。<br>
+      「こういうのできますか？」を一番言ってくれたのは長田さんでした。<br>
+      そのアイデアと行動力がある限り、AIはどこまでもあなたの味方です。<br><br>
+      作業を手放して、判断に集中する。<br>
+      その先に、店長としてのさらなるステージがあります。
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(4)">← 前へ</button>
+    <span class="page-counter">5 / 5</span>
+    <button class="page-nav-btn hidden">次へ →</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const pages = document.querySelectorAll('.page');
+  function goPage(idx) {
+    tabBtns.forEach(b => b.classList.remove('active'));
+    tabBtns[idx].classList.add('active');
+    pages.forEach(p => p.classList.remove('active'));
+    pages[idx].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => goPage(parseInt(btn.dataset.page)));
+  });
+</script>
+</body>
+</html>
