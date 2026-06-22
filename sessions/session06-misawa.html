@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Lesson Session 06 — 最終回：作って、巣立つ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal-50: #e6f7f5; --teal-100: #b3ece6; --teal-200: #80e0d6;
+    --teal-500: #26a69a; --teal-600: #00897b; --teal-700: #00796b;
+    --orange-50: #fff3e0; --orange-100: #ffe0b2; --orange-600: #fb8c00;
+    --blue-50: #e8f0fe; --blue-100: #d2e3fc; --blue-200: #aecbfa;
+    --blue-600: #1a73e8; --blue-700: #1967d2;
+    --green-50: #e6f4ea; --green-100: #ceead6; --green-600: #1e8e3e; --green-700: #188038;
+    --yellow-50: #fef7e0; --yellow-100: #feefc3; --yellow-600: #f9ab00;
+    --red-50: #fce8e6; --red-100: #fad2cf; --red-600: #d93025;
+    --purple-50: #f3e8fd; --purple-100: #e8d0fb; --purple-600: #9334e6;
+    --gray-50: #f8f9fa; --gray-100: #f1f3f4; --gray-200: #e8eaed;
+    --gray-300: #dadce0; --gray-400: #bdc1c6; --gray-500: #9aa0a6;
+    --gray-600: #80868b; --gray-700: #5f6368; --gray-800: #3c4043; --gray-900: #202124;
+    --shadow-sm: 0 1px 2px rgba(60,64,67,0.1), 0 1px 3px rgba(60,64,67,0.08);
+    --shadow-md: 0 1px 3px rgba(60,64,67,0.12), 0 4px 8px rgba(60,64,67,0.08);
+    --radius: 12px; --radius-sm: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body {
+    font-family: 'Noto Sans JP', 'IBM Plex Sans', sans-serif;
+    background: var(--gray-50); color: var(--gray-900);
+    line-height: 1.9; font-size: 16px; min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  .hero {
+    background: linear-gradient(135deg, var(--teal-600) 0%, var(--teal-700) 40%, #004d40 100%);
+    color: white; padding: 68px 24px 48px; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -40%; right: -15%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-inner { max-width: 760px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-label { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; margin-bottom: 12px; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero h1 { font-size: 28px; font-weight: 700; line-height: 1.45; margin-bottom: 16px; }
+  .hero p { font-size: 15px; line-height: 1.8; opacity: 0.9; max-width: 600px; }
+  .hero-meta { margin-top: 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+  .hero-meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; opacity: 0.85; font-family: 'IBM Plex Sans', sans-serif; }
+  .hero-meta-item svg { width: 18px; height: 18px; }
+  .tab-nav { position: sticky; top: 0; z-index: 100; background: white; border-bottom: 1px solid var(--gray-200); padding: 0 24px; box-shadow: var(--shadow-sm); }
+  .tab-nav-inner { max-width: 760px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
+  .tab-nav-inner::-webkit-scrollbar { display: none; }
+  .tab-btn { flex-shrink: 0; padding: 14px 16px; font-size: 13px; font-weight: 500; color: var(--gray-600); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: 'Noto Sans JP', sans-serif; }
+  .tab-btn:hover { color: var(--teal-600); background: var(--teal-50); }
+  .tab-btn.active { color: var(--teal-600); border-bottom-color: var(--teal-600); }
+  .page-container { flex: 1; }
+  .page { display: none; max-width: 760px; width: 100%; margin: 0 auto; padding: 48px 24px 80px; animation: pageIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes pageIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--gray-200); }
+  .page-nav-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--gray-300); background: white; color: var(--gray-700); transition: all 0.2s; font-family: 'Noto Sans JP', sans-serif; }
+  .page-nav-btn:hover { border-color: var(--teal-600); color: var(--teal-600); background: var(--teal-50); }
+  .page-nav-btn.primary { background: var(--teal-600); color: white; border-color: var(--teal-600); }
+  .page-nav-btn.primary:hover { background: var(--teal-700); }
+  .page-nav-btn.hidden { visibility: hidden; }
+  .page-counter { font-size: 13px; color: var(--gray-500); font-family: 'IBM Plex Sans', sans-serif; }
+  .section-header { margin-bottom: 32px; }
+  .section-number { font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--teal-600); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+  .section-title { font-size: 24px; font-weight: 700; line-height: 1.4; }
+  .prose { font-size: 16px; line-height: 2; color: var(--gray-800); }
+  .prose p { margin-bottom: 20px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { font-weight: 600; color: var(--gray-900); }
+  .card { background: white; border-radius: var(--radius); padding: 28px 32px; margin: 28px 0; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); }
+  .card-teal { background: var(--teal-50); border-color: var(--teal-200); }
+  .card-blue { background: var(--blue-50); border-color: var(--blue-200); }
+  .card-green { background: var(--green-50); border-color: var(--green-100); }
+  .card-orange { background: var(--orange-50); border-color: var(--orange-100); }
+  .card-purple { background: var(--purple-50); border-color: var(--purple-100); }
+  .card-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+  .cl-teal { color: var(--teal-600); } .cl-blue { color: var(--blue-600); } .cl-green { color: var(--green-700); }
+  .cl-orange { color: var(--orange-600); } .cl-purple { color: var(--purple-600); }
+  .steps { margin: 24px 0; }
+  .step { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
+  .step:last-child { margin-bottom: 0; }
+  .step-marker { flex-shrink: 0; width: 32px; height: 32px; background: var(--teal-600); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; font-weight: 600; margin-top: 2px; }
+  .step-content { flex: 1; }
+  .step-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .step-desc { font-size: 15px; color: var(--gray-700); line-height: 1.7; }
+  .prompt-box { background: var(--gray-900); color: #e8eaed; border-radius: var(--radius); padding: 24px 28px; margin: 24px 0; font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; line-height: 1.8; position: relative; white-space: pre-wrap; }
+  .prompt-box::before { content: 'PROMPT'; position: absolute; top: 10px; right: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: var(--gray-500); }
+  .strength-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+  .strength-item { background: white; border-radius: var(--radius-sm); padding: 20px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); }
+  .strength-icon { font-size: 22px; margin-bottom: 8px; }
+  .strength-title { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+  .strength-desc { font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+  .approach-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin: 24px 0; }
+  .approach-card { background: white; border-radius: var(--radius); padding: 24px 28px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); }
+  .approach-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .approach-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .approach-name { font-weight: 700; font-size: 17px; }
+  .approach-sub { font-size: 13px; color: var(--gray-500); }
+  .approach-body { font-size: 14px; color: var(--gray-700); line-height: 1.8; }
+  .divider { height: 1px; background: var(--gray-200); margin: 40px 0; }
+  .note { background: var(--gray-100); border-radius: var(--radius-sm); padding: 20px 24px; margin: 24px 0; font-size: 14px; line-height: 1.8; color: var(--gray-700); }
+  .note-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-500); margin-bottom: 6px; }
+  .callout { background: linear-gradient(135deg, var(--teal-50) 0%, var(--blue-50) 100%); border: 1px solid var(--teal-200); border-radius: var(--radius); padding: 28px 32px; margin: 32px 0; text-align: center; }
+  .callout-icon { font-size: 28px; margin-bottom: 12px; }
+  .callout-text { font-size: 17px; font-weight: 600; line-height: 1.7; }
+  .callout-sub { font-size: 14px; color: var(--gray-600); margin-top: 10px; line-height: 1.7; }
+  .checklist { margin: 24px 0; }
+  .checklist-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--gray-100); }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-box { flex-shrink: 0; width: 22px; height: 22px; border: 2px solid var(--gray-300); border-radius: 4px; margin-top: 2px; }
+  .checklist-text { font-size: 15px; color: var(--gray-800); line-height: 1.6; }
+  .roadmap { margin: 32px 0; }
+  .roadmap-item { display: flex; gap: 16px; margin-bottom: 0; padding: 16px 0; border-left: 3px solid var(--teal-200); margin-left: 15px; padding-left: 24px; position: relative; }
+  .roadmap-item::before { content: ''; position: absolute; left: -8px; top: 18px; width: 13px; height: 13px; border-radius: 50%; background: var(--teal-600); border: 3px solid white; box-shadow: 0 0 0 2px var(--teal-200); }
+  .roadmap-item.completed::before { background: var(--green-600); box-shadow: 0 0 0 2px var(--green-100); }
+  .roadmap-item.current::before { background: var(--orange-600); box-shadow: 0 0 0 2px var(--orange-100); width: 15px; height: 15px; left: -9px; }
+  .roadmap-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; color: var(--gray-500); letter-spacing: 0.04em; }
+  .roadmap-title { font-weight: 600; font-size: 15px; margin-top: 2px; }
+  .roadmap-desc { font-size: 13px; color: var(--gray-600); line-height: 1.6; margin-top: 4px; }
+  .message-card { background: linear-gradient(135deg, #f8fbff 0%, #f0f7f5 100%); border: 1px solid var(--teal-200); border-radius: var(--radius); padding: 36px 40px; margin: 36px 0; }
+  .message-from { font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; color: var(--teal-600); margin-bottom: 16px; }
+  .message-body { font-size: 16px; line-height: 2.2; color: var(--gray-800); }
+  .message-body p { margin-bottom: 20px; }
+  .message-body p:last-child { margin-bottom: 0; }
+  .message-sign { text-align: right; margin-top: 24px; font-size: 15px; color: var(--gray-600); font-style: italic; }
+  @media (max-width: 640px) {
+    .hero { padding: 48px 20px 36px; } .hero h1 { font-size: 23px; }
+    .page { padding: 36px 20px 64px; }
+    .strength-grid { grid-template-columns: 1fr; }
+    .card, .message-card { padding: 22px 20px; }
+    .tab-btn { padding: 12px 12px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">AI Lesson — Session 06 ／ Final</div>
+    <h1>最終回：作って、巣立つ</h1>
+    <p>6回の研修の締めくくり。<br>今日は「バナー作成アプリ」を一緒に作り上げます。<br>そして、研修後もひとりで走り続けるための装備を渡します。</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        90分 ／ 実践中心
+      </div>
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        1 on 1 レクチャー（最終回）
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <button class="tab-btn active" data-page="0">ふりかえり</button>
+    <button class="tab-btn" data-page="1">アプリ設計</button>
+    <button class="tab-btn" data-page="2">実践：作る</button>
+    <button class="tab-btn" data-page="3">自走ガイド</button>
+    <button class="tab-btn" data-page="4">卒業</button>
+  </div>
+</nav>
+
+<div class="page-container">
+
+<!-- ━━━ Page 0: ふりかえり ━━━ -->
+<div class="page active" data-page="0">
+  <div class="section-header">
+    <div class="section-number">Review</div>
+    <h2 class="section-title">前回のふりかえり</h2>
+  </div>
+  <div class="prose"><p>Session 05で取り組んだことの振り返りです。</p></div>
+  <div class="card card-teal">
+    <div class="steps">
+      <div class="step"><div class="step-marker">1</div><div class="step-content"><div class="step-title">APIの基礎知識とセキュリティ</div><div class="step-desc">Google AI StudioでのAPIキー発行、ハードコード禁止、課金設定と上限管理。鍵の扱いを徹底。</div></div></div>
+      <div class="step"><div class="step-marker">2</div><div class="step-content"><div class="step-title">予算シミュレーターの改善方針</div><div class="step-desc">前月データ残留バグの解決、前年実績との比較機能の追加計画。コード品質のセカンドオピニオン手法。</div></div></div>
+      <div class="step"><div class="step-marker">3</div><div class="step-content"><div class="step-title">NotebookLMの共有活用</div><div class="step-desc">Googleドライブ連携で動的更新される仕組み。過去POPからのプロンプト生成の可能性。</div></div></div>
+      <div class="step"><div class="step-marker">4</div><div class="step-content"><div class="step-title">バナー作成アプリのデモ → 「作りたい！」</div><div class="step-desc">対話型の画像生成アプリを体感。コスト管理、著作権チェック機能も確認。今日はこれを作ります。</div></div></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="note">
+    <div class="note-label">宿題の確認</div>
+    <div class="checklist">
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>画像サイズの縮尺を整理した？</strong> — 広告用ポップ、チラシ、バナーなど、作りたい画像のサイズ（A4、正方形、横長など）。</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>Geminiで機能要件を先出しした？</strong> — 「こういう機能がほしい」をGeminiに1回投げておく。</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>NotebookLMを触ってみた？</strong> — 店舗データや過去POPを読み込ませてみた？</div></div>
+      <div class="checklist-item"><div class="checklist-box"></div><div class="checklist-text"><strong>予算シミュレーターの続き</strong> — 前年実績との比較機能、バグ修正の進捗。</div></div>
+    </div>
+  </div>
+
+  <div class="prose" style="margin-top: 32px;">
+    <p>今日が最終回です。</p>
+    <p><strong>前半：バナー作成アプリを一緒に作る。<br>後半：研修後もひとりで走り続けるための装備を渡します。</strong></p>
+    <p>時間を最大限使いましょう。早速、設計に入ります。</p>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn hidden">← 前へ</button>
+    <span class="page-counter">0 / 4</span>
+    <button class="page-nav-btn primary" onclick="goPage(1)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 1: アプリ設計 ━━━ -->
+<div class="page" data-page="1">
+  <div class="section-header">
+    <div class="section-number">Section 01 — Design</div>
+    <h2 class="section-title">バナー作成アプリの設計</h2>
+  </div>
+  <div class="prose">
+    <p>まず「何を作るか」を整理します。<br>前回見たデモを思い出しながら、<strong>今日のゴール</strong>を明確にしましょう。</p>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">今日のゴール：API手前まで完成させる</div>
+    <div class="prose">
+      <p>前回のデモアプリは裏でGPTのAPIを使っていました。<br>今日は<strong>APIを繋ぐ「手前」まで</strong>——つまり、画面のUI・対話のフロー・プロンプト生成ロジックまでを完成させます。</p>
+      <p>APIキーを差し込めば動く状態まで持っていく。<br>研修後、APIの準備ができたら自分で接続して完成させる——この設計です。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-blue">アプリの機能構成</div>
+    <div class="steps">
+      <div class="step"><div class="step-marker" style="background: var(--blue-600);">1</div><div class="step-content"><div class="step-title">用途の選択</div><div class="step-desc">「何を作りたいか」を選ぶ画面。広告バナー、店頭POP、チラシ、SNS投稿画像など。用途に応じて最適なサイズとトーンを自動設定。</div></div></div>
+      <div class="step"><div class="step-marker" style="background: var(--blue-600);">2</div><div class="step-content"><div class="step-title">サイズの選択</div><div class="step-desc">縦長・横長・正方形などのプリセット。GPT Imageは16の倍数制約があるので、あらかじめ対応済みの数値を選択肢にする。</div></div></div>
+      <div class="step"><div class="step-marker" style="background: var(--blue-600);">3</div><div class="step-content"><div class="step-title">対話型のヒアリング</div><div class="step-desc">いきなり生成しない。AIが質問形式でイメージを聞き取り、最適なプロンプトを組み立てる。<br>「どんな雰囲気？」「ターゲットは？」「入れたいキャッチコピーは？」<br>——前回のデモで見た、コスト削減のための対話設計。</div></div></div>
+      <div class="step"><div class="step-marker" style="background: var(--blue-600);">4</div><div class="step-content"><div class="step-title">プロンプトの自動生成</div><div class="step-desc">対話の結果をもとに、画像生成用のプロンプトを自動構築。足りない要素はAIが補完。</div></div></div>
+      <div class="step"><div class="step-marker" style="background: var(--blue-600);">5</div><div class="step-content"><div class="step-title">生成＆保存（API接続後）</div><div class="step-desc">ここがAPI接続部分。今日はこの手前まで。ボタンは配置するが、APIキーが入るまではダミー動作。</div></div></div>
+    </div>
+  </div>
+
+  <div class="card card-orange">
+    <div class="card-label cl-orange">設計のポイント — 「失敗を減らす」設計</div>
+    <div class="prose">
+      <p>画像生成は1回230円。「とりあえず作ってみて」を繰り返すとコストがかさむ。</p>
+      <p>だから<strong>対話で要件を詰めてからプロンプトを作り、1発でいい画像を出す</strong>設計にする。<br>前回のデモで見た通り、この「対話→プロンプト生成→確認→生成」のフローが、コスト管理と品質の両立のカギです。</p>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(0)">← 前へ</button>
+    <span class="page-counter">1 / 4</span>
+    <button class="page-nav-btn primary" onclick="goPage(2)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 2: 実践：作る ━━━ -->
+<div class="page" data-page="2">
+  <div class="section-header">
+    <div class="section-number">Section 02 — Build</div>
+    <h2 class="section-title">実践：アプリを作る</h2>
+  </div>
+  <div class="prose">
+    <p>設計が固まったら、<strong>手を動かす時間</strong>です。<br>Geminiのキャンバスモードで、バナー作成アプリを一緒に構築していきます。</p>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">制作の進め方</div>
+    <div class="steps">
+      <div class="step"><div class="step-marker">1</div><div class="step-content"><div class="step-title">まずUI（画面の見た目）を作る（15分）</div><div class="step-desc">用途選択、サイズ選択、対話エリア、プロンプト表示エリア、生成ボタン。<br>見た目が先にあると、完成形がイメージしやすい。</div></div></div>
+      <div class="step"><div class="step-marker">2</div><div class="step-content"><div class="step-title">対話フローを組み込む（20分）</div><div class="step-desc">ユーザーが用途を選ぶ→AIが質問を出す→回答に応じて次の質問→最終的にプロンプトを生成。<br>この「対話ロジック」がアプリの心臓部。</div></div></div>
+      <div class="step"><div class="step-marker">3</div><div class="step-content"><div class="step-title">プロンプト生成ロジックを作る（15分）</div><div class="step-desc">対話の結果を1つのプロンプト文に組み立てる。テンプレートベースで、変数（サイズ、雰囲気、色、コピー）を埋め込む形。</div></div></div>
+      <div class="step"><div class="step-marker">4</div><div class="step-content"><div class="step-title">API接続ポイントを用意する（10分）</div><div class="step-desc">「ここにAPIキーを入れれば動く」状態にする。ダミーのレスポンスを表示して、動作フローを確認。</div></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label cl-blue">初手のプロンプト</div>
+    <div class="prompt-box">以下の仕様でバナー作成支援Webアプリを作ってください。
+キャンバスモードで、プロモードで作ってください。
+
+【目的】
+メガネ店の店舗スタッフが、広告バナー・POP・チラシ用の
+画像を生成するためのアプリ。
+
+【画面構成】
+1. 用途選択（広告バナー / 店頭POP / チラシ / SNS投稿）
+2. サイズ選択（横長1792×1024 / 縦長1024×1792 / 正方形1024×1024）
+3. 対話エリア（AIがヒアリング→ユーザーが回答するチャット形式）
+4. 生成されたプロンプトの表示エリア（コピーボタン付き）
+5. 「画像を生成」ボタン（API接続用。今はダミー動作でOK）
+
+【対話フロー】
+ユーザーが用途とサイズを選んだ後、以下を順に聞く：
+- ターゲット層は？（例：20代女性 / 家族連れ / シニア）
+- どんな雰囲気にしたい？（選択肢をサジェスト）
+- 入れたいキャッチコピーやテキストはある？
+- 使いたい色やブランドカラーは？
+- その他の要望（自由記述）
+
+回答をもとに、画像生成用のプロンプトを自動で組み立てて表示する。
+
+【デザイン】
+シンプルで使いやすい。ティールグリーン基調。
+スマホでも使えるレスポンシブ対応。</div>
+  </div>
+
+  <div class="note">
+    <div class="note-label">制作中のTips</div>
+    <p><strong>うまくいかない時は：</strong>エラーをそのままGeminiに貼る。見た目が違うならスクショを撮って貼る。<br><strong>チャットが長くなったら：</strong>引き継ぎ書を作って新しいチャットへ。<br><strong>「それ以外は変更しないで」を忘れずに。</strong></p>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(1)">← 前へ</button>
+    <span class="page-counter">2 / 4</span>
+    <button class="page-nav-btn primary" onclick="goPage(3)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 3: 自走ガイド ━━━ -->
+<div class="page" data-page="3">
+  <div class="section-header">
+    <div class="section-number">Section 03 — Toolkit</div>
+    <h2 class="section-title">研修後の自走ガイド</h2>
+  </div>
+  <div class="prose">
+    <p>研修は今日で終わりますが、<strong>AIとの付き合いは今日から始まります。</strong></p>
+    <p>ここに、研修後もひとりで走り続けるための装備をまとめました。<br>困った時はこのページに戻ってきてください。</p>
+  </div>
+
+  <div class="card card-teal">
+    <div class="card-label cl-teal">困ったときの自己解決フロー</div>
+    <div class="strength-grid">
+      <div class="strength-item" style="border-left: 4px solid var(--teal-600);">
+        <div class="strength-icon">🐛</div>
+        <div class="strength-title">エラーが出た</div>
+        <div class="strength-desc">エラーメッセージをそのままGeminiに貼る。「これ直して」でOK。自分で読み解こうとしなくていい。</div>
+      </div>
+      <div class="strength-item" style="border-left: 4px solid var(--blue-600);">
+        <div class="strength-icon">🖼️</div>
+        <div class="strength-title">見た目が違う</div>
+        <div class="strength-desc">スクショを撮ってGeminiに貼る。赤丸や矢印で「ここが違う」を示すとなお良い。</div>
+      </div>
+      <div class="strength-item" style="border-left: 4px solid var(--purple-600);">
+        <div class="strength-icon">💬</div>
+        <div class="strength-title">チャットが長くなった</div>
+        <div class="strength-desc">引き継ぎ書を作って新しいチャットへ。AI申し送りノートも冒頭に貼る。</div>
+      </div>
+      <div class="strength-item" style="border-left: 4px solid var(--orange-600);">
+        <div class="strength-icon">🔍</div>
+        <div class="strength-title">コードが怪しい</div>
+        <div class="strength-desc">ChatGPTにセカンドオピニオンを取る。「このコードにセキュリティ問題・バグ・不要なコードがないか確認して」。</div>
+      </div>
+      <div class="strength-item" style="border-left: 4px solid var(--green-600);">
+        <div class="strength-icon">🤖</div>
+        <div class="strength-title">AIの回答が的外れ</div>
+        <div class="strength-desc">モードを確認（高速→プロモードに変更）。依頼を分割して1ステップずつ頼む。前提を全部書き直す。</div>
+      </div>
+      <div class="strength-item" style="border-left: 4px solid var(--teal-600);">
+        <div class="strength-icon">📝</div>
+        <div class="strength-title">前回の続きがうまくいかない</div>
+        <div class="strength-desc">AI申し送りノートを新しいチャットの冒頭に貼る。毎回ゼロから説明し直さなくていい。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card card-blue">
+    <div class="card-label cl-blue">手元に残っている武器</div>
+    <div class="approach-grid">
+      <div class="approach-card" style="border-left: 4px solid var(--teal-600);">
+        <div class="approach-header">
+          <div class="approach-icon" style="background: var(--teal-50);">🧠</div>
+          <div><div class="approach-name">AI申し送りノート</div><div class="approach-sub">セッションを超えてAIを「育てる」仕組み</div></div>
+        </div>
+        <div class="approach-body">作業のたびに教訓を1行追記する。これが溜まるほど、AIの出力精度が上がる。プロジェクトごとに分けて管理。</div>
+      </div>
+      <div class="approach-card" style="border-left: 4px solid var(--blue-600);">
+        <div class="approach-header">
+          <div class="approach-icon" style="background: var(--blue-50);">📚</div>
+          <div><div class="approach-name">NotebookLM</div><div class="approach-sub">チームで共有できる専門AI</div></div>
+        </div>
+        <div class="approach-body">売上データ、過去POP、マニュアルを読み込ませて「深く聞く」。Googleドライブ連携で動的に更新。チーム共有可能。</div>
+      </div>
+      <div class="approach-card" style="border-left: 4px solid var(--purple-600);">
+        <div class="approach-header">
+          <div class="approach-icon" style="background: var(--purple-50);">💎</div>
+          <div><div class="approach-name">Gems（チャットボット）</div><div class="approach-sub">就業規則ボット、接客QA</div></div>
+        </div>
+        <div class="approach-body">指示文＋知識ベースで専門AIを構築。「広く聞く」用途。プロンプトの精度が品質を決める。</div>
+      </div>
+      <div class="approach-card" style="border-left: 4px solid var(--green-600);">
+        <div class="approach-header">
+          <div class="approach-icon" style="background: var(--green-50);">🚀</div>
+          <div><div class="approach-name">GASデプロイ</div><div class="approach-sub">作ったものを社内全員に共有</div></div>
+        </div>
+        <div class="approach-body">キャンバスで作る→GASにコード貼り付け→デプロイ→URL共有。予算シミュレーターで実証済み。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🔑</div>
+    <div class="callout-text">研修で学んだのは「答え」ではなく「問い方」。</div>
+    <div class="callout-sub">
+      AIは日々進化します。今日使えるツールが来月には変わるかもしれない。<br>
+      でも「仕事を分解する」「1ステップずつ依頼する」「申し送りノートで育てる」<br>
+      この考え方は、どんなAIが来ても変わりません。
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(2)">← 前へ</button>
+    <span class="page-counter">3 / 4</span>
+    <button class="page-nav-btn primary" onclick="goPage(4)">次へ →</button>
+  </div>
+</div>
+
+<!-- ━━━ Page 4: 卒業 ━━━ -->
+<div class="page" data-page="4">
+  <div class="section-header">
+    <div class="section-number">Graduation</div>
+    <h2 class="section-title">卒業 — 6回の軌跡</h2>
+  </div>
+  <div class="prose"><p>6回の研修を振り返ります。</p></div>
+
+  <div class="roadmap">
+    <div class="roadmap-item completed">
+      <div>
+        <div class="roadmap-label">Session 01</div>
+        <div class="roadmap-title">AIへの「伝え方」を学ぶ</div>
+        <div class="roadmap-desc">仕事の分解、メタプロンプト、フレームワーク。AIとの対話の基礎を築いた。</div>
+      </div>
+    </div>
+    <div class="roadmap-item completed">
+      <div>
+        <div class="roadmap-label">Session 02</div>
+        <div class="roadmap-title">テクニックを身につける</div>
+        <div class="roadmap-desc">モードの使い分け、データ分析の4ステップ、Gemsでチャットボット作成。</div>
+      </div>
+    </div>
+    <div class="roadmap-item completed">
+      <div>
+        <div class="roadmap-label">Session 03</div>
+        <div class="roadmap-title">「作る」を本格化する</div>
+        <div class="roadmap-desc">Claude Codeデモで最前線を体感。キャンバスで予算シミュレーターを着手。バイブコーディングの始まり。</div>
+      </div>
+    </div>
+    <div class="roadmap-item completed">
+      <div>
+        <div class="roadmap-label">Session 04</div>
+        <div class="roadmap-title">外部データ連携 ＋ 再構築</div>
+        <div class="roadmap-desc">天気API、NHK番組表、祝日API。予算シミュレーターをゼロから再構築し、GASでWebアプリとしてデプロイ。</div>
+      </div>
+    </div>
+    <div class="roadmap-item completed">
+      <div>
+        <div class="roadmap-label">Session 05</div>
+        <div class="roadmap-title">APIを手に入れる</div>
+        <div class="roadmap-desc">APIの基礎とセキュリティ。NotebookLMの共有活用。バナーマのデモで「作りたい！」が生まれた。</div>
+      </div>
+    </div>
+    <div class="roadmap-item current">
+      <div>
+        <div class="roadmap-label">Session 06（今日）</div>
+        <div class="roadmap-title">作って、巣立つ</div>
+        <div class="roadmap-desc">バナー作成アプリを制作。自走のための装備を手に。ここから先は、自分の力で。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="callout">
+    <div class="callout-icon">🎓</div>
+    <div class="callout-text">6回の研修、お疲れさまでした。</div>
+    <div class="callout-sub">
+      Session 01で「AIへの伝え方」を学び、Session 06で「AIと一緒にアプリを作る」ところまで来ました。<br>
+      ここから先は、三澤さん自身のプロジェクトです。<br>
+      困った時は、前のページの自走ガイドを思い出してください。
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="page-nav-btn" onclick="goPage(3)">← 前へ</button>
+    <span class="page-counter">4 / 4</span>
+    <button class="page-nav-btn hidden">次へ →</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const pages = document.querySelectorAll('.page');
+  function goPage(idx) {
+    tabBtns.forEach(b => b.classList.remove('active'));
+    tabBtns[idx].classList.add('active');
+    pages.forEach(p => p.classList.remove('active'));
+    pages[idx].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => goPage(parseInt(btn.dataset.page)));
+  });
+</script>
+</body>
+</html>
