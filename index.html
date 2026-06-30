@@ -457,6 +457,107 @@
     font-weight: 500;
   }
 
+  /* ─── Certificate section ─── */
+  .cert-section {
+    margin-top: 48px;
+    padding-top: 40px;
+    border-top: 1px solid var(--gray-200);
+  }
+
+  .cert-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .cert-section-header .cert-icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cert-section-header .cert-icon svg {
+    width: 22px; height: 22px;
+    fill: white;
+  }
+
+  .cert-section-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gray-900);
+    letter-spacing: -0.01em;
+  }
+
+  .cert-section-header p {
+    font-size: 13px;
+    color: var(--gray-500);
+    margin-top: 2px;
+  }
+
+  .cert-card {
+    background: linear-gradient(135deg, #fffbeb, #fef3c7, #fffbeb);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm), 0 0 0 1px rgba(217,119,6,0.12);
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    max-width: 480px;
+  }
+
+  .cert-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg), 0 0 0 1px rgba(217,119,6,0.2);
+  }
+
+  .cert-card .card-accent {
+    height: 6px;
+    background: linear-gradient(90deg, #f59e0b, #d97706, #b45309);
+  }
+
+  .cert-card .card-body {
+    padding: 28px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .cert-card .cert-medal {
+    width: 56px; height: 56px;
+    flex-shrink: 0;
+  }
+
+  .cert-card .cert-text h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #92400e;
+    margin-bottom: 4px;
+  }
+
+  .cert-card .cert-text p {
+    font-size: 13px;
+    color: #b45309;
+  }
+
+  .cert-card .card-footer {
+    padding: 12px 24px;
+    border-top: 1px solid rgba(217,119,6,0.12);
+    background: rgba(255,255,255,0.5);
+  }
+
+  .cert-card .card-footer .open-label {
+    color: #b45309;
+  }
+
+  .cert-card .card-footer .open-label svg {
+    fill: #b45309;
+  }
+
   /* ─── Footer ─── */
   .dash-footer {
     text-align: center;
@@ -525,6 +626,7 @@
     <div class="dash-welcome" id="dash-welcome"></div>
     <div id="tab-nav-area"></div>
     <div class="session-grid" id="session-grid"></div>
+    <div id="certificate-area"></div>
   </main>
 
   <footer class="dash-footer">
@@ -606,6 +708,14 @@ const SESSIONS = {
     { day: 5, label: 'DAY 5', title: '全部まとめて前に進める', desc: 'データ連携・シフト管理・評価シート', file: 'sessions/session05-osada.html', accent: 'day5' },
     { day: 6, label: 'DAY 6', title: '最終回：ここから先は、自分の力で', desc: '総まとめ・自走キット', file: 'sessions/session06-osada.html', accent: 'day6' },
   ],
+};
+
+// 修了証データ
+const CERTIFICATES = {
+  misawa: { name: '三澤朋恵', file: 'certificates/certificate-misawa.html' },
+  kuboki: { name: '久保木教文', file: 'certificates/certificate-kuboki.html' },
+  ojima:  { name: '小島千春', file: 'certificates/certificate-ojima.html' },
+  osada:  { name: '長田直樹', file: 'certificates/certificate-osada.html' },
 };
 
 // ─── Login Logic ───
@@ -718,6 +828,51 @@ function renderSessions(memberId) {
       </div>
     </a>
   `).join('');
+
+  renderCertificate(memberId);
+}
+
+function renderCertificate(memberId) {
+  const cert = CERTIFICATES[memberId];
+  const area = document.getElementById('certificate-area');
+  if (!cert) { area.innerHTML = ''; return; }
+
+  area.innerHTML = `
+    <div class="cert-section">
+      <div class="cert-section-header">
+        <div class="cert-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        </div>
+        <div>
+          <h3>修了証書</h3>
+          <p>全6回のAI研修プログラムを修了しました</p>
+        </div>
+      </div>
+      <a class="cert-card" href="${cert.file}" target="_blank" rel="noopener">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <svg class="cert-medal" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="28" cy="24" r="18" fill="#f59e0b" opacity="0.15"/>
+            <circle cx="28" cy="24" r="13" fill="#f59e0b" opacity="0.25"/>
+            <circle cx="28" cy="24" r="9" fill="#d97706"/>
+            <path d="M28 19l2.09 4.23L35 24.02l-3.5 3.41.83 4.82L28 30.27l-4.33 1.98.83-4.82L21 24.02l4.91-.79L28 19z" fill="#fffbeb"/>
+            <path d="M22 36l2-8M34 36l-2-8" stroke="#d97706" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+          <div class="cert-text">
+            <h4>${cert.name}</h4>
+            <p>AI活用研修 修了証書</p>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="open-label">
+            証書を開く
+            <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="#b45309"/></svg>
+          </span>
+          ${currentUser.role === 'owner' ? `<span class="person-tag">${ACCOUNTS[memberId].name}</span>` : ''}
+        </div>
+      </a>
+    </div>
+  `;
 }
 </script>
 

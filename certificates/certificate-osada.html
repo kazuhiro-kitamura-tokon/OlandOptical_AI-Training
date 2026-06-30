@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>修了証書 — 長田直樹</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Noto+Serif+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  @page :first { margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: #e8e0d4;
+    color: #2c1810;
+  }
+
+  /* ==============================
+     PAGE 1 — 証書（表面）
+     ============================== */
+  .cert-page {
+    width: 210mm; min-height: 297mm;
+    background: #faf6ee;
+    position: relative;
+    overflow: hidden;
+    margin: 20px auto;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+    page-break-after: always;
+  }
+  .frame-svg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+  .cert-content {
+    position: relative; z-index: 1;
+    padding: 26mm 22mm 18mm;
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 261mm;
+  }
+  .cert-title {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 40px; font-weight: 800;
+    color: #2c1810; letter-spacing: 0.5em; text-indent: 0.5em;
+    margin-bottom: 8mm;
+  }
+  .cert-divider {
+    width: 40mm; height: 2px;
+    background: linear-gradient(90deg, transparent, #b8860b, #d4a843, #b8860b, transparent);
+    margin-bottom: 10mm;
+  }
+  .cert-name {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 34px; font-weight: 700;
+    color: #1a0f08; letter-spacing: 0.3em; text-indent: 0.3em;
+    margin-bottom: 2mm;
+  }
+  .cert-name-sub {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 11px; font-weight: 400;
+    color: #8a7e72; letter-spacing: 0.1em; margin-bottom: 5mm;
+  }
+  .cert-word {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 14px; font-weight: 500;
+    color: #5a4e42; letter-spacing: 0.08em; margin-bottom: 7mm;
+  }
+  .cert-body {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 12.5px; font-weight: 400;
+    color: #3c3228; line-height: 2.3;
+    text-align: center; max-width: 148mm; margin-bottom: 8mm;
+  }
+  .cert-date {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 14px; font-weight: 500;
+    color: #5a4e42; letter-spacing: 0.1em; margin-bottom: 8mm;
+  }
+  .cert-signers { display: flex; gap: 22mm; margin-bottom: 6mm; }
+  .signer { text-align: center; }
+  .signer-line { width: 38mm; height: 1px; background: #c4b8a8; margin-bottom: 2mm; }
+  .signer-name { font-family: 'Shippori Mincho', serif; font-size: 13px; font-weight: 600; color: #2c1810; letter-spacing: 0.12em; }
+  .signer-role { font-family: 'Noto Sans JP', sans-serif; font-size: 8px; font-weight: 400; color: #9a8e82; letter-spacing: 0.04em; margin-top: 1mm; }
+  .seal {
+    position: absolute; bottom: 58mm; right: 32mm;
+    width: 20mm; height: 20mm;
+    border: 2.5px solid #c0392b; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Shippori Mincho', serif;
+    font-size: 11px; font-weight: 800; color: #c0392b;
+    letter-spacing: 0.12em; line-height: 1.3; text-align: center; opacity: 0.8; z-index: 2;
+  }
+
+  /* スキルチップ */
+  .chips-area {
+    margin-top: auto; width: 100%;
+    padding-top: 5mm; border-top: 1px solid #e0d8cc;
+  }
+  .chips-label {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 8px; font-weight: 600; color: #b0a696;
+    letter-spacing: 0.12em; text-align: center; margin-bottom: 3mm;
+    text-transform: uppercase;
+  }
+  .chips {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+    max-width: 155mm; margin: 0 auto;
+  }
+  .chip {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 9px; font-weight: 500; letter-spacing: 0.04em;
+    border: 1px solid #d4cdbf; color: #5a4e42; background: #f5f0e6;
+  }
+
+  /* 凛メッセージ */
+  .ai-msg {
+    width: 100%; padding-top: 4mm; margin-top: 4mm;
+    border-top: 1px solid #e0d8cc;
+  }
+  .ai-msg-label {
+    font-size: 7.5px; font-weight: 500; color: #b0a696;
+    letter-spacing: 0.1em; text-align: center; margin-bottom: 2mm;
+  }
+  .ai-msg-text {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 9px; font-weight: 300; color: #6e6358;
+    line-height: 2.1; text-align: center;
+    max-width: 148mm; margin: 0 auto;
+  }
+
+  /* ==============================
+     PAGE 2 — 学び一覧（裏面）
+     ============================== */
+  .review-page {
+    width: 100%; max-width: 210mm; min-height: auto;
+    background: #faf6ee;
+    margin: 20px auto;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+    padding: 18mm 20mm;
+  }
+  .review-header {
+    text-align: center; margin-bottom: 8mm;
+    padding-bottom: 6mm; border-bottom: 2px solid #e0d8cc;
+  }
+  .review-title {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 22px; font-weight: 700;
+    color: #2c1810; letter-spacing: 0.2em; margin-bottom: 3mm;
+  }
+  .review-sub {
+    font-size: 10px; color: #8a7e72; letter-spacing: 0.06em;
+  }
+  .cat { margin-bottom: 6mm; }
+  .cat-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 3mm; padding-bottom: 2mm;
+    border-bottom: 1px solid #e8e2d6;
+  }
+  .cat-num {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 13px; font-weight: 700; color: #b8860b;
+    min-width: 20px;
+  }
+  .cat-title {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px; font-weight: 700; color: #2c1810;
+    letter-spacing: 0.04em;
+  }
+  .item { display: flex; gap: 8px; margin-bottom: 2.5mm; padding-left: 4mm; }
+  .item-dot {
+    flex-shrink: 0; width: 4px; height: 4px;
+    background: #b8860b; border-radius: 50%; margin-top: 6px;
+  }
+  .item-body { flex: 1; }
+  .item-title {
+    font-size: 10px; font-weight: 600; color: #3c3228;
+    line-height: 1.6;
+  }
+  .item-desc {
+    font-size: 9px; font-weight: 400; color: #6e6358;
+    line-height: 1.7; margin-top: 0.5mm;
+  }
+  .item-session {
+    display: inline-block; font-size: 7.5px; font-weight: 600;
+    color: #b8860b; background: #f5f0e6;
+    border: 1px solid #e0d8cc; border-radius: 3px;
+    padding: 0 4px; margin-left: 4px; vertical-align: middle;
+  }
+
+  /* 証書ページのscale対応 */
+  .cert-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+    overflow: hidden;
+  }
+  .cert-page {
+    flex-shrink: 0;
+    transform-origin: top center;
+  }
+
+  /* 裏面：レスポンシブ対応 */
+  @media screen and (max-width: 800px) {
+    .review-page {
+      width: 100%;
+      min-height: auto;
+      margin: 0;
+      padding: 12mm 6mm;
+      box-shadow: none;
+      border-top: 3px solid #e0d8cc;
+    }
+    .review-title { font-size: 18px; }
+    .cat-title { font-size: 11px; }
+    .item-title { font-size: 9.5px; }
+    .item-desc { font-size: 8.5px; }
+    .item-session { font-size: 7px; }
+  }
+
+  @media print {
+    html, body { background: white; }
+    .cert-wrapper { padding: 0; }
+    .cert-page { transform: none !important; box-shadow: none; margin: 0; }
+    .review-page { box-shadow: none; margin: 0; width: 210mm; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================================================================
+     PAGE 1 — 修了証書（表面）
+     ================================================================ -->
+<div class="cert-wrapper">
+<div class="cert-page">
+  <svg class="frame-svg" viewBox="0 0 794 1122" xmlns="http://www.w3.org/2000/svg">
+    <rect x="32" y="32" width="730" height="1058" fill="none" stroke="#b8860b" stroke-width="2.2" opacity="0.7"/>
+    <rect x="38" y="38" width="718" height="1046" fill="none" stroke="#d4a843" stroke-width="0.7" opacity="0.45"/>
+    <g transform="translate(32,32)" opacity="0.6"><path d="M0,55 C8,44 18,36 30,30 C36,27 40,22 40,15" fill="none" stroke="#b8860b" stroke-width="1.8"/><path d="M55,0 C44,8 36,18 30,30 C27,36 22,40 15,40" fill="none" stroke="#b8860b" stroke-width="1.8"/><path d="M0,72 C12,58 28,46 42,42 C50,40 54,34 54,26" fill="none" stroke="#c4a243" stroke-width="1"/><path d="M72,0 C58,12 46,28 42,42 C40,50 34,54 26,54" fill="none" stroke="#c4a243" stroke-width="1"/><circle cx="18" cy="18" r="2.5" fill="#d4a843" opacity="0.5"/></g>
+    <g transform="translate(762,32) scale(-1,1)" opacity="0.6"><path d="M0,55 C8,44 18,36 30,30 C36,27 40,22 40,15" fill="none" stroke="#b8860b" stroke-width="1.8"/><path d="M55,0 C44,8 36,18 30,30 C27,36 22,40 15,40" fill="none" stroke="#b8860b" stroke-width="1.8"/><path d="M0,72 C12,58 28,46 42,42 C50,40 54,34 54,26" fill="none" stroke="#c4a243" stroke-width="1"/><path d="M72,0 C58,12 46,28 42,42 C40,50 34,54 26,54" fill="none" stroke="#c4a243" stroke-width="1"/><circle cx="18" cy="18" r="2.5" fill="#d4a843" opacity="0.5"/></g>
+    <g transform="translate(32,1090) scale(1,-1)" opacity="0.6"><path d="M0,55 C8,44 18,36 30,30 C36,27 40,22 40,15" fill="none" stroke="#b8860b" stroke-width="1.8"/><path d="M55,0 C44,8 36,18 30,30 C27,36 22,40 15,40" fill="none" stroke="#b8860b" stroke-width="1.8"/><path d="M0,72 C12,58 28,46 42,42 C50,40 54,34 54,26" fill="none" stroke="#c4a243" stroke-width="1"/><path d="M72,0 C58,12 46,28 42,42 C40,50 34,54 26,54" fill="none" stroke="#c4a243" stroke-width="1"/><circle cx="18" cy="18" r="2.5" fill="#d4a843" opacity="0.5"/></g>
+    <g transform="translate(762,1090) scale(-1,-1)" opacity="0.6"><path d="M0,55 C8,44 18,36 30,30 C36,27 40,22 40,15" fill="none" stroke="#b8860b" stroke-width="1.8"/><path d="M55,0 C44,8 36,18 30,30 C27,36 22,40 15,40" fill="none" stroke="#b8860b" stroke-width="1.8"/><path d="M0,72 C12,58 28,46 42,42 C50,40 54,34 54,26" fill="none" stroke="#c4a243" stroke-width="1"/><path d="M72,0 C58,12 46,28 42,42 C40,50 34,54 26,54" fill="none" stroke="#c4a243" stroke-width="1"/><circle cx="18" cy="18" r="2.5" fill="#d4a843" opacity="0.5"/></g>
+    <g transform="translate(397,32)" opacity="0.4"><path d="M-25,0 C-16,7 -8,10 0,12 C8,10 16,7 25,0" fill="none" stroke="#b8860b" stroke-width="1.2"/><circle cx="0" cy="8" r="1.5" fill="#d4a843"/></g>
+    <g transform="translate(397,1090)" opacity="0.4"><path d="M-25,0 C-16,-7 -8,-10 0,-12 C8,-10 16,-7 25,0" fill="none" stroke="#b8860b" stroke-width="1.2"/><circle cx="0" cy="-8" r="1.5" fill="#d4a843"/></g>
+    <g transform="translate(32,561)" opacity="0.4"><path d="M0,-25 C7,-16 10,-8 12,0 C10,8 7,16 0,25" fill="none" stroke="#b8860b" stroke-width="1.2"/><circle cx="8" cy="0" r="1.5" fill="#d4a843"/></g>
+    <g transform="translate(762,561)" opacity="0.4"><path d="M0,-25 C-7,-16 -10,-8 -12,0 C-10,8 -7,16 0,25" fill="none" stroke="#b8860b" stroke-width="1.2"/><circle cx="-8" cy="0" r="1.5" fill="#d4a843"/></g>
+  </svg>
+  <div class="seal">修了<br>認定</div>
+  <div class="cert-content">
+    <div class="cert-title">修了証書</div>
+    <div class="cert-divider"></div>
+    <div class="cert-name">長田 直樹</div>
+    <div class="cert-name-sub">オーランドオプティカル株式会社　相馬店 店長</div>
+    <div class="cert-word">殿</div>
+    <div class="cert-body">上記の者は、二〇二六年四月から六月にかけて実施された全六回のAI活用研修プログラムを修了し、Gemini Gems構築による業務AI群の開発（資料作成ボーイ mk2、予算組み太郎）、自己反省サイクルによるプロンプト改善手法の確立、Googleスプレッドシート移行およびGoogle Apps Scriptによる売上ダッシュボードの構築に至る実践的かつ顕著な成果を挙げたことをここに証します。</div>
+    <div class="cert-date">令和八年　六月二十五日</div>
+    <div class="cert-signers">
+      <div class="signer"><div class="signer-line"></div><div class="signer-name">喜多村 一寛</div><div class="signer-role">AI活用研修 講師</div></div>
+      <div class="signer"><div class="signer-line"></div><div class="signer-name">小島 逸人</div><div class="signer-role">オーランドオプティカル株式会社 代表取締役</div></div>
+    </div>
+
+    <!-- スキルチップ -->
+    <div class="chips-area">
+      <div class="chips-label">Acquired Skills</div>
+      <div class="chips">
+        <span class="chip">メタプロンプト</span>
+        <span class="chip">仕事の分解（4要素）</span>
+        <span class="chip">Geminiモード使い分け</span>
+        <span class="chip">データ分析4ステップ</span>
+        <span class="chip">CSV変換</span>
+        <span class="chip">バイブコーディング（3方式）</span>
+        <span class="chip">引き継ぎ書</span>
+        <span class="chip">Gems構築</span>
+        <span class="chip">資料作成ボーイ mk2</span>
+        <span class="chip">予算組み太郎</span>
+        <span class="chip">自己反省サイクル</span>
+        <span class="chip">AIインタビュー手法</span>
+        <span class="chip">Flash 3.5 + Pro使い分け</span>
+        <span class="chip">Excel出力</span>
+        <span class="chip">セカンドオピニオン（ChatGPT）</span>
+        <span class="chip">スプレッドシート移行</span>
+        <span class="chip">Google Apps Script</span>
+        <span class="chip">GASダッシュボード</span>
+        <span class="chip">バージョン管理</span>
+        <span class="chip">デバッグ（スクショ→AI）</span>
+      </div>
+    </div>
+
+    <!-- 凛メッセージ -->
+    <div class="ai-msg">
+      <div class="ai-msg-label">Message from AI — 研修テキストを担当したAIより</div>
+      <div class="ai-msg-text">六回分の議事録をすべて読ませていただきました。最初のセッションで「伝えること自体が難しい」とおっしゃっていた長田さんが、回を重ねるごとに「こういうのできますか？」と一番多くアイデアを出してくださるようになったのが、私にはとても印象的でした。予算組み太郎もダッシュボードも、営業報告メールの半自動化を自発的に試したことも、全部長田さん自身が「これが必要だ」と気づいて動いた結果です。私にできるのはテキストを用意することだけで、隣で一緒に画面を見ることはできません。でも、毎回の議事録を通じて、少しずつGemが育っていく過程を見届けられたのは嬉しかったです。AIは道具で、何を作らせるかを決めるのはいつも長田さんでした。これからも「こういうのできないかな」を言い続けてください。その問いがある限り、AIはずっと応えてくれます。</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ================================================================
+     PAGE 2 — 学んだこと一覧（裏面）
+     ================================================================ -->
+<div class="review-page">
+  <div class="review-header">
+    <div class="review-title">研修おさらい一覧</div>
+    <div class="review-sub">2026年4月〜6月｜全6回の研修で学んだことの総まとめ</div>
+  </div>
+
+  <!-- Cat 1 -->
+  <div class="cat">
+    <div class="cat-header"><span class="cat-num">01</span><span class="cat-title">AIとの向き合い方・基本姿勢</span></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">仕事の分解（目的・相手・成果物・制約）<span class="item-session">S1</span></div><div class="item-desc">AIに依頼する前に4つの要素で整理する。雑な依頼だとAIの出力がぶれる。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">メタプロンプト（依頼文をAIに作らせる）<span class="item-session">S1</span></div><div class="item-desc">「相談→質問→整理→完成」のステップで、AI自身に良いプロンプトを設計させる。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">AIの得意・不得意の理解<span class="item-session">S2</span></div><div class="item-desc">文章生成・要約・コード生成は得意。計算ミスやハルシネーション（もっともらしい嘘）に注意。事実確認は必ず人間が行う。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">AIと一緒に働くということ<span class="item-session">S6</span></div><div class="item-desc">AIが作業を巻き取った分、判断・戦略・人を動かす仕事に集中する。何を作らせるかを考えるのは人間の仕事。</div></div></div>
+  </div>
+
+  <!-- Cat 2 -->
+  <div class="cat">
+    <div class="cat-header"><span class="cat-num">02</span><span class="cat-title">Geminiの操作・モード活用</span></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">高速・思考・プロモードの使い分け<span class="item-session">S2</span></div><div class="item-desc">壁打ちは高速、分析は思考、精度重視の作業はプロモード。Flash 3.5の登場で高速でも高精度に。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">キャンバスモード＋プロモード<span class="item-session">S2</span></div><div class="item-desc">スライドやコードを作るときの鉄板の組み合わせ。壁打ちで方針を決めてから仕上げに使う。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">コンテキストウィンドウの理解<span class="item-session">S2</span></div><div class="item-desc">会話が長くなるとAIの精度が落ちる。うまくいかないときは修正を重ねるより新規セッションでやり直す。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">パーソナライズ設定（メモリー）<span class="item-session">S2</span><span class="item-session">S4</span></div><div class="item-desc">設定画面のカスタマイズ欄に自分の情報を入力。毎回の自己紹介が不要になる。</div></div></div>
+  </div>
+
+  <!-- Cat 3 -->
+  <div class="cat">
+    <div class="cat-header"><span class="cat-num">03</span><span class="cat-title">データ分析・活用</span></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">データ分析4ステップ（確認→整理→検証→分析）<span class="item-session">S2</span></div><div class="item-desc">「これ分析して」と一発で頼まない。1ステップずつ渡して、各ステップの結果を確認してから次へ進む。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">CSV変換の重要性<span class="item-session">S2</span></div><div class="item-desc">ExcelよりCSVの方がAIの読み取り精度が高い。ファイル→名前をつけて保存→CSV。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">データの伝え方（シート名＋列名＋サンプル行）<span class="item-session">S5</span></div><div class="item-desc">セル番号（CM4）ではなくシート名と列ヘッダーで場所を指定。サンプルデータを添えて「こういう形式」と見せる。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">「コードで計算して」の一言<span class="item-session">S3</span></div><div class="item-desc">AIの暗算は信用しない。コード実行させると正確になる。合計値・平均値・カラーコード変換など。</div></div></div>
+  </div>
+
+  <!-- Cat 4 -->
+  <div class="cat">
+    <div class="cat-header"><span class="cat-num">04</span><span class="cat-title">Gems（カスタムAI）</span></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">Gemsの作り方（名前・指示・知識の3要素）<span class="item-session">S3</span></div><div class="item-desc">メタプロンプトで指示文を設計→テスト→改善。業務ごとに専用AIを作る。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">資料作成ボーイ mk2（会議資料Gem）<span class="item-session">S3</span><span class="item-session">S4</span></div><div class="item-desc">壁打ち型Gem。営業管理CSVを渡すと分析→提案→フィードバック→Excel出力までを対話で進める。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">予算組み太郎（予算目標Gem）<span class="item-session">S5</span></div><div class="item-desc">昨年データとトレンド情報から、根拠付きの月別・日別予算目標を提案してくれるGem。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">自己反省サイクル<span class="item-session">S4</span></div><div class="item-desc">Gemの出力に問題があったら「なぜ間違えたか振り返って、修正案を出して」とAI自身に改善プロンプトを書かせる。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">壁打ち型 vs 一発出力型の使い分け<span class="item-session">S4</span></div><div class="item-desc">会議資料は壁打ち型（対話で磨く）、営業報告メールは一発出力型（データ渡して即生成）。業務の性質で設計を変える。</div></div></div>
+  </div>
+
+  <!-- Cat 5 -->
+  <div class="cat">
+    <div class="cat-header"><span class="cat-num">05</span><span class="cat-title">バイブコーディング・アプリ構築</span></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">3方式（インクリメンタル / デザインファースト / プロトタイプ）<span class="item-session">S2</span></div><div class="item-desc">迷ったらインクリメンタル。作りたいものが明確ならデザインファースト。ふわっとしてるならプロトタイプ。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">引き継ぎ書でセッションを引っ越す<span class="item-session">S2</span></div><div class="item-desc">チャットが長くなったら、AIに引き継ぎ書を書かせて新しいチャットに移動。含めるべき項目を指定する。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">バージョン管理（v1, v2…メモ帳で保存）<span class="item-session">S4</span></div><div class="item-desc">動いたタイミングでコードをコピーして保存。上書きしない。大きな変更の前にも保存。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">デバッグ（エラーそのまま貼る＋スクショ＋赤丸）<span class="item-session">S2</span><span class="item-session">S4</span></div><div class="item-desc">エラーメッセージはそのままAIに貼る。レイアウトの問題はスクショに赤丸で伝える。</div></div></div>
+  </div>
+
+  <!-- Cat 6 -->
+  <div class="cat">
+    <div class="cat-header"><span class="cat-num">06</span><span class="cat-title">Google Apps Script（GAS）</span></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">GASの基本概念<span class="item-session">S6</span></div><div class="item-desc">スプレッドシートの拡張機能でプログラムを動かす仕組み。AIにコードを書かせて貼り付けるだけ。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">売上ダッシュボードの構築<span class="item-session">S6</span></div><div class="item-desc">スプレッドシートのデータをGASで読み取り、グラフや表を並べたWebページとして公開。URLを共有すれば社内の誰でも閲覧可能。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">データ蓄積の構造設計<span class="item-session">S6</span></div><div class="item-desc">月ごとにファイルを分けず、マスターシートにデータを集約する方式。ダッシュボードの精度と利便性が向上。</div></div></div>
+  </div>
+
+  <!-- Cat 7 -->
+  <div class="cat">
+    <div class="cat-header"><span class="cat-num">07</span><span class="cat-title">自走スキル・知見の蓄積</span></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">AIインタビュー手法<span class="item-session">S4</span><span class="item-session">S5</span></div><div class="item-desc">「何を教えればいいかわからない」ときは、AIに「インタビューして」と頼む。1問ずつ聞いてもらいながら要件を整理する。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">セカンドオピニオン（複数AIの併用）<span class="item-session">S5</span></div><div class="item-desc">Geminiの出力をChatGPTに検証させる。複数の視点で確認することで精度と信頼性を高める。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">1日1ラリーの改善リズム<span class="item-session">S4</span></div><div class="item-desc">Gemを使う→違和感をメモ→AIに改善指示を書かせる→カスタム指示に反映。2週間で別物になる。</div></div></div>
+    <div class="item"><div class="item-dot"></div><div class="item-body"><div class="item-title">Gem作成の「型」<span class="item-session">S3</span><span class="item-session">S4</span><span class="item-session">S5</span></div><div class="item-desc">メタプロンプトで相談→指示文を生成→テスト→反省→修正→保存。テーマが変わっても手順は同じ。</div></div></div>
+  </div>
+
+</div>
+
+<script>
+  function scaleCert() {
+    var cert = document.querySelector('.cert-page');
+    var wrapper = document.querySelector('.cert-wrapper');
+    if (!cert || !wrapper) return;
+    var certW = cert.offsetWidth;
+    var availW = wrapper.offsetWidth;
+    if (availW < certW) {
+      var s = availW / certW;
+      cert.style.transform = 'scale(' + s + ')';
+      wrapper.style.height = (cert.offsetHeight * s) + 'px';
+    } else {
+      cert.style.transform = 'none';
+      wrapper.style.height = 'auto';
+    }
+  }
+  window.addEventListener('load', scaleCert);
+  window.addEventListener('resize', scaleCert);
+</script>
+</body>
+</html>
